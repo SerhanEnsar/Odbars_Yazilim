@@ -13,7 +13,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-transparent text-stone-200 p-4 font-mono select-none flex flex-col h-screen overflow-hidden scanlines">
+    <div className="h-screen w-screen bg-transparent text-stone-200 p-4 font-mono select-none flex flex-col overflow-hidden scanlines box-border">
       
       {/* Header */}
       <header className="flex justify-between items-center bg-[#2a241c] p-3 tactical-border shadow-lg mb-4 shrink-0">
@@ -56,7 +56,7 @@ export default function App() {
       <div className="flex-1 grid grid-cols-12 gap-4 min-h-0">
         
         {/* Left Column: Mission & Telemetry */}
-        <div className="col-span-3 flex flex-col gap-4 overflow-y-auto pr-1">
+        <div className="col-span-3 flex flex-col gap-4 overflow-y-auto pr-1 h-full pb-2">
           
           {/* Active Mode */}
           <div className="bg-[#2a241c] p-4 tactical-border relative">
@@ -140,7 +140,7 @@ export default function App() {
         </div>
 
         {/* Center & Right Column: Cameras and Target */}
-        <div className="col-span-9 flex flex-col gap-4">
+        <div className="col-span-9 flex flex-col gap-4 h-full min-h-0 pb-2">
           
           {/* Main Camera Feed */}
           <div className="flex-1 bg-[#161412] tactical-border relative overflow-hidden flex flex-col">
