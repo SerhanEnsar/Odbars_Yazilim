@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #10b981; /* Emerald 500 */
+  --color-dark-bg: #0f172a; /* Slate 900 */
+  --color-panel-bg: #1e293b; /* Slate 800 */
+  --color-danger: #ef4444; /* Red 500 */
+  --color-warning: #f59e0b; /* Amber 500 */
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-dark-bg);
+  color: #f8fafc;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
