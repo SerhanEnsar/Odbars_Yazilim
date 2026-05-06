@@ -18,18 +18,19 @@ export default function App() {
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     
+    let removeListener = null;
+
     // Electron'dan gelen canlı telemetri simülasyonunu dinle
     if (window.electronAPI && window.electronAPI.onTelemetryUpdate) {
-      console.log("Electron IPC bağlandı, veriler dinleniyor...");
-      window.electronAPI.onTelemetryUpdate((data) => {
-        console.log("Telemetri verisi alındı:", data);
-        setTelemetry(prev => ({ ...prev, ...data }));
+      removeListener = window.electronAPI.onTelemetryUpdate((data) => {
+        setTelemetry(data);
       });
-    } else {
-      console.error("HATA: window.electronAPI bulunamadı!");
     }
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      if (removeListener) removeListener();
+    };
   }, []);
 
   return (

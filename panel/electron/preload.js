@@ -1,5 +1,9 @@
-import { contextBridge, ipcRenderer } from 'electron';
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  onTelemetryUpdate: (callback) => ipcRenderer.on('telemetry-update', (_event, value) => callback(value))
+  onTelemetryUpdate: (callback) => {
+    const listener = (_event, value) => callback(value);
+    ipcRenderer.on('telemetry-update', listener);
+    return () => ipcRenderer.removeListener('telemetry-update', listener);
+  }
 });
