@@ -30,7 +30,8 @@ export default function App() {
   const [taskStatuses, setTaskStatuses] = useState({
     1: 'TAMAM', 2: 'TAMAM', 3: 'AKTİF', 4: 'BEKLEME', 5: 'BEKLEME', 6: 'BEKLEME', 7: 'BEKLEME'
   });
-  const [popupMenu, setPopupMenu] = useState({ visible: false, taskId: null, x: 0, y: 0 });
+  const [popupMenu, setPopupMenu] = useState({ visible: false, taskId: null, x: 0, y: 0, focusedOptionIndex: 0 });
+  const [focusedTaskId, setFocusedTaskId] = useState(null);
   
   const isTargeting = taskStatuses[7] === 'AKTİF';
 
@@ -53,24 +54,87 @@ export default function App() {
       });
     }
 
+    return () => {
+      clearInterval(timer);
+      if (removeListener) removeListener();
+    };
+  }, []);
+
+  useEffect(() => {
     const validKeys = ['w', 'a', 's', 'd', ' '];
     
     const handleKeyDown = (e) => {
       const key = e.key.toLowerCase();
       
+      // O/o Tuşu İle Mod Geçişi
       if (key === 'o') {
         setDriveMode(prev => {
           const nextMode = prev === 'OTONOM' ? 'MANUEL' : 'OTONOM';
-          if (nextMode === 'OTONOM') setPressedKeys(new Set());
+          if (nextMode === 'OTONOM') {
+            setPressedKeys(new Set());
+            setFocusedTaskId(null);
+            setPopupMenu(p => ({ ...p, visible: false }));
+          } else {
+            const activeTask = Object.keys(taskStatuses).find(k => taskStatuses[k] === 'AKTİF') || 1;
+            setFocusedTaskId(Number(activeTask));
+          }
           return nextMode;
         });
         return;
       }
 
-      if (driveMode === 'MANUEL' && validKeys.includes(key)) {
+      if (driveMode !== 'MANUEL') return;
+
+      // Ok Tuşları Navigasyonu
+      if (key === 'arrowup' || key === 'arrowdown') {
+        e.preventDefault(); // Sayfanın kaymasını engelle
+        if (popupMenu.visible) {
+          let newIdx = popupMenu.focusedOptionIndex;
+          if (key === 'arrowup') newIdx = Math.max(0, newIdx - 1);
+          if (key === 'arrowdown') newIdx = Math.min(2, newIdx + 1);
+          setPopupMenu({ ...popupMenu, focusedOptionIndex: newIdx });
+        } else {
+          let next = focusedTaskId || 1;
+          if (key === 'arrowup') next = Math.max(1, next - 1);
+          if (key === 'arrowdown') next = Math.min(7, next + 1);
+          setFocusedTaskId(next);
+        }
+        return;
+      }
+
+      // Enter Tuşu Onayı
+      if (key === 'enter') {
+        e.preventDefault();
+        if (popupMenu.visible) {
+          const options = ['TAMAM', 'AKTİF', 'BEKLEME'];
+          updateTaskStatus(popupMenu.taskId, options[popupMenu.focusedOptionIndex]);
+        } else if (focusedTaskId) {
+          const el = document.getElementById(`task-${focusedTaskId}`);
+          let x = window.innerWidth / 2;
+          let y = window.innerHeight / 2;
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            x = rect.right - 100;
+            y = rect.bottom - 10;
+          }
+          // Varsayılan olarak "AKTİF" seçeneğini seçili başlat
+          setPopupMenu({ visible: true, taskId: focusedTaskId, x, y, focusedOptionIndex: 1 });
+        }
+        return;
+      }
+
+      // Esc Tuşu İptal
+      if (key === 'escape') {
+        setPopupMenu(p => ({ ...p, visible: false }));
+        return;
+      }
+
+      // Sürüş Tuşları
+      if (validKeys.includes(key)) {
         setPressedKeys(prev => new Set(prev).add(key));
       }
     };
+
     const handleKeyUp = (e) => {
       const key = e.key.toLowerCase();
       if (driveMode === 'MANUEL' && validKeys.includes(key)) {
@@ -86,12 +150,10 @@ export default function App() {
     window.addEventListener('keyup', handleKeyUp);
 
     return () => {
-      clearInterval(timer);
-      if (removeListener) removeListener();
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [driveMode]);
+  }, [driveMode, taskStatuses, popupMenu, focusedTaskId]);
 
   const updateTaskStatus = (id, status) => {
     setTaskStatuses(prev => {
@@ -104,7 +166,7 @@ export default function App() {
       next[id] = status;
       return next;
     });
-    setPopupMenu({ visible: false, taskId: null, x: 0, y: 0 });
+    setPopupMenu({ visible: false, taskId: null, x: 0, y: 0, focusedOptionIndex: 0 });
   };
 
   return (
@@ -119,9 +181,24 @@ export default function App() {
           onMouseLeave={() => setPopupMenu({ ...popupMenu, visible: false })}
         >
           <div className="text-[8px] text-stone-400 font-bold px-1 mb-1 border-b border-stone-600 pb-1 uppercase tracking-widest">Durum Seçin</div>
-          <button onClick={() => updateTaskStatus(popupMenu.taskId, 'TAMAM')} className="text-[10px] bg-[#22c55e]/20 text-[#22c55e] hover:bg-[#22c55e]/40 px-3 py-1 font-bold text-left tracking-widest">TAMAM</button>
-          <button onClick={() => updateTaskStatus(popupMenu.taskId, 'AKTİF')} className="text-[10px] bg-[#f59e0b]/20 text-[#f59e0b] hover:bg-[#f59e0b]/40 px-3 py-1 font-bold text-left tracking-widest">AKTİF</button>
-          <button onClick={() => updateTaskStatus(popupMenu.taskId, 'BEKLEME')} className="text-[10px] bg-stone-700/50 text-stone-300 hover:bg-stone-600 px-3 py-1 font-bold text-left tracking-widest">BEKLEME</button>
+          <button 
+            onClick={() => updateTaskStatus(popupMenu.taskId, 'TAMAM')} 
+            className={`text-[10px] px-3 py-1 font-bold text-left tracking-widest ${popupMenu.focusedOptionIndex === 0 ? 'bg-[#22c55e] text-black border border-[#22c55e]' : 'bg-[#22c55e]/20 text-[#22c55e] hover:bg-[#22c55e]/40 border border-transparent'}`}
+          >
+            TAMAM
+          </button>
+          <button 
+            onClick={() => updateTaskStatus(popupMenu.taskId, 'AKTİF')} 
+            className={`text-[10px] px-3 py-1 font-bold text-left tracking-widest ${popupMenu.focusedOptionIndex === 1 ? 'bg-[#f59e0b] text-black border border-[#f59e0b]' : 'bg-[#f59e0b]/20 text-[#f59e0b] hover:bg-[#f59e0b]/40 border border-transparent'}`}
+          >
+            AKTİF
+          </button>
+          <button 
+            onClick={() => updateTaskStatus(popupMenu.taskId, 'BEKLEME')} 
+            className={`text-[10px] px-3 py-1 font-bold text-left tracking-widest ${popupMenu.focusedOptionIndex === 2 ? 'bg-stone-300 text-black border border-stone-300' : 'bg-stone-700/50 text-stone-300 hover:bg-stone-600 border border-transparent'}`}
+          >
+            BEKLEME
+          </button>
         </div>
       )}
 
@@ -180,13 +257,17 @@ export default function App() {
             
             <div className="grid grid-cols-2 gap-2">
               <button 
-                onClick={() => { setDriveMode('OTONOM'); setPressedKeys(new Set()); }}
+                onClick={() => { setDriveMode('OTONOM'); setPressedKeys(new Set()); setFocusedTaskId(null); }}
                 className={`py-1.5 font-bold transition-colors tracking-widest shadow-md text-xs flex justify-center items-center gap-1 ${driveMode === 'OTONOM' ? 'bg-[#f59e0b] text-black' : 'bg-[#161412] text-stone-400 border border-stone-600 hover:text-stone-200'}`}
               >
                 OTONOM <span className="text-[9px] opacity-70">[O]</span>
               </button>
               <button 
-                onClick={() => setDriveMode('MANUEL')}
+                onClick={() => { 
+                  setDriveMode('MANUEL'); 
+                  const activeTask = Object.keys(taskStatuses).find(k => taskStatuses[k] === 'AKTİF') || 1;
+                  setFocusedTaskId(Number(activeTask)); 
+                }}
                 className={`py-1.5 font-bold transition-colors tracking-widest text-xs flex justify-center items-center gap-1 ${driveMode === 'MANUEL' ? 'bg-[#f59e0b] text-black' : 'bg-[#161412] border border-stone-600 text-stone-400 hover:text-stone-200'}`}
               >
                 MANUEL <span className="text-[9px] opacity-70">[O]</span>
@@ -236,20 +317,24 @@ export default function App() {
                 const isCompleted = status === 'TAMAM';
                 const isActive = status === 'AKTİF';
                 const isPending = status === 'BEKLEME';
+                const isFocused = focusedTaskId === task.id;
 
                 return (
                   <div 
+                    id={`task-${task.id}`}
                     key={task.id} 
                     onClick={(e) => {
                       if (driveMode !== 'MANUEL') return;
                       e.stopPropagation();
+                      setFocusedTaskId(task.id);
                       const rect = e.currentTarget.getBoundingClientRect();
-                      setPopupMenu({ visible: true, taskId: task.id, x: rect.right - 100, y: rect.bottom - 10 });
+                      setPopupMenu({ visible: true, taskId: task.id, x: rect.right - 100, y: rect.bottom - 10, focusedOptionIndex: 1 });
                     }}
                     className={`flex items-center justify-between p-1.5 relative overflow-hidden transition-colors ${driveMode === 'MANUEL' ? 'cursor-pointer hover:border-stone-400' : ''}
                       ${isCompleted ? 'bg-[#22c55e]/10 border border-[#22c55e]/50' : ''}
                       ${isActive ? 'bg-[#161412] border-2 border-[#f59e0b]' : ''}
                       ${isPending ? 'bg-[#161412] border border-stone-700 opacity-80' : ''}
+                      ${isFocused && driveMode === 'MANUEL' ? 'outline outline-2 outline-[#f59e0b]/80 bg-[#161412]/50' : ''}
                     `}
                   >
                     {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#f59e0b] animate-pulse"></div>}
