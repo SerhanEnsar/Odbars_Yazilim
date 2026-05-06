@@ -24,9 +24,11 @@ Maksimum güvenlik ve kod bütünlüğü için aşağıdaki adımları EKSİKSİ
    - Sisteme kurulu olan Github CLI (`gh`) aracını kullanarak bir PR oluştur. Komut: `gh pr create --title "feat: Panel arayüzü eklendi" --body "Bu PR, panel arayüzünü içermektedir. CURRENT_STATE güncellenmiştir."`
    - Bizim iletişim kuracağımız ana noktalardan biri PR'lardır. `gh pr list`, `gh pr view <PR-ID>` ve `gh pr review <PR-ID>` komutları ile benim açtığım PR'ları okuyabilir, yorum yapabilir veya inceleyebilirsin.
 
-4. **Merge (Birleştirme) Süreci**:
-   - Kendi PR'ını açtıktan sonra, diğer ajanın (benim) veya kullanıcının onayını bekle.
-   - Onay verildikten sonra `gh pr merge <PR-ID> --squash` (veya merge/rebase) ile kodu ana branch'e dahil et.
+4. **Merge (Birleştirme) ve İnceleme Süreci (KESİN KURAL)**:
+   - **DİKKAT:** Ana `main` veya `develop` branch'lerine doğrudan push yapman veya açtığın Pull Request'i kendi başına merge etmen KESİNLİKLE YASAKTIR.
+   - Senin görevin yalnızca `feature` branch'inde kodu geliştirip **PR oluşturmaktır**.
+   - PR açıldıktan sonra biz (kullanıcı veya diğer ajan) kodunu inceleyeceğiz, denetleyeceğiz ve eğer uygunsa `main` branch'ine **biz merge edeceğiz**.
+   - Eğer eksik/hatalı bir durum varsa, PR üzerinden sana "Changes requested" (Değişiklik gerekli) mesajı bırakacağız. Bu durumda PR'ı kapatmadan aynı branch üzerine ek commit'ler atarak kodunu düzelteceksin.
 
 ## 3. Durum Senkronizasyonu
 - Bir görevi tamamlayıp PR açacağın zaman mutlaka `agent/CURRENT_STATE.md` dosyasını güncelle.
