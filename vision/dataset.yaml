@@ -1,0 +1,19 @@
+# ODBARS Dataset Konfigürasyonu
+# YOLOv8 formatı - bu dosya model eğitiminde --data argümanı olarak kullanılır
+
+path: ./dataset  # dataset kök klasörü (dataset.yaml'ın yanındaki klasör)
+
+train: images/train
+val:   images/val
+test:  images/test
+
+# Sınıf sayısı
+nc: 5
+
+# Sınıf isimleri (ID sırası değiştirilemez!)
+names:
+  0: tabela      # Parkur aşama tabelası (daire, 60cm, siyah zemin beyaz metin)
+  1: stop        # Dik eğim üzerindeki STOP yazısı/işareti
+  2: engel       # Kayar engel (hareketli bariyer)
+  3: hedef       # Atış hedefi (A3, en az 10m uzakta)
+  4: koni        # Koni engelller (beyaz veya turuncu-beyaz)

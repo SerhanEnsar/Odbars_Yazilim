@@ -1,8 +1,9 @@
-__pycache__/
-*.pyc
-.DS_Store
-.env
-node_modules/
-build/
-dist/
+# Dataset klasörleri Git'e eklenir ama içindeki görseller/etiketler eklenmez
+# (Görüntüler büyük dosyalardır, Git LFS veya harici depolama kullanılır)
 
+vision/dataset/images/
+vision/dataset/labels/
+vision/__pycache__/
+vision/venv/
+vision/runs/        # YOLO eğitim çıktıları (büyük dosyalar)
+vision/*.pt         # Eğitilmiş model ağırlıkları (büyük dosyalar)
