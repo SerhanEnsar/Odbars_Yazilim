@@ -1,22 +1,65 @@
 # Projenin Güncel Durumu (Current State)
 
-*Lütfen her tamamlanan görevden veya önemli bir karardan sonra bu dosyayı güncelleyin.*
+*Her tamamlanan görevden veya önemli karardan sonra bu dosyayı güncelleyin.*
 
-## Son Güncelleme: 6 Mayıs 2026 (Gece)
-**Durum**: İnsansız Kara Aracı (İKA) için ODBARS NEXUS (Yer Kontrol İstasyonu) paneli arayüz geliştirme (Phase 1) aşaması başarıyla tamamlandı. Artık arayüzün arkasındaki iletişim (Haberleşme/Veri Akışı/ROS/MAVLink) ve donanım entegrasyonu (Phase 2) aşamasına geçiş için hazırız.
+## Son Güncelleme: 7 Mayıs 2026
+**Branch**: `feature/panel-init`  
+**Durum**: Panel (GCS) arayüzü + Vision Core temeli tamamlandı. Donanım entegrasyonu bekleniyor.
 
-**Tamamlananlar**:
-- `feature/panel-init` branch'i oluşturuldu ve Electron + Vite + React altyapısı başarıyla kurulup derlenebilir hale getirildi.
-- "Çöl Kamuflajı / Taktik Askeri" (Desert Khaki/Coyote Brown) temasına sahip, okunabilirliği çok yüksek ve profesyonel bir GCS HUD tasarımı yapıldı.
-- Özel yarışma widget'ları (Kayar engel, Su geçişi, Dik eğim vb. karar logları) eklendi.
-- "Savaş/Nişan Modu" (Silah Sistemleri) için Picture-in-Picture tarzı, kameraların ekranda yumuşakça yer ve boyut değiştirdiği özel animasyonlu mantık kuruldu.
-- TailwindCSS ile ekran taşmalarına karşı tam duyarlı (responsive) yükseklik/esneklik yapıları eklendi.
+---
 
-**Sıradaki Adımlar (To-Do - Diğer Ajan İçin)**:
-1. **GitHub PR İncelemesi**: Şu an açık olan `feature/panel-init` PR'ının main'e merge edilmesi işlemi tamamlanmalıdır (Kullanıcı onayı ile).
-2. **Telemetri ve Haberleşme Altyapısı**: Arayüzdeki dummy (sahte) verilerin yerine, araçtan gelecek gerçek MAVLink veya ROS verilerini alacak Node.js (Electron Backend) UDP/TCP soket veya WebSocket sunucusunun kurulması.
-3. **Kamera Akışı (Video Streaming)**: `CAM_01`, `CAM_02` ve `CAM_03` için araca bağlanacak RTSP/WebRTC akışlarının arayüzdeki `<video>` taglarına veya Canvas'a entegre edilmesi.
-4. **Manuel Sürüş (Gamepad API)**: Kullanıcının bağlayacağı Joystick/Gamepad verilerini okuyacak `navigator.getGamepads()` entegrasyonunun eklenmesi.
+## Tamamlananlar
 
-**Bloke Eden Durumlar (Blockers)**:
-- Yok. Arayüz tarafı çok stabil, arka uç (backend/hardware) entegrasyonu için tertemiz bir zemin bırakıldı.
+### Panel (GCS Arayüzü)
+- Electron + Vite + React altyapısı kuruldu, `npm run dev` ile çalışıyor.
+- "Çöl Kamuflajı / Taktik Askeri" temasıyla tam HUD tasarımı tamamlandı.
+- **Telemetri**: 20Hz hızında smooth "Random Walk" simülasyon verisi akıyor (main.js).
+- **Sürüş Modu**: `O` tuşu ile OTONOM ↔ MANUEL geçişi.
+- **Klavye Kontrolü**: WASD + SPACE tuş göstergesi (sadece MANUEL modda).
+- **Görev Navigasyonu**: Manuel modda ↑↓ ok tuşları + Enter ile popup + Esc ile iptal.
+- **Görev Durumları**: Aynı anda yalnızca 1 AKTİF görev, OTONOM modda değişiklik kilitli.
+- **Dinamik Action Log**: Toast bildirimleri + genişletilebilir floating panel (sağ altta).
+  - AKTİF: Turuncu, TAMAM: Yeşil, BEKLEME: Gri, ACİL: Kırmızı yanıp söner.
+  - Panel açıkken toastlar gizlenir, yeni log gelince auto-scroll.
+- **Kamera Altyapısı**: 3 kamera slotu (CAM_FWD, CAM_REAR, CAM_AIM) MJPEG stream alacak şekilde hazırlandı. `http://127.0.0.1:8765/cam_*` adreslerini dinliyor. Sinyal yokken animasyonlu "Sinyal Aranıyor" ekranı.
+- **Animasyon**: Atış Görevi AKTİF olunca CAM_AIM büyüyüp ön plana geçiyor (Picture-in-Picture).
+
+### Vision Core (Python)
+- `vision/main.py`: Flask tabanlı MJPEG streaming sunucusu kuruldu.
+- Port: **8765** (macOS AirPlay 5000'i kullandığından çakışmaması için).
+- Kamera açılamazsa siyah dummy frame akışı yapıyor, uygulama çökmüyor.
+- YOLO / OpenCV entegrasyonu için yer açık bırakıldı (`# GORUNTU ISLEME ALANI`).
+- `vision/requirements.txt`: flask, opencv-python, numpy, ultralytics.
+
+### Dokümantasyon
+- `vision/KOMUTLAR.md`: Vision sunucusu için tüm terminal komutları.
+- `panel/KOMUTLAR.md`: Panel için tüm terminal komutları + klavye kısayolları.
+
+---
+
+## Sıradaki Adımlar (To-Do)
+
+1. **YOLO Entegrasyonu**: `vision/main.py` içindeki `# GORUNTU ISLEME ALANI` bölümüne YOLOv8/v11 ile nesne tespiti + bounding box çizimi eklenmesi.
+2. **Kamera Erişim İzni**: macOS Gizlilik → Kamera izninin terminale verilmesi (ilk çalıştırmada çıkabilir).
+3. **Donanım Telemetri**: `panel/electron/main.js` içindeki simülasyon kodunun yerine gerçek SerialPort/UDP veri okuma altyapısının kurulması.
+4. **Gamepad API**: `navigator.getGamepads()` ile joystick/gamepad desteği (yarışma öncesinde).
+5. **Jetson Geçişi**: Vision sunucusu `host='0.0.0.0'` ile zaten ağa açık. Panel URL'lerinde `127.0.0.1` → `<JETSON_IP>` değiştirilmesi yeterli.
+
+---
+
+## Bloke Eden Durumlar (Blockers)
+
+- Diğer araç sistemleri (STM32, ROS vb.) henüz hazır değil → Telemetri entegrasyonu beklemede.
+- Gerçek kamera donanımı mevcut değil → Vision simülasyon modunda çalışıyor.
+
+---
+
+## Komut Özeti
+
+```bash
+# Vision Core başlat (Control Panel kök dizininden)
+cd vision && source venv/bin/activate && python main.py
+
+# Panel başlat
+cd panel && npm run dev
+```
