@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Activity, Battery, Camera, Crosshair, ShieldAlert, Wifi, Zap, Terminal, 
-  Play, Pause, AlertOctagon, Settings2, ListTodo, Target, Navigation
+  Play, Pause, AlertOctagon, Settings2, ListTodo, Target, Navigation, Unlock, Lock
 } from 'lucide-react';
 
 export default function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [isTargeting, setIsTargeting] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -85,22 +86,23 @@ export default function App() {
               Görev Durumu
             </h2>
             <div className="space-y-2 mt-2">
-              <div className="flex items-center justify-between bg-[#22c55e]/20 border border-[#22c55e] p-1.5 lg:p-2">
+              <div className="flex items-center justify-between bg-[#22c55e]/20 border border-[#22c55e] p-1.5 lg:p-2 transition-colors">
                 <span className="text-[#22c55e] text-[10px] lg:text-xs font-bold uppercase tracking-wider">1. Su Geçişi</span>
                 <span className="text-[9px] lg:text-[10px] bg-[#22c55e] text-black font-bold px-1.5 py-0.5">TAMAM</span>
               </div>
-              <div className="flex items-center justify-between bg-[#161412] border-2 border-[#f59e0b] p-1.5 lg:p-2 relative overflow-hidden">
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#f59e0b] animate-pulse"></div>
-                <span className="text-[#f59e0b] text-[10px] lg:text-xs font-bold pl-2 uppercase tracking-wider">2. Taşlı Yol</span>
-                <span className="text-[9px] lg:text-[10px] bg-[#f59e0b] text-black font-bold px-1.5 py-0.5 animate-pulse">AKTİF</span>
+              <div className={`flex items-center justify-between p-1.5 lg:p-2 relative overflow-hidden transition-colors ${!isTargeting ? 'bg-[#161412] border-2 border-[#f59e0b]' : 'bg-[#161412] border border-stone-700 opacity-80'}`}>
+                {!isTargeting && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#f59e0b] animate-pulse"></div>}
+                <span className={`text-[10px] lg:text-xs font-bold pl-2 uppercase tracking-wider ${!isTargeting ? 'text-[#f59e0b]' : 'text-stone-400'}`}>2. Taşlı Yol</span>
+                <span className={`text-[9px] lg:text-[10px] font-bold px-1.5 py-0.5 ${!isTargeting ? 'bg-[#f59e0b] text-black animate-pulse' : 'bg-stone-700 text-stone-300'}`}>
+                  {!isTargeting ? 'AKTİF' : 'BEKLEME'}
+                </span>
               </div>
-              <div className="flex items-center justify-between bg-[#161412] border border-stone-700 p-1.5 lg:p-2 opacity-80">
-                <span className="text-stone-400 text-[10px] lg:text-xs font-bold uppercase tracking-wider">3. Yan Eğim</span>
-                <span className="text-[9px] lg:text-[10px] bg-stone-700 text-stone-300 font-bold px-1.5 py-0.5">BEKLEME</span>
-              </div>
-              <div className="flex items-center justify-between bg-[#161412] border border-stone-700 p-1.5 lg:p-2 opacity-80">
-                <span className="text-stone-400 text-[10px] lg:text-xs font-bold uppercase tracking-wider">4. Dik Engel</span>
-                <span className="text-[9px] lg:text-[10px] bg-stone-700 text-stone-300 font-bold px-1.5 py-0.5">BEKLEME</span>
+              <div className={`flex items-center justify-between p-1.5 lg:p-2 relative overflow-hidden transition-colors ${isTargeting ? 'bg-[#161412] border-2 border-[#f59e0b]' : 'bg-[#161412] border border-stone-700 opacity-80'}`}>
+                {isTargeting && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#f59e0b] animate-pulse"></div>}
+                <span className={`text-[10px] lg:text-xs font-bold pl-2 uppercase tracking-wider ${isTargeting ? 'text-[#f59e0b]' : 'text-stone-400'}`}>3. Atış Görevi</span>
+                <span className={`text-[9px] lg:text-[10px] font-bold px-1.5 py-0.5 ${isTargeting ? 'bg-[#f59e0b] text-black animate-pulse' : 'bg-stone-700 text-stone-300'}`}>
+                  {isTargeting ? 'AKTİF' : 'BEKLEME'}
+                </span>
               </div>
             </div>
           </div>
@@ -122,7 +124,7 @@ export default function App() {
               </div>
               <div className="bg-[#161412] p-1.5 border border-stone-700">
                 <span className="text-[9px] text-stone-400 font-bold block mb-0.5">HIZ (M/S)</span>
-                <span className="text-base text-stone-100 font-bold tracking-wider">2.4</span>
+                <span className="text-base text-stone-100 font-bold tracking-wider">{isTargeting ? '0.0' : '2.4'}</span>
               </div>
               <div className="bg-[#161412] p-1.5 border border-stone-700">
                 <span className="text-[9px] text-stone-400 font-bold block mb-0.5">PITCH</span>
@@ -140,58 +142,69 @@ export default function App() {
         {/* Center & Right Column: Cameras and Target */}
         <div className="col-span-9 flex flex-col gap-3 h-full min-h-0">
           
-          {/* Main Camera Feed */}
-          <div className="flex-1 bg-[#161412] tactical-border relative overflow-hidden flex flex-col min-h-0">
-            <div className="corners-alt"></div>
-            <div className="absolute top-2 left-2 z-10 flex items-center gap-2 bg-[#2a241c]/90 px-2 lg:px-3 py-1 lg:py-1.5 border border-stone-600 shadow-md">
-              <div className="w-2 h-2 bg-[#ef4444] animate-pulse"></div>
-              <span className="text-[10px] lg:text-xs font-bold text-stone-200 tracking-widest">CAM_01_FWD // AI_OVERLAY_ACTIVE</span>
-            </div>
+          {/* Animated Cameras Container */}
+          <div className="flex-1 relative min-h-0 w-full overflow-hidden">
             
-            <div className="absolute top-2 right-2 z-10 text-[10px] lg:text-xs font-bold text-[#ef4444] bg-[#2a241c]/90 px-2 lg:px-3 py-1 lg:py-1.5 border border-red-500/50 tracking-widest">
-              REC ●
-            </div>
-
-            {/* Dummy Camera Image / Placeholder */}
-            <div className="flex-1 flex items-center justify-center relative bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-stone-800 to-[#161412] min-h-0">
-              {/* Tactical Crosshair Background */}
-              <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-40">
-                <div className="w-full h-[1px] bg-[#f59e0b]/50 absolute"></div>
-                <div className="h-full w-[1px] bg-[#f59e0b]/50 absolute"></div>
-                <div className="w-48 h-48 lg:w-64 lg:h-64 border-2 border-[#f59e0b]/50 rounded-full absolute"></div>
-              </div>
-
-              {/* Overlay elements to simulate AI detection */}
-              <div className="absolute top-1/2 left-1/3 w-16 h-24 lg:w-24 lg:h-32 border-2 border-[#f59e0b] bg-[#f59e0b]/20 flex flex-col justify-end shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                <div className="bg-[#f59e0b] text-black text-[8px] lg:text-[10px] font-bold px-1 uppercase tracking-widest">TGT: ENGEL (82%)</div>
-              </div>
-              <div className="absolute top-2/3 right-1/4 w-8 h-12 lg:w-12 lg:h-16 border-2 border-[#22c55e] bg-[#22c55e]/20 flex flex-col justify-end shadow-[0_0_15px_rgba(34,197,94,0.3)]">
-                <div className="bg-[#22c55e] text-black text-[8px] lg:text-[10px] font-bold px-1 uppercase tracking-widest">TGT: KONİ (95%)</div>
+            {/* CAM 1 - FWD */}
+            <div 
+              className={`absolute tactical-border transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col justify-center items-center overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-stone-800 to-[#161412]
+              ${isTargeting 
+                ? 'top-[calc(65%+6px)] left-0 w-[calc(50%-6px)] h-[calc(35%-6px)] opacity-80' 
+                : 'top-0 left-0 w-full h-[calc(65%-6px)] opacity-100'}`}
+            >
+              <div className="corners-alt"></div>
+              <div className="absolute top-2 left-2 z-10 flex items-center gap-2 bg-[#2a241c]/90 px-2 py-1 border border-stone-600 shadow-md">
+                <div className={`w-2 h-2 ${isTargeting ? 'bg-stone-500' : 'bg-[#ef4444] animate-pulse'}`}></div>
+                <span className="text-[9px] lg:text-xs font-bold text-stone-200 tracking-widest">CAM_01_FWD</span>
               </div>
               
+              {/* Fake AI Overlay - Only visible when large */}
+              <div className={`absolute inset-0 transition-opacity duration-300 ${isTargeting ? 'opacity-0' : 'opacity-100'}`}>
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-40">
+                  <div className="w-full h-[1px] bg-[#f59e0b]/50 absolute"></div>
+                  <div className="h-full w-[1px] bg-[#f59e0b]/50 absolute"></div>
+                </div>
+                <div className="absolute top-1/2 left-1/3 w-20 h-28 border-2 border-[#f59e0b] bg-[#f59e0b]/20 flex flex-col justify-end shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+                  <div className="bg-[#f59e0b] text-black text-[9px] font-bold px-1 uppercase tracking-widest">TGT: ENGEL (82%)</div>
+                </div>
+              </div>
               <Camera size={48} className="text-stone-600 absolute" />
             </div>
 
-            {/* Sub Cameras Row */}
-            <div className="h-24 lg:h-36 bg-[#161412] border-t-2 border-stone-700 flex shrink-0">
-              <div className="flex-1 border-r-2 border-stone-700 relative group bg-[#1e1b18] flex items-center justify-center min-h-0">
-                <div className="absolute top-1 left-1 z-10 text-[9px] lg:text-xs font-bold bg-[#2a241c]/90 px-1 lg:px-2 py-0.5 lg:py-1 text-stone-300 border border-stone-600 tracking-widest">CAM_02_REAR</div>
-                <span className="text-stone-500 text-[9px] lg:text-[11px] font-bold tracking-widest uppercase">Sinyal Aranıyor...</span>
+            {/* CAM 2 - REAR */}
+            <div 
+              className={`absolute tactical-border transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col justify-center items-center overflow-hidden bg-[#1e1b18]
+              ${isTargeting 
+                ? 'top-[calc(65%+6px)] left-[calc(50%+6px)] w-[calc(50%-6px)] h-[calc(35%-6px)] opacity-80' 
+                : 'top-[calc(65%+6px)] left-0 w-[calc(50%-6px)] h-[calc(35%-6px)] opacity-80'}`}
+            >
+              <div className="absolute top-1 left-1 z-10 text-[9px] lg:text-[10px] font-bold bg-[#2a241c]/90 px-2 py-1 text-stone-300 border border-stone-600 tracking-widest">CAM_02_REAR</div>
+              <span className="text-stone-500 text-[9px] lg:text-[11px] font-bold tracking-widest uppercase">Sinyal Aranıyor...</span>
+            </div>
+
+            {/* CAM 3 - AIM (Targeting) */}
+            <div 
+              className={`absolute tactical-border transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col justify-center items-center overflow-hidden bg-[#1e1b18] border border-[#ef4444]/30
+              ${isTargeting 
+                ? 'top-0 left-0 w-full h-[calc(65%-6px)] shadow-[0_0_30px_rgba(239,68,68,0.15)] opacity-100' 
+                : 'top-[calc(65%+6px)] left-[calc(50%+6px)] w-[calc(50%-6px)] h-[calc(35%-6px)] opacity-80'}`}
+            >
+              <div className="corners-alt"></div>
+              <div className="absolute top-2 left-2 z-10 text-[9px] lg:text-[11px] bg-[#2a241c]/90 px-2 py-1 text-[#f59e0b] border border-[#f59e0b]/50 tracking-widest font-bold flex items-center gap-2 transition-all">
+                <Crosshair size={isTargeting ? 14 : 12} className={isTargeting ? "text-[#ef4444] animate-pulse" : ""} /> CAM_03_AIM
               </div>
-              <div className="flex-1 relative group bg-[#1e1b18] flex items-center justify-center overflow-hidden min-h-0">
-                <div className="absolute top-1 left-1 z-10 text-[9px] lg:text-xs bg-[#2a241c]/90 px-1 lg:px-2 py-0.5 lg:py-1 text-[#f59e0b] border border-[#f59e0b]/50 tracking-widest font-bold flex items-center gap-1 lg:gap-2">
-                  <Crosshair size={12} /> CAM_03_AIM
+              
+              {/* Fake target scope - Scales based on state */}
+              <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-700 ${isTargeting ? 'opacity-100 scale-125' : 'opacity-60 scale-75'}`}>
+                <div className={`rounded-full border-2 border-[#ef4444] relative transition-all duration-700 ${isTargeting ? 'w-48 h-48 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : 'w-20 h-20'}`}>
+                  <div className="absolute top-1/2 left-[-20px] right-[-20px] h-[2px] bg-[#ef4444]"></div>
+                  <div className="absolute left-1/2 top-[-20px] bottom-[-20px] w-[2px] bg-[#ef4444]"></div>
+                  <div className={`rounded-full border border-[#ef4444]/50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ${isTargeting ? 'w-24 h-24' : 'w-10 h-10'}`}></div>
                 </div>
-                {/* Fake target scope */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-80">
-                  <div className="w-16 h-16 lg:w-24 lg:h-24 rounded-full border-2 border-[#ef4444] relative">
-                    <div className="absolute top-1/2 left-[-10px] lg:left-[-15px] right-[-10px] lg:right-[-15px] h-[2px] bg-[#ef4444]"></div>
-                    <div className="absolute left-1/2 top-[-10px] lg:top-[-15px] bottom-[-10px] lg:bottom-[-15px] w-[2px] bg-[#ef4444]"></div>
-                    <div className="w-8 h-8 lg:w-12 lg:h-12 rounded-full border border-[#ef4444]/50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-                  </div>
-                </div>
-                <span className="text-[#ef4444]/60 text-[9px] lg:text-[11px] font-bold tracking-widest uppercase mt-12 lg:mt-20">Hedef Bekleniyor...</span>
               </div>
+              <span className={`text-[#ef4444] font-bold tracking-widest uppercase mt-32 transition-all duration-500 ${isTargeting ? 'text-sm opacity-100' : 'text-[9px] opacity-60'}`}>
+                {isTargeting ? 'HEDEF ARANIYOR...' : 'BEKLEMEDE'}
+              </span>
             </div>
           </div>
 
@@ -208,23 +221,35 @@ export default function App() {
               <div className="flex-1 bg-[#161412] border border-stone-700 p-2 overflow-y-auto text-[9px] lg:text-[11px] font-bold space-y-1 lg:space-y-2 tracking-widest leading-relaxed">
                 <div className="text-[#22c55e]"><span className="text-stone-500 mr-2">[14:21:05]</span> SYS_AUTH: Otonom mod aktif.</div>
                 <div className="text-stone-200"><span className="text-stone-500 mr-2">[14:21:08]</span> VISION_CORE: Su geçişi tespit.</div>
-                <div className="text-stone-200"><span className="text-stone-500 mr-2">[14:21:08]</span> NAV_CORE: Hız adapte -&gt; 1.5m/s.</div>
-                <div className="text-[#f59e0b]"><span className="text-stone-500 mr-2">[14:22:15]</span> VISION_WARN: Kayar engel algılandı.</div>
-                <div className="text-[#f59e0b] animate-pulse"><span className="text-stone-500 mr-2">[14:22:18]</span> NAV_ACTION: Taktik bekleme (3s)</div>
+                <div className="text-[#f59e0b]"><span className="text-stone-500 mr-2">[14:22:15]</span> VISION_WARN: Kayar engel aşıldı.</div>
+                {isTargeting && (
+                  <>
+                    <div className="text-stone-200"><span className="text-stone-500 mr-2">[14:24:10]</span> NAV_CORE: Atış istasyonuna ulaşıldı. Araç durduruldu.</div>
+                    <div className="text-[#ef4444] animate-pulse"><span className="text-stone-500 mr-2">[14:24:11]</span> WPN_SYS: Silah sistemleri devreye alınıyor. Hedef taraması başladı.</div>
+                  </>
+                )}
               </div>
             </div>
 
             {/* Atış Paneli */}
             <div className="bg-[#2a241c] p-2 lg:p-3 tactical-border flex flex-col items-center justify-center relative overflow-hidden min-h-0">
               <div className="corners-alt"></div>
-              <div className="absolute top-0 w-full h-1 bg-[#ef4444] opacity-80 shadow-[0_0_15px_#ef4444]"></div>
+              <div className={`absolute top-0 w-full h-1 transition-colors duration-500 ${isTargeting ? 'bg-[#ef4444] opacity-100 shadow-[0_0_20px_#ef4444]' : 'bg-[#f59e0b] opacity-50'}`}></div>
               
-              <Crosshair size={24} className="text-stone-400 mb-1 lg:mb-2" />
-              <h3 className="text-[10px] lg:text-sm font-bold text-[#ef4444] mb-1 tracking-widest uppercase text-center">Silah Sistemleri</h3>
-              <span className="text-[8px] lg:text-[10px] text-stone-400 mb-2 lg:mb-4 tracking-widest font-bold uppercase text-center leading-tight">Lazer Pasif<br/>Kilit Yok</span>
+              <Crosshair size={24} className={`mb-1 lg:mb-2 transition-colors duration-500 ${isTargeting ? 'text-[#ef4444] animate-pulse' : 'text-stone-400'}`} />
+              <h3 className={`text-[10px] lg:text-sm font-bold mb-1 tracking-widest uppercase text-center transition-colors duration-500 ${isTargeting ? 'text-[#ef4444]' : 'text-[#f59e0b]'}`}>Silah Sistemleri</h3>
+              <span className={`text-[8px] lg:text-[9px] mb-2 lg:mb-4 tracking-widest font-bold uppercase text-center leading-tight transition-all duration-500 ${isTargeting ? 'text-stone-200' : 'text-stone-500'}`}>
+                {isTargeting ? 'Lazer Modülü Aktif\nHedef Aranıyor' : 'Lazer Modülü Pasif\nKilit Yok'}
+              </span>
               
-              <button disabled className="w-full bg-[#161412] text-stone-500 py-1.5 lg:py-2 font-bold cursor-not-allowed border-2 border-stone-700 tracking-widest uppercase text-[9px] lg:text-xs">
-                KİLİTLİ
+              <button 
+                onClick={() => setIsTargeting(!isTargeting)}
+                className={`w-full py-1.5 lg:py-2 font-bold transition-all duration-300 border-2 tracking-widest uppercase text-[9px] lg:text-xs flex justify-center items-center gap-2
+                  ${isTargeting 
+                    ? 'bg-[#ef4444]/20 border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444]/40 shadow-[0_0_10px_rgba(239,68,68,0.3)]' 
+                    : 'bg-[#161412] text-[#f59e0b] border-stone-700 hover:border-[#f59e0b] cursor-pointer'}`}
+              >
+                {isTargeting ? <><Unlock size={12}/> Kapat</> : <><Lock size={12}/> Aktifleştir</>}
               </button>
             </div>
 
