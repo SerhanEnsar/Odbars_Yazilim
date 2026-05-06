@@ -28,6 +28,9 @@ function createWindow() {
     win.loadFile(path.join(process.env.DIST, 'index.html'))
   }
 
+  // Debugging için DevTools aç
+  win.webContents.openDevTools();
+
   // MOCK TELEMETRY SIMULATOR
   win.webContents.on('did-finish-load', () => {
     setInterval(() => {

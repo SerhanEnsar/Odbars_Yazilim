@@ -20,9 +20,13 @@ export default function App() {
     
     // Electron'dan gelen canlı telemetri simülasyonunu dinle
     if (window.electronAPI && window.electronAPI.onTelemetryUpdate) {
+      console.log("Electron IPC bağlandı, veriler dinleniyor...");
       window.electronAPI.onTelemetryUpdate((data) => {
+        console.log("Telemetri verisi alındı:", data);
         setTelemetry(prev => ({ ...prev, ...data }));
       });
+    } else {
+      console.error("HATA: window.electronAPI bulunamadı!");
     }
 
     return () => clearInterval(timer);
