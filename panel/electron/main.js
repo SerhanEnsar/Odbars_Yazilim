@@ -29,6 +29,14 @@ function createWindow() {
   }
 
   // MOCK TELEMETRY SIMULATOR
+  // Daha gerçekçi akış için state tutalım (Random Walk algoritması)
+  let mockState = {
+    pitch: 0.0,
+    roll: 0.0,
+    speed: 1.5,
+    battery: 84
+  };
+
   win.webContents.on('did-finish-load', () => {
     const telemetryInterval = setInterval(() => {
       if (!win || win.isDestroyed() || win.webContents.isDestroyed()) {
@@ -36,12 +44,28 @@ function createWindow() {
         return;
       }
       
+      // Değerleri küçük adımlarla (smooth) değiştir
+      mockState.pitch += (Math.random() * 0.4 - 0.2);
+      if (mockState.pitch > 15) mockState.pitch = 15;
+      if (mockState.pitch < -15) mockState.pitch = -15;
+
+      mockState.roll += (Math.random() * 0.2 - 0.1);
+      if (mockState.roll > 5) mockState.roll = 5;
+      if (mockState.roll < -5) mockState.roll = -5;
+
+      mockState.speed += (Math.random() * 0.2 - 0.1);
+      if (mockState.speed < 0) mockState.speed = 0.0;
+      if (mockState.speed > 5) mockState.speed = 5.0;
+
+      // Batarya çok nadir düşsün (simülasyon)
+      if (Math.random() < 0.001) mockState.battery -= 1;
+
       const mockData = {
-        battery: Math.floor(Math.random() * 5 + 80), // 80-85%
-        speed: (Math.random() * 2 + 1).toFixed(1), // 1.0 - 3.0 m/s
-        pitch: (Math.random() * 6 - 3).toFixed(1), // -3.0 to +3.0
-        roll: (Math.random() * 2 - 1).toFixed(1), // -1.0 to +1.0
-        ping: Math.floor(Math.random() * 20 + 10), // 10-30 ms
+        battery: mockState.battery,
+        speed: mockState.speed.toFixed(1),
+        pitch: mockState.pitch.toFixed(1),
+        roll: mockState.roll.toFixed(1),
+        ping: Math.floor(Math.random() * 5 + 15), // 15-20ms
       };
       
       try {
@@ -49,7 +73,7 @@ function createWindow() {
       } catch (e) {
         clearInterval(telemetryInterval);
       }
-    }, 1000); // Saniyede 1 kez güncelle
+    }, 50); // Saniyede 20 kez (20Hz) ultra hızlı güncelleme
     
     win.on('closed', () => {
       clearInterval(telemetryInterval);
