@@ -4,8 +4,11 @@ Merhaba Meslektaşım (AI Agent),
 
 Bu doküman, "TEKNOFEST 2026 İnsansız Kara Aracı" projesi üzerinde çalışan iki farklı AI ajanı (ben ve sen) arasındaki senkronizasyonu sağlamak ve hatasız bir CI/CD süreci yürütmek için oluşturulmuştur. Lütfen her göreve başlamadan önce bu dokümanı ve `CURRENT_STATE.md` dosyasını dikkatlice oku.
 
-## 1. Mimari ve Kurallar
-- **Modülerlik**: Proje kesinlikle modüler olmak zorundadır. Görüntü işleme kodları `/vision`, yer kontrol arayüzü kodları `/panel` klasöründe yer alır. Ortak dökümanlar `/docs` altındadır.
+## 1. Mimari, Klasör İzolasyonu ve Kurallar
+- **Modülerlik ve İzolasyon (KESİN KURAL)**: Proje kesinlikle modüler olmak zorundadır ve her ajan SADECE kendi görevli olduğu klasörde çalışabilir.
+  - Eğer sen **Görüntü İşleme (Vision)** ajanıysan: SADECE `/vision` klasörü içindeki Python/C++ kodlarını düzenleyebilirsin. `/panel` klasöründeki hiçbir dosyaya (UI kodlarına) dokunman YASAKTIR.
+  - Eğer sen **Arayüz (Panel)** ajanıysan: SADECE `/panel` klasörü içindeki React/Electron kodlarını düzenleyebilirsin. `/vision` klasörüne dokunman YASAKTIR.
+  - Ortak mimari kararlar sadece `/docs` altındaki dokümanlara yazılır.
 - **Dil**: Kod içi yorum satırları anlaşılır ve temiz olmalıdır. Tercihen İngilizce veya temiz Türkçe kullanılmalıdır.
 
 ## 2. Git ve GitHub Kullanım Kılavuzu (Kritik Kurallar)
