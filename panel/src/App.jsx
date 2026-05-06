@@ -190,6 +190,17 @@ export default function App() {
   }, [driveMode, taskStatuses, popupMenu, focusedTaskId]);
 
   const updateTaskStatus = (id, status) => {
+    const taskNames = {
+      1: "Su Geçişi", 2: "Taşlı Yol", 3: "Kayar Engel", 
+      4: "Tabela Okuma", 5: "Dik Eğim (Stop)", 6: "Yan Eğim", 7: "Atış Görevi"
+    };
+
+    if (taskStatuses[id] === status) {
+      setPopupMenu({ visible: false, taskId: null, x: 0, y: 0, focusedOptionIndex: 0 });
+      addLog('NAV_CORE', `${taskNames[id]} görevi zaten ${status} durumunda.`, 'pending');
+      return;
+    }
+
     setTaskStatuses(prev => {
       const next = { ...prev };
       if (status === 'AKTİF') {
@@ -202,11 +213,6 @@ export default function App() {
     });
     setPopupMenu({ visible: false, taskId: null, x: 0, y: 0, focusedOptionIndex: 0 });
 
-    // Duruma göre log ekle
-    const taskNames = {
-      1: "Su Geçişi", 2: "Taşlı Yol", 3: "Kayar Engel", 
-      4: "Tabela Okuma", 5: "Dik Eğim (Stop)", 6: "Yan Eğim", 7: "Atış Görevi"
-    };
     if (status === 'AKTİF') {
       addLog('NAV_CORE', `${taskNames[id]} görevine başlandı.`, 'warning');
       if (id === 7) addLog('WPN_SYS', 'Silah sistemleri devreye alınıyor. Hedef taraması başladı.', 'error');
