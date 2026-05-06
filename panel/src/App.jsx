@@ -7,9 +7,24 @@ import {
 export default function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isTargeting, setIsTargeting] = useState(false);
+  const [telemetry, setTelemetry] = useState({
+    battery: 84,
+    speed: '0.0',
+    pitch: '+0.0',
+    roll: '0.0',
+    ping: 12
+  });
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    
+    // Electron'dan gelen canlı telemetri simülasyonunu dinle
+    if (window.electronAPI && window.electronAPI.onTelemetryUpdate) {
+      window.electronAPI.onTelemetryUpdate((data) => {
+        setTelemetry(prev => ({ ...prev, ...data }));
+      });
+    }
+
     return () => clearInterval(timer);
   }, []);
 
@@ -44,7 +59,7 @@ export default function App() {
           <div className="flex items-center space-x-2 bg-[#161412] px-3 py-1.5 border border-[#22c55e]/30">
             <Wifi className="text-[#22c55e]" size={16} />
             <span className="text-base lg:text-lg font-bold text-[#22c55e]">98%</span>
-            <span className="text-[9px] lg:text-[10px] text-[#22c55e]/80">12MS</span>
+            <span className="text-[9px] lg:text-[10px] text-[#22c55e]/80">{telemetry.ping}MS</span>
           </div>
           <button className="bg-[#ef4444] hover:bg-red-600 text-white px-4 lg:px-6 py-1.5 lg:py-2 font-bold flex items-center space-x-2 transition-all border-2 border-red-300 shadow-[0_0_15px_rgba(239,68,68,0.4)] active:scale-95 uppercase tracking-widest">
             <AlertOctagon size={18} />
@@ -144,24 +159,32 @@ export default function App() {
               Telemetri Verisi
             </h2>
             <div className="grid grid-cols-2 gap-2 mt-2">
-              <div className="bg-[#161412] p-1.5 border border-stone-700">
+              <div className="bg-[#161412] p-1.5 border border-stone-700 transition-colors">
                 <span className="text-[9px] text-stone-400 font-bold block mb-0.5">BATARYA</span>
                 <div className="flex items-center gap-1">
-                  <Battery size={12} className="text-[#22c55e]" />
-                  <span className="text-base text-[#22c55e] font-bold tracking-wider">84%</span>
+                  <Battery size={12} className={telemetry.battery > 20 ? "text-[#22c55e]" : "text-[#ef4444] animate-pulse"} />
+                  <span className={`text-base font-bold tracking-wider ${telemetry.battery > 20 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
+                    {telemetry.battery}%
+                  </span>
                 </div>
               </div>
               <div className="bg-[#161412] p-1.5 border border-stone-700">
                 <span className="text-[9px] text-stone-400 font-bold block mb-0.5">HIZ (M/S)</span>
-                <span className="text-base text-stone-100 font-bold tracking-wider">{isTargeting ? '0.0' : '2.4'}</span>
+                <span className="text-base text-stone-100 font-bold tracking-wider">
+                  {isTargeting ? '0.0' : telemetry.speed}
+                </span>
               </div>
               <div className="bg-[#161412] p-1.5 border border-stone-700">
                 <span className="text-[9px] text-stone-400 font-bold block mb-0.5">PITCH</span>
-                <span className="text-base text-stone-100 font-bold tracking-wider">+4.2°</span>
+                <span className="text-base text-stone-100 font-bold tracking-wider">
+                  {telemetry.pitch > 0 ? '+' : ''}{telemetry.pitch}°
+                </span>
               </div>
               <div className="bg-[#161412] p-1.5 border border-stone-700">
                 <span className="text-[9px] text-stone-400 font-bold block mb-0.5">ROLL</span>
-                <span className="text-base text-stone-100 font-bold tracking-wider">-1.1°</span>
+                <span className="text-base text-stone-100 font-bold tracking-wider">
+                  {telemetry.roll > 0 ? '+' : ''}{telemetry.roll}°
+                </span>
               </div>
             </div>
           </div>

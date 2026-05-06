@@ -15,8 +15,8 @@ function createWindow() {
     title: 'ODBARS NEXUS - Yer Kontrol İstasyonu',
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
-      nodeIntegration: true,
-      contextIsolation: false
+      nodeIntegration: false,
+      contextIsolation: true
     },
   })
 
@@ -27,6 +27,23 @@ function createWindow() {
     // Production build
     win.loadFile(path.join(process.env.DIST, 'index.html'))
   }
+
+  // MOCK TELEMETRY SIMULATOR
+  win.webContents.on('did-finish-load', () => {
+    setInterval(() => {
+      if (!win) return;
+      
+      const mockData = {
+        battery: Math.floor(Math.random() * 5 + 80), // 80-85%
+        speed: (Math.random() * 2 + 1).toFixed(1), // 1.0 - 3.0 m/s
+        pitch: (Math.random() * 6 - 3).toFixed(1), // -3.0 to +3.0
+        roll: (Math.random() * 2 - 1).toFixed(1), // -1.0 to +1.0
+        ping: Math.floor(Math.random() * 20 + 10), // 10-30 ms
+      };
+      
+      win.webContents.send('telemetry-update', mockData);
+    }, 1000); // Saniyede 1 kez güncelle
+  });
 }
 
 app.on('window-all-closed', () => {
