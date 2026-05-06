@@ -23,7 +23,7 @@ export default function App() {
             <Target className="text-[#00ff41] animate-pulse" size={28} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-[0.2em] text-neutral-100">İKA-GCS <span className="text-[#00ff41]">NEXUS</span></h1>
+            <h1 className="text-2xl font-bold tracking-[0.2em] text-neutral-100">ODBARS <span className="text-[#00ff41]">NEXUS</span></h1>
             <p className="text-[10px] text-[#00ff41]/70 uppercase tracking-widest">Taktik Operasyon Merkezi // SYS_ONLINE</p>
           </div>
         </div>

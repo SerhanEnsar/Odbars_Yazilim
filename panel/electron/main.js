@@ -12,7 +12,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1440,
     height: 900,
-    title: 'İKA GCS - Yer Kontrol İstasyonu',
+    title: 'ODBARS NEXUS - Yer Kontrol İstasyonu',
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
       nodeIntegration: true,
