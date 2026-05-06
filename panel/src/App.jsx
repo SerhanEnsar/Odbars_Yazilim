@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Activity, Battery, Camera, Crosshair, ShieldAlert, Wifi, Zap, Terminal, 
   Play, Pause, AlertOctagon, Settings2, ListTodo, Target, Navigation, Unlock, Lock
@@ -32,6 +32,29 @@ export default function App() {
   });
   const [popupMenu, setPopupMenu] = useState({ visible: false, taskId: null, x: 0, y: 0, focusedOptionIndex: 0 });
   const [focusedTaskId, setFocusedTaskId] = useState(null);
+  
+  // Sistem Logları
+  const [logs, setLogs] = useState([
+    { id: 1, time: new Date().toLocaleTimeString('tr-TR', { hour12: false }), sender: 'SYS_AUTH', text: 'Sistem başlatıldı. NEXUS Çöl Harekat Merkezi devrede.', type: 'success' }
+  ]);
+  const logContainerRef = useRef(null);
+
+  const addLog = (sender, text, type = 'info') => {
+    setLogs(prev => [...prev, {
+      id: Date.now() + Math.random(),
+      time: new Date().toLocaleTimeString('tr-TR', { hour12: false }),
+      sender,
+      text,
+      type
+    }]);
+  };
+
+  // Loglar eklendikçe en alta scroll
+  useEffect(() => {
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+    }
+  }, [logs]);
   
   const isTargeting = taskStatuses[7] === 'AKTİF';
 
@@ -68,18 +91,17 @@ export default function App() {
       
       // O/o Tuşu İle Mod Geçişi
       if (key === 'o') {
-        setDriveMode(prev => {
-          const nextMode = prev === 'OTONOM' ? 'MANUEL' : 'OTONOM';
-          if (nextMode === 'OTONOM') {
-            setPressedKeys(new Set());
-            setFocusedTaskId(null);
-            setPopupMenu(p => ({ ...p, visible: false }));
-          } else {
-            const activeTask = Object.keys(taskStatuses).find(k => taskStatuses[k] === 'AKTİF') || 1;
-            setFocusedTaskId(Number(activeTask));
-          }
-          return nextMode;
-        });
+        const nextMode = driveMode === 'OTONOM' ? 'MANUEL' : 'OTONOM';
+        setDriveMode(nextMode);
+        if (nextMode === 'OTONOM') {
+          setPressedKeys(new Set());
+          setFocusedTaskId(null);
+          setPopupMenu(p => ({ ...p, visible: false }));
+        } else {
+          const activeTask = Object.keys(taskStatuses).find(k => taskStatuses[k] === 'AKTİF') || 1;
+          setFocusedTaskId(Number(activeTask));
+        }
+        addLog('SYS_AUTH', `${nextMode} sürüş modu aktifleştirildi.`, nextMode === 'MANUEL' ? 'warning' : 'success');
         return;
       }
 
@@ -167,6 +189,20 @@ export default function App() {
       return next;
     });
     setPopupMenu({ visible: false, taskId: null, x: 0, y: 0, focusedOptionIndex: 0 });
+
+    // Duruma göre log ekle
+    const taskNames = {
+      1: "Su Geçişi", 2: "Taşlı Yol", 3: "Kayar Engel", 
+      4: "Tabela Okuma", 5: "Dik Eğim (Stop)", 6: "Yan Eğim", 7: "Atış Görevi"
+    };
+    if (status === 'AKTİF') {
+      addLog('NAV_CORE', `${taskNames[id]} görevine başlandı.`, 'info');
+      if (id === 7) addLog('WPN_SYS', 'Silah sistemleri devreye alınıyor. Hedef taraması başladı.', 'error');
+    } else if (status === 'TAMAM') {
+      addLog('NAV_CORE', `${taskNames[id]} görevi başarıyla tamamlandı.`, 'success');
+    } else {
+      addLog('NAV_CORE', `${taskNames[id]} görevi beklemeye alındı.`, 'warning');
+    }
   };
 
   return (
@@ -232,7 +268,10 @@ export default function App() {
             <span className="text-base lg:text-lg font-bold text-[#22c55e]">98%</span>
             <span className="text-[9px] lg:text-[10px] text-[#22c55e]/80">{telemetry.ping}MS</span>
           </div>
-          <button className="bg-[#ef4444] hover:bg-red-600 text-white px-4 lg:px-6 py-1.5 lg:py-2 font-bold flex items-center space-x-2 transition-all border-2 border-red-300 shadow-[0_0_15px_rgba(239,68,68,0.4)] active:scale-95 uppercase tracking-widest">
+          <button 
+            onClick={() => addLog('SYS_CRIT', 'ACİL DURDURMA PROTOKOLÜ DEVREDE!', 'error')}
+            className="bg-[#ef4444] hover:bg-red-600 text-white px-4 lg:px-6 py-1.5 lg:py-2 font-bold flex items-center space-x-2 transition-all border-2 border-red-300 shadow-[0_0_15px_rgba(239,68,68,0.4)] active:scale-95 uppercase tracking-widest"
+          >
             <AlertOctagon size={18} />
             <span className="text-sm lg:text-base">Acil Durdurma</span>
           </button>
@@ -485,16 +524,20 @@ export default function App() {
                 <Terminal size={14} />
                 Sistem Olay Günlüğü
               </h2>
-              <div className="flex-1 bg-[#161412] border border-stone-700 p-2 overflow-y-auto text-[9px] lg:text-[11px] font-bold space-y-1 lg:space-y-2 tracking-widest leading-relaxed">
-                <div className="text-[#22c55e]"><span className="text-stone-500 mr-2">[14:21:05]</span> SYS_AUTH: Otonom mod aktif.</div>
-                <div className="text-stone-200"><span className="text-stone-500 mr-2">[14:21:08]</span> VISION_CORE: Su geçişi tespit.</div>
-                <div className="text-[#f59e0b]"><span className="text-stone-500 mr-2">[14:22:15]</span> VISION_WARN: Kayar engel aşıldı.</div>
-                {isTargeting && (
-                  <>
-                    <div className="text-stone-200"><span className="text-stone-500 mr-2">[14:24:10]</span> NAV_CORE: Atış istasyonuna ulaşıldı. Araç durduruldu.</div>
-                    <div className="text-[#ef4444] animate-pulse"><span className="text-stone-500 mr-2">[14:24:11]</span> WPN_SYS: Silah sistemleri devreye alınıyor. Hedef taraması başladı.</div>
-                  </>
-                )}
+              <div ref={logContainerRef} className="flex-1 bg-[#161412] border border-stone-700 p-2 overflow-y-auto text-[9px] lg:text-[11px] font-bold space-y-1 lg:space-y-2 tracking-widest leading-relaxed">
+                {logs.map(log => {
+                  let colorClass = 'text-stone-200';
+                  if (log.type === 'success') colorClass = 'text-[#22c55e]';
+                  if (log.type === 'warning') colorClass = 'text-[#f59e0b]';
+                  if (log.type === 'error') colorClass = 'text-[#ef4444] animate-pulse';
+                  
+                  return (
+                    <div key={log.id} className={colorClass}>
+                      <span className="text-stone-500 mr-2">[{log.time}]</span> 
+                      {log.sender}: {log.text}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
