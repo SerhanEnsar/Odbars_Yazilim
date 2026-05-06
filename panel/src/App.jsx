@@ -57,6 +57,16 @@ export default function App() {
     
     const handleKeyDown = (e) => {
       const key = e.key.toLowerCase();
+      
+      if (key === 'o') {
+        setDriveMode(prev => {
+          const nextMode = prev === 'OTONOM' ? 'MANUEL' : 'OTONOM';
+          if (nextMode === 'OTONOM') setPressedKeys(new Set());
+          return nextMode;
+        });
+        return;
+      }
+
       if (driveMode === 'MANUEL' && validKeys.includes(key)) {
         setPressedKeys(prev => new Set(prev).add(key));
       }
@@ -171,15 +181,15 @@ export default function App() {
             <div className="grid grid-cols-2 gap-2">
               <button 
                 onClick={() => { setDriveMode('OTONOM'); setPressedKeys(new Set()); }}
-                className={`py-1.5 font-bold transition-colors tracking-widest shadow-md text-xs ${driveMode === 'OTONOM' ? 'bg-[#f59e0b] text-black' : 'bg-[#161412] text-stone-400 border border-stone-600 hover:text-stone-200'}`}
+                className={`py-1.5 font-bold transition-colors tracking-widest shadow-md text-xs flex justify-center items-center gap-1 ${driveMode === 'OTONOM' ? 'bg-[#f59e0b] text-black' : 'bg-[#161412] text-stone-400 border border-stone-600 hover:text-stone-200'}`}
               >
-                OTONOM
+                OTONOM <span className="text-[9px] opacity-70">[O]</span>
               </button>
               <button 
                 onClick={() => setDriveMode('MANUEL')}
-                className={`py-1.5 font-bold transition-colors tracking-widest text-xs ${driveMode === 'MANUEL' ? 'bg-[#f59e0b] text-black' : 'bg-[#161412] border border-stone-600 text-stone-400 hover:text-stone-200'}`}
+                className={`py-1.5 font-bold transition-colors tracking-widest text-xs flex justify-center items-center gap-1 ${driveMode === 'MANUEL' ? 'bg-[#f59e0b] text-black' : 'bg-[#161412] border border-stone-600 text-stone-400 hover:text-stone-200'}`}
               >
-                MANUEL
+                MANUEL <span className="text-[9px] opacity-70">[O]</span>
               </button>
             </div>
 
