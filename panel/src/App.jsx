@@ -80,7 +80,16 @@ export default function App() {
   }, [driveMode]);
 
   const updateTaskStatus = (id, status) => {
-    setTaskStatuses(prev => ({ ...prev, [id]: status }));
+    setTaskStatuses(prev => {
+      const next = { ...prev };
+      if (status === 'AKTİF') {
+        Object.keys(next).forEach(k => {
+          if (next[k] === 'AKTİF') next[k] = 'BEKLEME';
+        });
+      }
+      next[id] = status;
+      return next;
+    });
     setPopupMenu({ visible: false, taskId: null, x: 0, y: 0 });
   };
 
@@ -171,22 +180,16 @@ export default function App() {
             </div>
 
             {/* Klavye Göstergesi */}
-            <div className={`mt-3 transition-opacity duration-300 ${driveMode === 'MANUEL' ? 'opacity-100' : 'opacity-30 pointer-events-none grayscale'}`}>
-              <span className="text-[8px] text-stone-400 font-bold block mb-2 text-center tracking-widest uppercase">Manuel Sürüş Kontrolleri</span>
-              <div className="flex flex-col items-center gap-1">
-                <div className="flex justify-center gap-1">
-                   <Keybox letter="q" unassigned />
-                   <Keybox letter="w" pressed={pressedKeys.has('w')} />
-                   <Keybox letter="e" unassigned />
-                </div>
-                <div className="flex justify-center gap-1">
-                   <Keybox letter="a" pressed={pressedKeys.has('a')} />
-                   <Keybox letter="s" pressed={pressedKeys.has('s')} />
-                   <Keybox letter="d" pressed={pressedKeys.has('d')} />
-                </div>
-                <div className="flex justify-center mt-1">
-                   <Keybox letter="space" label="FREN" pressed={pressedKeys.has(' ')} wide />
-                </div>
+            <div className={`mt-3 transition-all duration-300 ${driveMode === 'MANUEL' ? 'opacity-100 min-h-[32px]' : 'opacity-0 h-0 overflow-hidden'}`}>
+              <div className="flex justify-center gap-2 flex-wrap">
+                {Array.from(pressedKeys).map(key => (
+                  <Keybox 
+                    key={key} 
+                    letter={key === ' ' ? 'FREN' : key} 
+                    pressed={true} 
+                    wide={key === ' '} 
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -224,11 +227,12 @@ export default function App() {
                   <div 
                     key={task.id} 
                     onClick={(e) => {
+                      if (driveMode !== 'MANUEL') return;
                       e.stopPropagation();
                       const rect = e.currentTarget.getBoundingClientRect();
                       setPopupMenu({ visible: true, taskId: task.id, x: rect.right - 100, y: rect.bottom - 10 });
                     }}
-                    className={`flex items-center justify-between p-1.5 relative overflow-hidden transition-colors cursor-pointer hover:border-stone-400
+                    className={`flex items-center justify-between p-1.5 relative overflow-hidden transition-colors ${driveMode === 'MANUEL' ? 'cursor-pointer hover:border-stone-400' : ''}
                       ${isCompleted ? 'bg-[#22c55e]/10 border border-[#22c55e]/50' : ''}
                       ${isActive ? 'bg-[#161412] border-2 border-[#f59e0b]' : ''}
                       ${isPending ? 'bg-[#161412] border border-stone-700 opacity-80' : ''}
