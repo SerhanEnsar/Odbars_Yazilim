@@ -3,17 +3,18 @@
 *Lütfen her tamamlanan görevden veya önemli bir karardan sonra bu dosyayı güncelleyin.*
 
 ## Son Güncelleme: 6 Mayıs 2026
-**Durum**: Projenin iskeleti kuruldu ve temel planlamalar yapıldı.
+**Durum**: Proje hedefi TEKNOFEST İnsansız Kara Aracı (İKA) yarışması olarak güncellendi. Tüm mimari ve planlamalar bu yeni şartnameye göre (Manuel sürüş, otonom sürüş, atış görevi, koni ve hareketli engeller) revize edildi.
+
 **Tamamlananlar**:
 - `vision/`, `panel/` ve `docs/` klasör yapıları oluşturuldu.
-- Git repo başlatıldı ve `main` branch'ine ilk push yapıldı.
-- `docs/` altında mimari, panel ve vision için markdown planları oluşturuldu.
-- Ajanlar arası senkronizasyon için `agent/` klasörü eklendi.
+- Git repo başlatıldı ve GitHub'a bağlandı.
+- Dokümantasyonlar "İnsansız Kara Aracı" konseptine geçiş yapılarak güncellendi.
+- Ajanların haberleşme ve PR süreçlerini eksiksiz yürütebilmeleri için `INSTRUCTIONS.md` güncellendi.
 
 **Sıradaki Adımlar (To-Do)**:
-1. GCS Panel (Yer Kontrol İstasyonu) için kullanıcı (User) tarafından iletilecek Roadmap'in incelenmesi.
-2. Roadmap onaylandıktan sonra `feature/panel-init` (veya benzeri) bir branch açılıp panelin kodlanmasına başlanması.
-3. Görüntü işleme modülü (Vision) için YOLO ve sunucu haberleşmesi iskeletinin kurulması.
+1. Kullanıcıdan Panel tasarımı için hazırlanan Roadmap'in alınması.
+2. Roadmap baz alınarak `feature/panel-init` isimli bir branch açılması ve Yer Kontrol İstasyonu kodlamasına başlanması.
+3. Manuel kontrol (Joystick/Klavye verisi) ve kamera yayın (WebRTC/UDP) altyapısının tasarlanması.
 
 **Bloke Eden Durumlar (Blockers)**:
 - Yok. Sadece Roadmap bekleniyor.

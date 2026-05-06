@@ -1,16 +1,15 @@
-# TEKNOFEST Havacılıkta Yapay Zeka - Sistem Mimarisi
+# TEKNOFEST İnsansız Kara Aracı (İKA) - Sistem Mimarisi
 
 ## Genel Bakış
-Proje iki ana modülden oluşmaktadır:
-1. **Görüntü İşleme Modülü (Vision System)**: Sunucudan görüntüleri alan, üzerinde yapay zeka modelleri (nesne tespiti, pozisyon kestirimi, görüntü eşleme) koşturan ve sonuçları üreten sistem.
-2. **Yer Kontrol İstasyonu (GCS Panel)**: Operatörün sistemi takip edeceği, kamera görüntülerini canlı olarak bounding-box'lar (sınır kutuları) ile göreceği, bağlantı durumlarını ve telemetri bilgilerini anlık izleyebileceği modern arayüz.
+Proje, otonom ve uzaktan kumandalı sürüş yeteneklerine sahip bir İnsansız Kara Aracı (İKA) sistemini içermektedir. İki ana yazılım modülü bulunmaktadır:
+1. **Araç Üzeri Yazılım & Otonomi (Vision & Control)**: Aracın üzerindeki işlemcide çalışan, kameralardan gelen verileri işleyip (şerit takibi, koni tespiti, hareketli engel tespiti, hedef panosu tespiti) aracı yönlendiren ve otonom atış kararını veren otonomi/görüntü işleme sistemi.
+2. **Yer Kontrol İstasyonu (GCS Panel)**: Operatörün aracı manuel koşuda uzaktan kontrol edeceği (RF/Wi-Fi), 3 farklı kameranın (ön, arka, nişan) canlı görüntülerini izleyeceği, telemetri verilerini göreceği ve acil durdurma (E-Stop) komutunu verebileceği modern arayüz.
 
 ## İletişim ve Veri Akışı
-- **Yarışma Sunucusu**: `http://IP:5000` üzerinden JSON API sunar. Görüntüleri ve telemetriyi verir, sonuçları alır.
-- **Vision Core**: Yarışma sunucusu ile API haberleşmesini yönetir. Görüntüleri işler.
-- **GCS Panel <-> Vision Core**: Panel, vision core üzerinden websocket veya yerel bir REST API ile beslenir. GCS Panel sadece bir "Front-end" olarak çalışırken, Vision System "Back-end" işlevini de üstlenir.
+- **GCS Panel <-> Araç (İKA)**: Araç ve yer istasyonu arasında düşük gecikmeli bir haberleşme protokolü (WebRTC üzerinden video akışı ve WebSocket/UDP üzerinden telemetri/kontrol komutları) kullanılacaktır.
+- Araç üzerinde ROS (Robot Operating System) veya benzer modüler bir middleware kullanılması durumunda, GCS Paneli ROSBridge (veya özel bir API) aracılığıyla araca bağlanacaktır.
 
 ## Modüler Yapı
-- `/vision`: Görüntü işleme modellerinin eğitimi, test edilmesi ve inferance (çıkarım) kodlarını barındırır.
-- `/panel`: React, Vue, Next.js veya saf HTML/JS tabanlı modern GCS arayüzünü barındırır.
-- `/docs`: Projenin planlamasını ve dökümantasyonunu tutar.
+- `/vision`: Otonom sürüş algoritmaları, engel tanıma, atış hedefini hizalama ve 3 kameranın verilerini işleyen modüller.
+- `/panel`: Aracı manuel olarak yönlendirme arayüzünü, sensör okumalarını ve kamera yayınlarını barındıran kontrol paneli.
+- `/docs`: Sistematik geliştirme ve proje takibi dokümantasyonu.

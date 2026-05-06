@@ -1,20 +1,21 @@
-# Görüntü İşleme (Vision System) Planlaması
+# Görüntü İşleme ve Otonomi (Vision System) Planlaması
 
-## 1. Görevler ve Algoritmalar
-1. **Nesne Tespiti (Object Detection)**: 
-   - İnsan, Taşıt, UAP (Uçuşa Uygun Alan Personel), UAİ (Uçuşa Uygun Alan İniş).
-   - Hareket durumlarının takibi (Optical Flow veya ardışık kare analizi).
-   - *Planlanan Model*: YOLOv8 / YOLOv10 (Hızlı çıkarım süresi ve yüksek isabet oranları sebebiyle).
-2. **Pozisyon Kestirimi (Position Estimation)**:
-   - Referans konum verileri kullanılarak ekrandaki objelerin dünya koordinatlarına dönüştürülmesi.
-   - Kamera matriksi (Intrinsic) ve duruş (Extrinsic/Pose) kestirimi (PnP, homography vb.).
-3. **Görüntü Eşleme (Image Matching)**:
-   - SIFT / ORB veya derin öğrenme tabanlı eşleştirici algoritmalar (SuperGlue/LightGlue) kullanılarak referans görüntü ile hedefi bulma.
+## 1. Algılama ve Görevler
+Şartnamedeki zorlu parkur ve atış görevlerini tamamlamak üzere aşağıdaki otonomi yetenekleri geliştirilecektir:
+1. **Parkur ve Engel Tespiti**:
+   - Parkuru sınırlayan bariyerlerin tespiti ile şerit takip algoritması.
+   - Trafik Konisi (Kırmızı-beyaz/Turuncu-beyaz) tespiti ve kaçınma.
+   - Kayar Engel (sürekli git-gel yapan 1 metrelik engel) tespiti ve hız ayarı ile zamanlamalı geçiş.
+2. **Atış ve Hedef Tespiti**:
+   - Nişan kamerası kullanılarak, 10 metre mesafedeki A3 boyutundaki hedef panosunun tespiti.
+   - Hedef panosundaki iç içe geçmiş halkaların algılanması ve lazerin tam orta noktaya otonom olarak hizalanması.
 
-## 2. Optimizasyon ve Süre
-- Yarışmada yaklaşık 5 dakika içerisinde 2250 kare işlenmesi gerekiyor (Yani ortalama 7.5 FPS).
-- Modelin GPU veya TensorRT üzerinde optimize çalışması şart.
+## 2. Kamera Konfigürasyonu
+- Araçta Şartname gereği **en az 3 kamera** bulunacaktır:
+  - Ön (İleri Sürüş) Kamerası
+  - Arka (Geri Sürüş) Kamerası
+  - Nişan Kamerası (Atış hizalama için yüksek zoom veya dar açılı özel kamera)
 
-## 3. Haberleşme
-- Sunucudan `GET` / `POST` metotları ile JSON istekleri çekilecek. İşlem tamamlandıktan sonra sonuç paketi oluşturulup tekrar sunucuya iletilecek.
-- Ayrıca Panel modülüne anlık veri akışı sağlamak için sistem `FastAPI` / `Flask` ile bir websocket veya lokal API ayağa kaldıracak.
+## 3. Optimizasyon
+- Nesne tanıma işlemleri (YOLOv8 vb. modeller ile koni ve hedef tespiti) edge cihazda (ör. Jetson Nano/Orin) çalışacak şekilde optimize edilecektir (TensorRT).
+- Sensör ve kontrol döngüsü gerçek zamanlı (düşük gecikmeli) çalışmalıdır.

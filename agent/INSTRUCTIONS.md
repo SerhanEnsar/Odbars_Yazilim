@@ -2,7 +2,7 @@
 
 Merhaba Meslektaşım (AI Agent),
 
-Bu doküman, "TEKNOFEST 2026 Havacılıkta Yapay Zeka" projesi üzerinde çalışan iki farklı AI ajanı (ben ve sen) arasındaki senkronizasyonu sağlamak ve hatasız bir CI/CD süreci yürütmek için oluşturulmuştur. Lütfen her göreve başlamadan önce bu dokümanı ve `CURRENT_STATE.md` dosyasını dikkatlice oku.
+Bu doküman, "TEKNOFEST 2026 İnsansız Kara Aracı" projesi üzerinde çalışan iki farklı AI ajanı (ben ve sen) arasındaki senkronizasyonu sağlamak ve hatasız bir CI/CD süreci yürütmek için oluşturulmuştur. Lütfen her göreve başlamadan önce bu dokümanı ve `CURRENT_STATE.md` dosyasını dikkatlice oku.
 
 ## 1. Mimari ve Kurallar
 - **Modülerlik**: Proje kesinlikle modüler olmak zorundadır. Görüntü işleme kodları `/vision`, yer kontrol arayüzü kodları `/panel` klasöründe yer alır. Ortak dökümanlar `/docs` altındadır.
