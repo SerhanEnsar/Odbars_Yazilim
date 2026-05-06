@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Activity, Battery, Camera, Crosshair, ShieldAlert, Wifi, Zap, Terminal, 
-  Play, Pause, AlertOctagon, Settings2, ListTodo, Target, Navigation, Unlock, Lock
+  Play, Pause, AlertOctagon, Settings2, ListTodo, Target, Navigation, Unlock, Lock, Bell
 } from 'lucide-react';
 
 const Keybox = ({ letter, label, pressed, unassigned, wide }) => {
@@ -221,24 +221,26 @@ export default function App() {
     <div className="h-screen w-screen bg-transparent text-stone-200 p-4 font-mono select-none flex flex-col overflow-hidden scanlines box-border" onClick={() => popupMenu.visible && setPopupMenu({ ...popupMenu, visible: false })}>
       
       {/* Toast Bildirimleri */}
-      <div className="fixed top-24 right-6 z-50 flex flex-col gap-3 pointer-events-none w-80">
-        {toasts.map(toast => {
-          let colorClass = 'border-stone-500 text-stone-200 bg-[#161412]/90';
-          if (toast.type === 'success') colorClass = 'border-[#22c55e] text-[#22c55e] bg-[#22c55e]/20';
-          if (toast.type === 'warning') colorClass = 'border-[#f59e0b] text-[#f59e0b] bg-[#f59e0b]/20';
-          if (toast.type === 'error') colorClass = 'border-[#ef4444] text-[#ef4444] bg-[#ef4444]/20 shadow-[0_0_15px_rgba(239,68,68,0.3)]';
-          
-          return (
-            <div key={toast.id} className={`p-3 border-l-4 backdrop-blur-md flex flex-col transition-all duration-300 ${colorClass}`}>
-               <div className="flex items-center gap-2 mb-1">
-                 <Terminal size={12} className="opacity-70" />
-                 <span className="text-[9px] font-bold tracking-widest uppercase opacity-70">[{toast.time}] {toast.sender}</span>
-               </div>
-               <span className="text-[10px] font-bold tracking-wider">{toast.text}</span>
-            </div>
-          );
-        })}
-      </div>
+      {(!isLogExpanded && toasts.length > 0) && (
+        <div className="fixed top-24 right-6 z-50 flex flex-col gap-3 pointer-events-none w-80">
+          {toasts.map(toast => {
+            let colorClass = 'border-stone-500 text-stone-200 bg-[#161412]/90';
+            if (toast.type === 'success') colorClass = 'border-[#22c55e] text-[#22c55e] bg-[#22c55e]/20';
+            if (toast.type === 'warning') colorClass = 'border-[#f59e0b] text-[#f59e0b] bg-[#f59e0b]/20';
+            if (toast.type === 'error') colorClass = 'border-[#ef4444] text-[#ef4444] bg-[#ef4444]/20 shadow-[0_0_15px_rgba(239,68,68,0.3)]';
+            
+            return (
+              <div key={toast.id} className={`p-3 border-l-4 backdrop-blur-md flex flex-col transition-all duration-300 ${colorClass}`}>
+                 <div className="flex items-center gap-2 mb-1">
+                   <Bell size={12} className="opacity-70" />
+                   <span className="text-[9px] font-bold tracking-widest uppercase opacity-70">[{toast.time}] {toast.sender}</span>
+                 </div>
+                 <span className="text-[10px] font-bold tracking-wider">{toast.text}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Görev Popup Menüsü */}
       {popupMenu.visible && (
@@ -472,77 +474,73 @@ export default function App() {
         </div>
 
         {/* Center & Right Column: Cameras and Target */}
-        <div className="col-span-9 flex flex-col h-full min-h-0 relative">
+        <div className="col-span-9 relative w-full h-full min-h-0 bg-[#161412]">
           
-          {/* Animated Cameras Container */}
-          <div className="flex-1 relative min-h-0 w-full overflow-hidden">
-            
-            {/* CAM 1 - FWD */}
-            <div 
-              className={`absolute transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] p-1.5
-              ${isTargeting 
-                ? 'top-[65%] left-0 w-1/2 h-[35%] opacity-80' 
-                : 'top-0 left-0 w-full h-[65%] opacity-100'}`}
-            >
-              <div className="w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-stone-800 to-[#161412]">
-                <div className="corners-alt"></div>
-                <div className="absolute top-2 left-2 z-10 flex items-center gap-2 bg-[#2a241c]/90 px-2 py-1 border border-stone-600 shadow-md">
-                  <div className={`w-2 h-2 ${isTargeting ? 'bg-stone-500' : 'bg-[#ef4444] animate-pulse'}`}></div>
-                  <span className="text-[9px] lg:text-xs font-bold text-stone-200 tracking-widest">CAM_01_FWD</span>
-                </div>
-                
-                {/* Fake AI Overlay - Only visible when large */}
-                <div className={`absolute inset-0 transition-opacity duration-300 ${isTargeting ? 'opacity-0' : 'opacity-100'}`}>
-                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-40">
-                    <div className="w-full h-[1px] bg-[#f59e0b]/50 absolute"></div>
-                    <div className="h-full w-[1px] bg-[#f59e0b]/50 absolute"></div>
-                  </div>
-                  <div className="absolute top-1/2 left-1/3 w-20 h-28 border-2 border-[#f59e0b] bg-[#f59e0b]/20 flex flex-col justify-end shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                    <div className="bg-[#f59e0b] text-black text-[9px] font-bold px-1 uppercase tracking-widest">TGT: ENGEL (82%)</div>
-                  </div>
-                </div>
-                <Camera size={48} className="text-stone-600 absolute" />
+          {/* CAM 1 - FWD */}
+          <div 
+            className={`absolute transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] p-1.5
+            ${isTargeting 
+              ? 'top-[65%] left-0 w-1/2 h-[35%] opacity-80' 
+              : 'top-0 left-0 w-full h-[65%] opacity-100'}`}
+          >
+            <div className="w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-stone-800 to-[#161412]">
+              <div className="corners-alt"></div>
+              <div className="absolute top-2 left-2 z-10 flex items-center gap-2 bg-[#2a241c]/90 px-2 py-1 border border-stone-600 shadow-md">
+                <div className={`w-2 h-2 ${isTargeting ? 'bg-stone-500' : 'bg-[#ef4444] animate-pulse'}`}></div>
+                <span className="text-[9px] lg:text-xs font-bold text-stone-200 tracking-widest">CAM_01_FWD</span>
               </div>
+              
+              {/* Fake AI Overlay - Only visible when large */}
+              <div className={`absolute inset-0 transition-opacity duration-300 ${isTargeting ? 'opacity-0' : 'opacity-100'}`}>
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-40">
+                  <div className="w-full h-[1px] bg-[#f59e0b]/50 absolute"></div>
+                  <div className="h-full w-[1px] bg-[#f59e0b]/50 absolute"></div>
+                </div>
+                <div className="absolute top-1/2 left-1/3 w-20 h-28 border-2 border-[#f59e0b] bg-[#f59e0b]/20 flex flex-col justify-end shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+                  <div className="bg-[#f59e0b] text-black text-[9px] font-bold px-1 uppercase tracking-widest">TGT: ENGEL (82%)</div>
+                </div>
+              </div>
+              <Camera size={48} className="text-stone-600 absolute" />
             </div>
+          </div>
 
-            {/* CAM 2 - REAR */}
-            <div 
-              className={`absolute transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] p-1.5
-              ${isTargeting 
-                ? 'top-[65%] left-1/2 w-1/2 h-[35%] opacity-80' 
-                : 'top-[65%] left-0 w-1/2 h-[35%] opacity-80'}`}
-            >
-              <div className="w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden bg-[#1e1b18]">
-                <div className="absolute top-1 left-1 z-10 text-[9px] lg:text-[10px] font-bold bg-[#2a241c]/90 px-2 py-1 text-stone-300 border border-stone-600 tracking-widest">CAM_02_REAR</div>
-                <span className="text-stone-500 text-[9px] lg:text-[11px] font-bold tracking-widest uppercase">Sinyal Aranıyor...</span>
-              </div>
+          {/* CAM 2 - REAR */}
+          <div 
+            className={`absolute transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] p-1.5
+            ${isTargeting 
+              ? 'top-[65%] left-1/2 w-1/2 h-[35%] opacity-80' 
+              : 'top-[65%] left-0 w-1/2 h-[35%] opacity-80'}`}
+          >
+            <div className="w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden bg-[#1e1b18]">
+              <div className="absolute top-1 left-1 z-10 text-[9px] lg:text-[10px] font-bold bg-[#2a241c]/90 px-2 py-1 text-stone-300 border border-stone-600 tracking-widest">CAM_02_REAR</div>
+              <span className="text-stone-500 text-[9px] lg:text-[11px] font-bold tracking-widest uppercase">Sinyal Aranıyor...</span>
             </div>
+          </div>
 
-            {/* CAM 3 - AIM (Targeting) */}
-            <div 
-              className={`absolute transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] p-1.5
-              ${isTargeting 
-                ? 'top-0 left-0 w-full h-[65%] opacity-100' 
-                : 'top-[65%] left-1/2 w-1/2 h-[35%] opacity-80'}`}
-            >
-              <div className={`w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden bg-[#1e1b18] transition-all duration-700 ${isTargeting ? 'border-2 border-[#ef4444]/50 shadow-[0_0_30px_rgba(239,68,68,0.15)]' : ''}`}>
-                <div className="corners-alt"></div>
-                <div className="absolute top-2 left-2 z-10 text-[9px] lg:text-[11px] bg-[#2a241c]/90 px-2 py-1 text-[#f59e0b] border border-[#f59e0b]/50 tracking-widest font-bold flex items-center gap-2 transition-all">
-                  <Crosshair size={isTargeting ? 14 : 12} className={isTargeting ? "text-[#ef4444] animate-pulse" : ""} /> CAM_03_AIM
-                </div>
-                
-                {/* Fake target scope - Scales based on state */}
-                <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-700 ${isTargeting ? 'opacity-100 scale-125' : 'opacity-60 scale-75'}`}>
-                  <div className={`rounded-full border-2 border-[#ef4444] relative transition-all duration-700 ${isTargeting ? 'w-48 h-48 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : 'w-20 h-20'}`}>
-                    <div className="absolute top-1/2 left-[-20px] right-[-20px] h-[2px] bg-[#ef4444]"></div>
-                    <div className="absolute left-1/2 top-[-20px] bottom-[-20px] w-[2px] bg-[#ef4444]"></div>
-                    <div className={`rounded-full border border-[#ef4444]/50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ${isTargeting ? 'w-24 h-24' : 'w-10 h-10'}`}></div>
-                  </div>
-                </div>
-                <span className={`text-[#ef4444] font-bold tracking-widest uppercase mt-32 transition-all duration-500 ${isTargeting ? 'text-sm opacity-100' : 'text-[9px] opacity-60'}`}>
-                  {isTargeting ? 'HEDEF ARANIYOR...' : 'BEKLEMEDE'}
-                </span>
+          {/* CAM 3 - AIM (Targeting) */}
+          <div 
+            className={`absolute transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] p-1.5
+            ${isTargeting 
+              ? 'top-0 left-0 w-full h-[65%] opacity-100' 
+              : 'top-[65%] left-1/2 w-1/2 h-[35%] opacity-80'}`}
+          >
+            <div className={`w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden bg-[#1e1b18] transition-all duration-700 ${isTargeting ? 'border-2 border-[#ef4444]/50 shadow-[0_0_30px_rgba(239,68,68,0.15)]' : ''}`}>
+              <div className="corners-alt"></div>
+              <div className="absolute top-2 left-2 z-10 text-[9px] lg:text-[11px] bg-[#2a241c]/90 px-2 py-1 text-[#f59e0b] border border-[#f59e0b]/50 tracking-widest font-bold flex items-center gap-2 transition-all">
+                <Crosshair size={isTargeting ? 14 : 12} className={isTargeting ? "text-[#ef4444] animate-pulse" : ""} /> CAM_03_AIM
               </div>
+              
+              {/* Fake target scope - Scales based on state */}
+              <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-700 ${isTargeting ? 'opacity-100 scale-125' : 'opacity-60 scale-75'}`}>
+                <div className={`rounded-full border-2 border-[#ef4444] relative transition-all duration-700 ${isTargeting ? 'w-48 h-48 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : 'w-20 h-20'}`}>
+                  <div className="absolute top-1/2 left-[-20px] right-[-20px] h-[2px] bg-[#ef4444]"></div>
+                  <div className="absolute left-1/2 top-[-20px] bottom-[-20px] w-[2px] bg-[#ef4444]"></div>
+                  <div className={`rounded-full border border-[#ef4444]/50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ${isTargeting ? 'w-24 h-24' : 'w-10 h-10'}`}></div>
+                </div>
+              </div>
+              <span className={`text-[#ef4444] font-bold tracking-widest uppercase mt-32 transition-all duration-500 ${isTargeting ? 'text-sm opacity-100' : 'text-[9px] opacity-60'}`}>
+                {isTargeting ? 'HEDEF ARANIYOR...' : 'BEKLEMEDE'}
+              </span>
             </div>
           </div>
 
@@ -580,32 +578,11 @@ export default function App() {
                  onClick={() => setIsLogExpanded(true)}
                  className="bg-[#2a241c]/90 backdrop-blur-md border border-stone-600 px-4 py-2 flex items-center gap-3 hover:bg-[#161412] hover:border-[#f59e0b] transition-all text-stone-300 group shadow-lg"
                >
-                 <Terminal size={16} className="text-[#f59e0b] group-hover:animate-pulse" />
+                 <Bell size={16} className="text-[#f59e0b] group-hover:animate-pulse" />
                  <span className="text-xs font-bold tracking-widest uppercase">Olay Günlüğü</span>
                  <span className="text-[9px] bg-[#161412] px-2 py-0.5 border border-stone-700 text-[#f59e0b]">{logs.length} KAYIT</span>
                </button>
             )}
-          </div>
-
-          {/* Atış Paneli Floating */}
-          <div className="absolute bottom-3 right-3 z-30 w-64 bg-[#2a241c]/90 backdrop-blur-md p-3 tactical-border flex flex-col items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.8)]">
-            <div className="corners-alt"></div>
-            <div className={`absolute top-0 w-full h-1 transition-colors duration-500 ${isTargeting ? 'bg-[#ef4444] opacity-100 shadow-[0_0_20px_#ef4444]' : 'bg-[#f59e0b] opacity-50'}`}></div>
-            
-            <Crosshair size={24} className={`mb-1 lg:mb-2 transition-colors duration-500 ${isTargeting ? 'text-[#ef4444] animate-pulse' : 'text-stone-400'}`} />
-            <h3 className={`text-[10px] lg:text-sm font-bold mb-1 tracking-widest uppercase text-center transition-colors duration-500 ${isTargeting ? 'text-[#ef4444]' : 'text-[#f59e0b]'}`}>Silah Sistemleri</h3>
-            <span className={`text-[8px] lg:text-[9px] mb-2 lg:mb-4 tracking-widest font-bold uppercase text-center leading-tight transition-all duration-500 ${isTargeting ? 'text-stone-200' : 'text-stone-500'}`}>
-              {isTargeting ? 'Lazer Modülü Aktif\nHedef Aranıyor' : 'Sistem Beklemede\nOtonom Sürüş Aktif'}
-            </span>
-            
-            <div 
-              className={`w-full py-1.5 lg:py-2 font-bold transition-all duration-300 border-2 tracking-widest uppercase text-[9px] lg:text-xs flex justify-center items-center gap-2
-                ${isTargeting 
-                  ? 'bg-[#ef4444]/20 border-[#ef4444] text-[#ef4444] shadow-[0_0_10px_rgba(239,68,68,0.3)]' 
-                  : 'bg-[#161412] text-stone-500 border-stone-700'}`}
-            >
-              {isTargeting ? <><Unlock size={12}/> Mod Açık</> : <><Lock size={12}/> Kapalı</>}
-            </div>
           </div>
 
         </div>
