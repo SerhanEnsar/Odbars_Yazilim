@@ -37,16 +37,28 @@ export default function App() {
   const [logs, setLogs] = useState([
     { id: 1, time: new Date().toLocaleTimeString('tr-TR', { hour12: false }), sender: 'SYS_AUTH', text: 'Sistem başlatıldı. NEXUS Çöl Harekat Merkezi devrede.', type: 'success' }
   ]);
+  const [toasts, setToasts] = useState([]);
+  const [isLogExpanded, setIsLogExpanded] = useState(false);
   const logContainerRef = useRef(null);
 
   const addLog = (sender, text, type = 'info') => {
-    setLogs(prev => [...prev, {
+    const logItem = {
       id: Date.now() + Math.random(),
       time: new Date().toLocaleTimeString('tr-TR', { hour12: false }),
       sender,
       text,
       type
-    }]);
+    };
+
+    setLogs(prev => [...prev, logItem]);
+    
+    // Toast Notification ekle
+    setToasts(prev => [...prev, logItem]);
+    
+    // 5 saniye sonra Toast'ı kaybet
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== logItem.id));
+    }, 5000);
   };
 
   // Loglar eklendikçe en alta scroll
@@ -208,6 +220,26 @@ export default function App() {
   return (
     <div className="h-screen w-screen bg-transparent text-stone-200 p-4 font-mono select-none flex flex-col overflow-hidden scanlines box-border" onClick={() => popupMenu.visible && setPopupMenu({ ...popupMenu, visible: false })}>
       
+      {/* Toast Bildirimleri */}
+      <div className="fixed top-24 right-6 z-50 flex flex-col gap-3 pointer-events-none w-80">
+        {toasts.map(toast => {
+          let colorClass = 'border-stone-500 text-stone-200 bg-[#161412]/90';
+          if (toast.type === 'success') colorClass = 'border-[#22c55e] text-[#22c55e] bg-[#22c55e]/20';
+          if (toast.type === 'warning') colorClass = 'border-[#f59e0b] text-[#f59e0b] bg-[#f59e0b]/20';
+          if (toast.type === 'error') colorClass = 'border-[#ef4444] text-[#ef4444] bg-[#ef4444]/20 shadow-[0_0_15px_rgba(239,68,68,0.3)]';
+          
+          return (
+            <div key={toast.id} className={`p-3 border-l-4 backdrop-blur-md flex flex-col transition-all duration-300 ${colorClass}`}>
+               <div className="flex items-center gap-2 mb-1">
+                 <Terminal size={12} className="opacity-70" />
+                 <span className="text-[9px] font-bold tracking-widest uppercase opacity-70">[{toast.time}] {toast.sender}</span>
+               </div>
+               <span className="text-[10px] font-bold tracking-wider">{toast.text}</span>
+            </div>
+          );
+        })}
+      </div>
+
       {/* Görev Popup Menüsü */}
       {popupMenu.visible && (
         <div 
@@ -440,7 +472,7 @@ export default function App() {
         </div>
 
         {/* Center & Right Column: Cameras and Target */}
-        <div className="col-span-9 flex flex-col gap-3 h-full min-h-0">
+        <div className="col-span-9 flex flex-col h-full min-h-0 relative">
           
           {/* Animated Cameras Container */}
           <div className="flex-1 relative min-h-0 w-full overflow-hidden">
@@ -514,54 +546,66 @@ export default function App() {
             </div>
           </div>
 
-          {/* Action Log & Atış Paneli */}
-          <div className="h-28 lg:h-36 grid grid-cols-3 gap-3 shrink-0">
+          {/* Olay Günlüğü Floating Panel */}
+          <div className={`absolute bottom-3 left-3 z-30 transition-all duration-300 ease-in-out flex flex-col ${isLogExpanded ? 'w-[60%] h-64' : 'w-auto h-auto'}`}>
+            {isLogExpanded ? (
+               <div className="flex-1 bg-[#2a241c]/95 backdrop-blur-md p-3 tactical-border flex flex-col shadow-[0_0_30px_rgba(0,0,0,0.8)] relative">
+                 <div className="corners-alt"></div>
+                 <div className="flex justify-between items-center border-b border-stone-600 pb-2 mb-2">
+                   <h2 className="text-[10px] lg:text-xs font-bold text-[#f59e0b] uppercase flex items-center gap-2 tracking-widest">
+                    <Terminal size={14} /> Sistem Olay Günlüğü
+                   </h2>
+                   <button onClick={() => setIsLogExpanded(false)} className="text-stone-400 hover:text-[#f59e0b] text-[10px] font-bold tracking-widest uppercase transition-colors">
+                     [ Kapat ]
+                   </button>
+                 </div>
+                 <div ref={logContainerRef} className="flex-1 bg-[#161412]/80 border border-stone-700 p-2 overflow-y-auto text-[9px] lg:text-[11px] font-bold space-y-2 tracking-widest leading-relaxed">
+                   {logs.map(log => {
+                     let colorClass = 'text-stone-200';
+                     if (log.type === 'success') colorClass = 'text-[#22c55e]';
+                     if (log.type === 'warning') colorClass = 'text-[#f59e0b]';
+                     if (log.type === 'error') colorClass = 'text-[#ef4444] animate-pulse';
+                     
+                     return (
+                       <div key={log.id} className={colorClass}>
+                         <span className="text-stone-500 mr-2">[{log.time}]</span> 
+                         {log.sender}: {log.text}
+                       </div>
+                     );
+                   })}
+                 </div>
+               </div>
+            ) : (
+               <button 
+                 onClick={() => setIsLogExpanded(true)}
+                 className="bg-[#2a241c]/90 backdrop-blur-md border border-stone-600 px-4 py-2 flex items-center gap-3 hover:bg-[#161412] hover:border-[#f59e0b] transition-all text-stone-300 group shadow-lg"
+               >
+                 <Terminal size={16} className="text-[#f59e0b] group-hover:animate-pulse" />
+                 <span className="text-xs font-bold tracking-widest uppercase">Olay Günlüğü</span>
+                 <span className="text-[9px] bg-[#161412] px-2 py-0.5 border border-stone-700 text-[#f59e0b]">{logs.length} KAYIT</span>
+               </button>
+            )}
+          </div>
+
+          {/* Atış Paneli Floating */}
+          <div className="absolute bottom-3 right-3 z-30 w-64 bg-[#2a241c]/90 backdrop-blur-md p-3 tactical-border flex flex-col items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+            <div className="corners-alt"></div>
+            <div className={`absolute top-0 w-full h-1 transition-colors duration-500 ${isTargeting ? 'bg-[#ef4444] opacity-100 shadow-[0_0_20px_#ef4444]' : 'bg-[#f59e0b] opacity-50'}`}></div>
             
-            {/* Karar Log'u */}
-            <div className="col-span-2 bg-[#2a241c] p-2 lg:p-3 tactical-border flex flex-col relative min-h-0">
-               <div className="corners-alt"></div>
-               <h2 className="text-[10px] lg:text-xs font-bold text-[#f59e0b] uppercase mb-1 lg:mb-2 flex items-center gap-2 tracking-widest border-b border-stone-600 pb-1 lg:pb-2">
-                <Terminal size={14} />
-                Sistem Olay Günlüğü
-              </h2>
-              <div ref={logContainerRef} className="flex-1 bg-[#161412] border border-stone-700 p-2 overflow-y-auto text-[9px] lg:text-[11px] font-bold space-y-1 lg:space-y-2 tracking-widest leading-relaxed">
-                {logs.map(log => {
-                  let colorClass = 'text-stone-200';
-                  if (log.type === 'success') colorClass = 'text-[#22c55e]';
-                  if (log.type === 'warning') colorClass = 'text-[#f59e0b]';
-                  if (log.type === 'error') colorClass = 'text-[#ef4444] animate-pulse';
-                  
-                  return (
-                    <div key={log.id} className={colorClass}>
-                      <span className="text-stone-500 mr-2">[{log.time}]</span> 
-                      {log.sender}: {log.text}
-                    </div>
-                  );
-                })}
-              </div>
+            <Crosshair size={24} className={`mb-1 lg:mb-2 transition-colors duration-500 ${isTargeting ? 'text-[#ef4444] animate-pulse' : 'text-stone-400'}`} />
+            <h3 className={`text-[10px] lg:text-sm font-bold mb-1 tracking-widest uppercase text-center transition-colors duration-500 ${isTargeting ? 'text-[#ef4444]' : 'text-[#f59e0b]'}`}>Silah Sistemleri</h3>
+            <span className={`text-[8px] lg:text-[9px] mb-2 lg:mb-4 tracking-widest font-bold uppercase text-center leading-tight transition-all duration-500 ${isTargeting ? 'text-stone-200' : 'text-stone-500'}`}>
+              {isTargeting ? 'Lazer Modülü Aktif\nHedef Aranıyor' : 'Sistem Beklemede\nOtonom Sürüş Aktif'}
+            </span>
+            
+            <div 
+              className={`w-full py-1.5 lg:py-2 font-bold transition-all duration-300 border-2 tracking-widest uppercase text-[9px] lg:text-xs flex justify-center items-center gap-2
+                ${isTargeting 
+                  ? 'bg-[#ef4444]/20 border-[#ef4444] text-[#ef4444] shadow-[0_0_10px_rgba(239,68,68,0.3)]' 
+                  : 'bg-[#161412] text-stone-500 border-stone-700'}`}
+            >
+              {isTargeting ? <><Unlock size={12}/> Mod Açık</> : <><Lock size={12}/> Kapalı</>}
             </div>
-
-            {/* Atış Paneli */}
-            <div className="bg-[#2a241c] p-2 lg:p-3 tactical-border flex flex-col items-center justify-center relative overflow-hidden min-h-0">
-              <div className="corners-alt"></div>
-              <div className={`absolute top-0 w-full h-1 transition-colors duration-500 ${isTargeting ? 'bg-[#ef4444] opacity-100 shadow-[0_0_20px_#ef4444]' : 'bg-[#f59e0b] opacity-50'}`}></div>
-              
-              <Crosshair size={24} className={`mb-1 lg:mb-2 transition-colors duration-500 ${isTargeting ? 'text-[#ef4444] animate-pulse' : 'text-stone-400'}`} />
-              <h3 className={`text-[10px] lg:text-sm font-bold mb-1 tracking-widest uppercase text-center transition-colors duration-500 ${isTargeting ? 'text-[#ef4444]' : 'text-[#f59e0b]'}`}>Silah Sistemleri</h3>
-              <span className={`text-[8px] lg:text-[9px] mb-2 lg:mb-4 tracking-widest font-bold uppercase text-center leading-tight transition-all duration-500 ${isTargeting ? 'text-stone-200' : 'text-stone-500'}`}>
-                {isTargeting ? 'Lazer Modülü Aktif\nHedef Aranıyor' : 'Sistem Beklemede\nOtonom Sürüş Aktif'}
-              </span>
-              
-              <div 
-                className={`w-full py-1.5 lg:py-2 font-bold transition-all duration-300 border-2 tracking-widest uppercase text-[9px] lg:text-xs flex justify-center items-center gap-2
-                  ${isTargeting 
-                    ? 'bg-[#ef4444]/20 border-[#ef4444] text-[#ef4444] shadow-[0_0_10px_rgba(239,68,68,0.3)]' 
-                    : 'bg-[#161412] text-stone-500 border-stone-700'}`}
-              >
-                {isTargeting ? <><Unlock size={12}/> Mod Açık</> : <><Lock size={12}/> Kapalı</>}
-              </div>
-            </div>
-
           </div>
 
         </div>
