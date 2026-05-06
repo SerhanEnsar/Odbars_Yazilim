@@ -3,18 +3,18 @@
 *Lütfen her tamamlanan görevden veya önemli bir karardan sonra bu dosyayı güncelleyin.*
 
 ## Son Güncelleme: 6 Mayıs 2026
-**Durum**: Proje hedefi TEKNOFEST İnsansız Kara Aracı (İKA) yarışması olarak güncellendi. Tüm mimari ve planlamalar bu yeni şartnameye göre (Manuel sürüş, otonom sürüş, atış görevi, koni ve hareketli engeller) revize edildi.
+**Durum**: İnsansız Kara Aracı (İKA) için kullanılacak GCS (Yer Kontrol İstasyonu) paneli isterleri kullanıcı tarafından sağlandı ve dokümante edildi. Geliştirme aşamasına geçiş için hazırız.
 
 **Tamamlananlar**:
-- `vision/`, `panel/` ve `docs/` klasör yapıları oluşturuldu.
-- Git repo başlatıldı ve GitHub'a bağlandı.
-- Dokümantasyonlar "İnsansız Kara Aracı" konseptine geçiş yapılarak güncellendi.
-- Ajanların haberleşme ve PR süreçlerini eksiksiz yürütebilmeleri için `INSTRUCTIONS.md` güncellendi.
+- Proje repoları ve modüler iskelet kuruldu.
+- Mimari ve İKA şartname kuralları belirlendi.
+- AI ajanlarının yetki kısıtlamaları ve PR kuralları katılaştırıldı.
+- Kullanıcıdan gelen "Panel Roadmap" dokümanlara (panel_plan.md) işlendi (React, Tailwind, Dummy Data, Taktik arayüz, Widget'lar).
 
 **Sıradaki Adımlar (To-Do)**:
-1. Kullanıcıdan Panel tasarımı için hazırlanan Roadmap'in alınması.
-2. Roadmap baz alınarak `feature/panel-init` isimli bir branch açılması ve Yer Kontrol İstasyonu kodlamasına başlanması.
-3. Manuel kontrol (Joystick/Klavye verisi) ve kamera yayın (WebRTC/UDP) altyapısının tasarlanması.
+1. `feature/panel-init` branch'inin oluşturulması.
+2. `panel/` dizini içerisinde React (Tercihen Vite ile) ve Tailwind CSS altyapısının kurulması.
+3. Dummy Data sisteminin hazırlanması ve Figma tasarımı vizyonuyla temel Dashboard iskeletinin (Taktik arayüz / Dark mode) kodlanması.
 
 **Bloke Eden Durumlar (Blockers)**:
-- Yok. Sadece Roadmap bekleniyor.
+- Yok. Yeni özellik branch'ine geçiş için hazırdır.
