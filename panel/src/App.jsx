@@ -66,7 +66,7 @@ export default function App() {
     if (logContainerRef.current) {
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
-  }, [logs]);
+  }, [logs, isLogExpanded]);
   
   const isTargeting = taskStatuses[7] === 'AKTİF';
 
@@ -222,7 +222,7 @@ export default function App() {
       
       {/* Toast Bildirimleri */}
       {(!isLogExpanded && toasts.length > 0) && (
-        <div className="fixed top-24 right-6 z-50 flex flex-col gap-3 pointer-events-none w-80">
+        <div className="fixed bottom-14 right-3 z-50 flex flex-col justify-end gap-3 pointer-events-none w-80">
           {toasts.map(toast => {
             let colorClass = 'border-stone-500 text-stone-200 bg-[#161412]/90';
             if (toast.type === 'success') colorClass = 'border-[#22c55e] text-[#22c55e] bg-[#22c55e]/20';
@@ -546,11 +546,11 @@ export default function App() {
           </div>
 
           {/* Olay Günlüğü Floating Panel */}
-          <div className={`absolute bottom-3 left-3 z-30 transition-all duration-300 ease-in-out flex flex-col ${isLogExpanded ? 'w-[60%] h-64' : 'w-auto h-auto'}`}>
+          <div className={`absolute bottom-3 right-3 z-30 transition-all duration-300 ease-in-out flex flex-col items-end ${isLogExpanded ? 'w-[90%] lg:w-[60%] h-72' : 'w-auto h-auto'}`}>
             {isLogExpanded ? (
-               <div className="flex-1 bg-[#2a241c]/95 backdrop-blur-md p-3 tactical-border flex flex-col shadow-[0_0_30px_rgba(0,0,0,0.8)] relative">
+               <div className="w-full h-full bg-[#2a241c]/95 backdrop-blur-md p-3 tactical-border flex flex-col shadow-[0_0_30px_rgba(0,0,0,0.8)] relative min-h-0">
                  <div className="corners-alt"></div>
-                 <div className="flex justify-between items-center border-b border-stone-600 pb-2 mb-2">
+                 <div className="flex justify-between items-center border-b border-stone-600 pb-2 mb-2 shrink-0">
                    <h2 className="text-[10px] lg:text-xs font-bold text-[#f59e0b] uppercase flex items-center gap-2 tracking-widest">
                     <Terminal size={14} /> Sistem Olay Günlüğü
                    </h2>
@@ -558,7 +558,7 @@ export default function App() {
                      [ Kapat ]
                    </button>
                  </div>
-                 <div ref={logContainerRef} className="flex-1 bg-[#161412]/80 border border-stone-700 p-2 overflow-y-auto text-[9px] lg:text-[11px] font-bold space-y-2 tracking-widest leading-relaxed">
+                 <div ref={logContainerRef} className="flex-1 bg-[#161412]/80 border border-stone-700 p-2 overflow-y-auto text-[9px] lg:text-[11px] font-bold space-y-2 tracking-widest leading-relaxed min-h-0">
                    {logs.map(log => {
                      let colorClass = 'text-stone-200';
                      if (log.type === 'success') colorClass = 'text-[#22c55e]';
