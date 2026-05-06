@@ -30,8 +30,11 @@ function createWindow() {
 
   // MOCK TELEMETRY SIMULATOR
   win.webContents.on('did-finish-load', () => {
-    setInterval(() => {
-      if (!win) return;
+    const telemetryInterval = setInterval(() => {
+      if (!win || win.isDestroyed() || win.webContents.isDestroyed()) {
+        clearInterval(telemetryInterval);
+        return;
+      }
       
       const mockData = {
         battery: Math.floor(Math.random() * 5 + 80), // 80-85%
@@ -41,8 +44,16 @@ function createWindow() {
         ping: Math.floor(Math.random() * 20 + 10), // 10-30 ms
       };
       
-      win.webContents.send('telemetry-update', mockData);
+      try {
+        win.webContents.send('telemetry-update', mockData);
+      } catch (e) {
+        clearInterval(telemetryInterval);
+      }
     }, 1000); // Saniyede 1 kez güncelle
+    
+    win.on('closed', () => {
+      clearInterval(telemetryInterval);
+    });
   });
 }
 
