@@ -6,7 +6,8 @@ import {
 
 export default function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [isTargeting, setIsTargeting] = useState(false);
+  const [activeTask, setActiveTask] = useState(3);
+  const isTargeting = activeTask === 7;
   const [telemetry, setTelemetry] = useState({
     battery: 84,
     speed: '0.0',
@@ -113,46 +114,49 @@ export default function App() {
             </div>
             
             <div className="space-y-1.5 mt-2 overflow-y-auto pr-1 pb-1">
-              {/* Completed Tasks */}
               {[
                 { id: 1, name: "Su Geçişi" },
-                { id: 2, name: "Taşlı Yol" }
-              ].map(task => (
-                <div key={task.id} className="flex items-center justify-between bg-[#22c55e]/10 border border-[#22c55e]/50 p-1.5 transition-colors">
-                  <span className="text-[#22c55e] text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">{task.id}. {task.name}</span>
-                  <span className="text-[8px] lg:text-[9px] bg-[#22c55e] text-black font-bold px-1.5 py-0.5">TAMAM</span>
-                </div>
-              ))}
-
-              {/* Active Task */}
-              <div className={`flex items-center justify-between p-1.5 relative overflow-hidden transition-colors ${!isTargeting ? 'bg-[#161412] border border-[#f59e0b]' : 'bg-[#161412] border border-stone-700 opacity-80'}`}>
-                {!isTargeting && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#f59e0b] animate-pulse"></div>}
-                <span className={`text-[9px] lg:text-[10px] font-bold pl-2 uppercase tracking-wider ${!isTargeting ? 'text-[#f59e0b]' : 'text-stone-400'}`}>3. Kayar Engel</span>
-                <span className={`text-[8px] lg:text-[9px] font-bold px-1.5 py-0.5 ${!isTargeting ? 'bg-[#f59e0b] text-black animate-pulse' : 'bg-stone-700 text-stone-300'}`}>
-                  {!isTargeting ? 'AKTİF' : 'BEKLEME'}
-                </span>
-              </div>
-
-              {/* Pending Tasks */}
-              {[
+                { id: 2, name: "Taşlı Yol" },
+                { id: 3, name: "Kayar Engel" },
                 { id: 4, name: "Tabela Okuma" },
                 { id: 5, name: "Dik Eğim (Stop)" },
                 { id: 6, name: "Yan Eğim" },
-              ].map(task => (
-                <div key={task.id} className="flex items-center justify-between bg-[#161412] border border-stone-700 p-1.5 opacity-80">
-                  <span className="text-stone-400 text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">{task.id}. {task.name}</span>
-                  <span className="text-[8px] lg:text-[9px] bg-stone-700 text-stone-300 font-bold px-1.5 py-0.5">BEKLEME</span>
-                </div>
-              ))}
+                { id: 7, name: "Atış Görevi" },
+              ].map(task => {
+                const isCompleted = task.id < activeTask;
+                const isActive = task.id === activeTask;
+                const isPending = task.id > activeTask;
 
-              {/* Targeting Task (Dynamic) */}
-              <div className={`flex items-center justify-between p-1.5 relative overflow-hidden transition-colors ${isTargeting ? 'bg-[#161412] border border-[#f59e0b]' : 'bg-[#161412] border border-stone-700 opacity-80'}`}>
-                {isTargeting && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#f59e0b] animate-pulse"></div>}
-                <span className={`text-[9px] lg:text-[10px] font-bold pl-2 uppercase tracking-wider ${isTargeting ? 'text-[#f59e0b]' : 'text-stone-400'}`}>7. Atış Görevi</span>
-                <span className={`text-[8px] lg:text-[9px] font-bold px-1.5 py-0.5 ${isTargeting ? 'bg-[#f59e0b] text-black animate-pulse' : 'bg-stone-700 text-stone-300'}`}>
-                  {isTargeting ? 'AKTİF' : 'BEKLEME'}
-                </span>
-              </div>
+                return (
+                  <div 
+                    key={task.id} 
+                    onClick={() => setActiveTask(task.id)}
+                    className={`flex items-center justify-between p-1.5 relative overflow-hidden transition-colors cursor-pointer hover:border-stone-400
+                      ${isCompleted ? 'bg-[#22c55e]/10 border border-[#22c55e]/50' : ''}
+                      ${isActive ? 'bg-[#161412] border-2 border-[#f59e0b]' : ''}
+                      ${isPending ? 'bg-[#161412] border border-stone-700 opacity-80' : ''}
+                    `}
+                  >
+                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#f59e0b] animate-pulse"></div>}
+                    
+                    <span className={`text-[9px] lg:text-[10px] font-bold uppercase tracking-wider ${isActive ? 'pl-2' : ''}
+                      ${isCompleted ? 'text-[#22c55e]' : ''}
+                      ${isActive ? 'text-[#f59e0b]' : ''}
+                      ${isPending ? 'text-stone-400' : ''}
+                    `}>
+                      {task.id}. {task.name}
+                    </span>
+                    
+                    <span className={`text-[8px] lg:text-[9px] font-bold px-1.5 py-0.5
+                      ${isCompleted ? 'bg-[#22c55e] text-black' : ''}
+                      ${isActive ? 'bg-[#f59e0b] text-black animate-pulse' : ''}
+                      ${isPending ? 'bg-stone-700 text-stone-300' : ''}
+                    `}>
+                      {isCompleted ? 'TAMAM' : isActive ? 'AKTİF' : 'BEKLEME'}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -176,7 +180,7 @@ export default function App() {
               <div className="bg-[#161412] p-1.5 border border-stone-700">
                 <span className="text-[9px] text-stone-400 font-bold block mb-0.5">HIZ (M/S)</span>
                 <span className="text-base text-stone-100 font-bold tracking-wider">
-                  {isTargeting ? '0.0' : telemetry.speed}
+                  {telemetry.speed}
                 </span>
               </div>
               <div className="bg-[#161412] p-1.5 border border-stone-700">
@@ -302,18 +306,17 @@ export default function App() {
               <Crosshair size={24} className={`mb-1 lg:mb-2 transition-colors duration-500 ${isTargeting ? 'text-[#ef4444] animate-pulse' : 'text-stone-400'}`} />
               <h3 className={`text-[10px] lg:text-sm font-bold mb-1 tracking-widest uppercase text-center transition-colors duration-500 ${isTargeting ? 'text-[#ef4444]' : 'text-[#f59e0b]'}`}>Silah Sistemleri</h3>
               <span className={`text-[8px] lg:text-[9px] mb-2 lg:mb-4 tracking-widest font-bold uppercase text-center leading-tight transition-all duration-500 ${isTargeting ? 'text-stone-200' : 'text-stone-500'}`}>
-                {isTargeting ? 'Lazer Modülü Aktif\nHedef Aranıyor' : 'Lazer Modülü Pasif\nKilit Yok'}
+                {isTargeting ? 'Lazer Modülü Aktif\nHedef Aranıyor' : 'Sistem Beklemede\nOtonom Sürüş Aktif'}
               </span>
               
-              <button 
-                onClick={() => setIsTargeting(!isTargeting)}
+              <div 
                 className={`w-full py-1.5 lg:py-2 font-bold transition-all duration-300 border-2 tracking-widest uppercase text-[9px] lg:text-xs flex justify-center items-center gap-2
                   ${isTargeting 
-                    ? 'bg-[#ef4444]/20 border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444]/40 shadow-[0_0_10px_rgba(239,68,68,0.3)]' 
-                    : 'bg-[#161412] text-[#f59e0b] border-stone-700 hover:border-[#f59e0b] cursor-pointer'}`}
+                    ? 'bg-[#ef4444]/20 border-[#ef4444] text-[#ef4444] shadow-[0_0_10px_rgba(239,68,68,0.3)]' 
+                    : 'bg-[#161412] text-stone-500 border-stone-700'}`}
               >
-                {isTargeting ? <><Unlock size={12}/> Kapat</> : <><Lock size={12}/> Aktifleştir</>}
-              </button>
+                {isTargeting ? <><Unlock size={12}/> Mod Açık</> : <><Lock size={12}/> Kapalı</>}
+              </div>
             </div>
 
           </div>
