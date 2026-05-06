@@ -208,12 +208,12 @@ export default function App() {
       4: "Tabela Okuma", 5: "Dik Eğim (Stop)", 6: "Yan Eğim", 7: "Atış Görevi"
     };
     if (status === 'AKTİF') {
-      addLog('NAV_CORE', `${taskNames[id]} görevine başlandı.`, 'info');
+      addLog('NAV_CORE', `${taskNames[id]} görevine başlandı.`, 'warning');
       if (id === 7) addLog('WPN_SYS', 'Silah sistemleri devreye alınıyor. Hedef taraması başladı.', 'error');
     } else if (status === 'TAMAM') {
       addLog('NAV_CORE', `${taskNames[id]} görevi başarıyla tamamlandı.`, 'success');
     } else {
-      addLog('NAV_CORE', `${taskNames[id]} görevi beklemeye alındı.`, 'warning');
+      addLog('NAV_CORE', `${taskNames[id]} görevi beklemeye alındı.`, 'pending');
     }
   };
 
@@ -228,6 +228,7 @@ export default function App() {
             if (toast.type === 'success') colorClass = 'border-[#22c55e] text-[#22c55e] bg-[#22c55e]/20';
             if (toast.type === 'warning') colorClass = 'border-[#f59e0b] text-[#f59e0b] bg-[#f59e0b]/20';
             if (toast.type === 'error') colorClass = 'border-[#ef4444] text-[#ef4444] bg-[#ef4444]/20 shadow-[0_0_15px_rgba(239,68,68,0.3)]';
+            if (toast.type === 'pending') colorClass = 'border-stone-600 text-stone-400 bg-stone-800/40';
             
             return (
               <div key={toast.id} className={`p-3 border-l-4 backdrop-blur-md flex flex-col transition-all duration-300 ${colorClass}`}>
@@ -563,6 +564,7 @@ export default function App() {
                      if (log.type === 'success') colorClass = 'text-[#22c55e]';
                      if (log.type === 'warning') colorClass = 'text-[#f59e0b]';
                      if (log.type === 'error') colorClass = 'text-[#ef4444] animate-pulse';
+                     if (log.type === 'pending') colorClass = 'text-stone-500';
                      
                      return (
                        <div key={log.id} className={colorClass}>
