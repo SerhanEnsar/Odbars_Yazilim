@@ -81,26 +81,55 @@ export default function App() {
           {/* Mission TODO List */}
           <div className="bg-[#2a241c] p-3 tactical-border flex-1 min-h-0 overflow-y-auto relative">
             <div className="corners-alt"></div>
-            <h2 className="text-[10px] lg:text-xs font-bold text-[#f59e0b] uppercase mb-2 flex items-center gap-2 border-b border-stone-600 pb-2 tracking-widest">
-              <ListTodo size={14} />
-              Görev Durumu
-            </h2>
-            <div className="space-y-2 mt-2">
-              <div className="flex items-center justify-between bg-[#22c55e]/20 border border-[#22c55e] p-1.5 lg:p-2 transition-colors">
-                <span className="text-[#22c55e] text-[10px] lg:text-xs font-bold uppercase tracking-wider">1. Su Geçişi</span>
-                <span className="text-[9px] lg:text-[10px] bg-[#22c55e] text-black font-bold px-1.5 py-0.5">TAMAM</span>
+            <div className="flex items-center justify-between border-b border-stone-600 pb-2 mb-2">
+              <h2 className="text-[10px] lg:text-xs font-bold text-[#f59e0b] uppercase flex items-center gap-2 tracking-widest">
+                <ListTodo size={14} />
+                Görev Durumu
+              </h2>
+              <div className="flex gap-2">
+                <span className="text-[9px] bg-[#ef4444]/20 text-[#ef4444] px-1 border border-[#ef4444]/50">CEZA: 0</span>
+                <span className="text-[9px] bg-stone-700 text-stone-200 px-1 border border-stone-500">PAS: 2</span>
               </div>
-              <div className={`flex items-center justify-between p-1.5 lg:p-2 relative overflow-hidden transition-colors ${!isTargeting ? 'bg-[#161412] border-2 border-[#f59e0b]' : 'bg-[#161412] border border-stone-700 opacity-80'}`}>
+            </div>
+            
+            <div className="space-y-1.5 mt-2 overflow-y-auto pr-1 pb-1">
+              {/* Completed Tasks */}
+              {[
+                { id: 1, name: "Su Geçişi" },
+                { id: 2, name: "Taşlı Yol" }
+              ].map(task => (
+                <div key={task.id} className="flex items-center justify-between bg-[#22c55e]/10 border border-[#22c55e]/50 p-1.5 transition-colors">
+                  <span className="text-[#22c55e] text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">{task.id}. {task.name}</span>
+                  <span className="text-[8px] lg:text-[9px] bg-[#22c55e] text-black font-bold px-1.5 py-0.5">TAMAM</span>
+                </div>
+              ))}
+
+              {/* Active Task */}
+              <div className={`flex items-center justify-between p-1.5 relative overflow-hidden transition-colors ${!isTargeting ? 'bg-[#161412] border border-[#f59e0b]' : 'bg-[#161412] border border-stone-700 opacity-80'}`}>
                 {!isTargeting && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#f59e0b] animate-pulse"></div>}
-                <span className={`text-[10px] lg:text-xs font-bold pl-2 uppercase tracking-wider ${!isTargeting ? 'text-[#f59e0b]' : 'text-stone-400'}`}>2. Taşlı Yol</span>
-                <span className={`text-[9px] lg:text-[10px] font-bold px-1.5 py-0.5 ${!isTargeting ? 'bg-[#f59e0b] text-black animate-pulse' : 'bg-stone-700 text-stone-300'}`}>
+                <span className={`text-[9px] lg:text-[10px] font-bold pl-2 uppercase tracking-wider ${!isTargeting ? 'text-[#f59e0b]' : 'text-stone-400'}`}>3. Kayar Engel</span>
+                <span className={`text-[8px] lg:text-[9px] font-bold px-1.5 py-0.5 ${!isTargeting ? 'bg-[#f59e0b] text-black animate-pulse' : 'bg-stone-700 text-stone-300'}`}>
                   {!isTargeting ? 'AKTİF' : 'BEKLEME'}
                 </span>
               </div>
-              <div className={`flex items-center justify-between p-1.5 lg:p-2 relative overflow-hidden transition-colors ${isTargeting ? 'bg-[#161412] border-2 border-[#f59e0b]' : 'bg-[#161412] border border-stone-700 opacity-80'}`}>
+
+              {/* Pending Tasks */}
+              {[
+                { id: 4, name: "Tabela Okuma" },
+                { id: 5, name: "Dik Eğim (Stop)" },
+                { id: 6, name: "Yan Eğim" },
+              ].map(task => (
+                <div key={task.id} className="flex items-center justify-between bg-[#161412] border border-stone-700 p-1.5 opacity-80">
+                  <span className="text-stone-400 text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">{task.id}. {task.name}</span>
+                  <span className="text-[8px] lg:text-[9px] bg-stone-700 text-stone-300 font-bold px-1.5 py-0.5">BEKLEME</span>
+                </div>
+              ))}
+
+              {/* Targeting Task (Dynamic) */}
+              <div className={`flex items-center justify-between p-1.5 relative overflow-hidden transition-colors ${isTargeting ? 'bg-[#161412] border border-[#f59e0b]' : 'bg-[#161412] border border-stone-700 opacity-80'}`}>
                 {isTargeting && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#f59e0b] animate-pulse"></div>}
-                <span className={`text-[10px] lg:text-xs font-bold pl-2 uppercase tracking-wider ${isTargeting ? 'text-[#f59e0b]' : 'text-stone-400'}`}>3. Atış Görevi</span>
-                <span className={`text-[9px] lg:text-[10px] font-bold px-1.5 py-0.5 ${isTargeting ? 'bg-[#f59e0b] text-black animate-pulse' : 'bg-stone-700 text-stone-300'}`}>
+                <span className={`text-[9px] lg:text-[10px] font-bold pl-2 uppercase tracking-wider ${isTargeting ? 'text-[#f59e0b]' : 'text-stone-400'}`}>7. Atış Görevi</span>
+                <span className={`text-[8px] lg:text-[9px] font-bold px-1.5 py-0.5 ${isTargeting ? 'bg-[#f59e0b] text-black animate-pulse' : 'bg-stone-700 text-stone-300'}`}>
                   {isTargeting ? 'AKTİF' : 'BEKLEME'}
                 </span>
               </div>
