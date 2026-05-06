@@ -1,23 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  --color-tactical-bg: #050505;
-  --color-tactical-panel: #0a0a0a;
-  --color-tactical-green: #00ff41;
-  --color-tactical-darkgreen: #008f11;
-  --color-tactical-amber: #ffb000;
-  --color-tactical-red: #ff003c;
+  --color-tactical-bg: #1e1b18; /* Dark Brown / Khaki Base */
+  --color-tactical-panel: #2a241c; /* Lighter Brown Panel */
+  --color-tactical-inner: #161412; /* Deepest Brown */
+  --color-tactical-accent: #f59e0b; /* Amber / Coyote Accent */
+  --color-tactical-green: #22c55e;
+  --color-tactical-red: #ef4444;
 }
 
 html, body {
   margin: 0;
   padding: 0;
-  background-color: var(--color-tactical-bg);
-  color: #e2e8f0;
+  background-color: #1e1b18;
+  /* Askeri Çöl Kamuflajı / Ripstop Kumaş Dokusu (Askeri Desen) */
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.2) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.02) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 2px, transparent 2px);
+  background-size: 10px 10px, 10px 10px, 50px 50px, 50px 50px;
+  color: #f5f5f4; /* Stone 50 for max readability */
   font-family: 'Space Mono', 'Courier New', Courier, monospace;
 }
 
-/* Taktiksel Scanline Efekti */
+/* Okunabilirliği yüksek daha şeffaf Scanline */
 .scanlines {
   position: relative;
 }
@@ -29,23 +36,24 @@ html, body {
   left: 0;
   bottom: 0;
   right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
   z-index: 50;
-  background-size: 100% 2px, 3px 100%;
+  background-size: 100% 4px;
   pointer-events: none;
 }
 
-/* Köşeli Taktik Çerçeve Efekti (Corner Brackets) */
+/* Askeri Desert/Coyote Taktik Çerçeveler */
 .tactical-border {
   position: relative;
-  border: 1px solid rgba(0, 255, 65, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.2); /* Amber border */
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.5); /* İç karartı */
 }
 .tactical-border::before, .tactical-border::after {
   content: '';
   position: absolute;
-  width: 10px;
-  height: 10px;
-  border-color: #00ff41;
+  width: 12px;
+  height: 12px;
+  border-color: #f59e0b;
   border-style: solid;
   pointer-events: none;
   z-index: 10;
@@ -59,13 +67,13 @@ html, body {
   border-width: 0 2px 2px 0;
 }
 
-/* İkinci set köşeler için */
+/* İkinci set köşeler */
 .tactical-border .corners-alt::before, .tactical-border .corners-alt::after {
   content: '';
   position: absolute;
-  width: 10px;
-  height: 10px;
-  border-color: #00ff41;
+  width: 12px;
+  height: 12px;
+  border-color: #f59e0b;
   border-style: solid;
   pointer-events: none;
   z-index: 10;
@@ -80,11 +88,11 @@ html, body {
 }
 
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #050505;
+  background: #1e1b18;
 }
 ::-webkit-scrollbar-thumb {
-  background: #008f11;
+  background: #f59e0b;
 }
