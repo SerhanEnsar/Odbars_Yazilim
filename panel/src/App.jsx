@@ -531,7 +531,7 @@ export default function App() {
               : 'top-0 left-0 w-full h-[65%] opacity-100'}`}
           >
             <div className="w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden">
-              <CameraFeed url="http://127.0.0.1:5000/cam_fwd" label="CAM_01_FWD" isTargeting={isTargeting} />
+              <CameraFeed url="http://127.0.0.1:8765/cam_fwd" label="CAM_01_FWD" isTargeting={isTargeting} />
               
               <div className="corners-alt pointer-events-none z-10"></div>
               <div className="absolute top-2 left-2 z-10 flex items-center gap-2 bg-[#2a241c]/90 px-2 py-1 border border-stone-600 shadow-md">
@@ -560,7 +560,7 @@ export default function App() {
               : 'top-[65%] left-0 w-1/2 h-[35%] opacity-80'}`}
           >
             <div className="w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden">
-              <CameraFeed url="http://127.0.0.1:5000/cam_rear" label="CAM_02_REAR" isTargeting={false} />
+              <CameraFeed url="http://127.0.0.1:8765/cam_rear" label="CAM_02_REAR" isTargeting={false} />
               
               <div className="corners-alt pointer-events-none z-10"></div>
               <div className="absolute top-1 left-1 z-10 text-[9px] lg:text-[10px] font-bold bg-[#2a241c]/90 px-2 py-1 text-stone-300 border border-stone-600 tracking-widest">CAM_02_REAR</div>
@@ -575,7 +575,7 @@ export default function App() {
               : 'top-[65%] left-1/2 w-1/2 h-[35%] opacity-80'}`}
           >
             <div className={`w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden transition-all duration-700 ${isTargeting ? 'border-2 border-[#ef4444]/50 shadow-[0_0_30px_rgba(239,68,68,0.15)]' : ''}`}>
-              <CameraFeed url="http://127.0.0.1:5000/cam_aim" label="CAM_03_AIM" isTargeting={isTargeting} />
+              <CameraFeed url="http://127.0.0.1:8765/cam_aim" label="CAM_03_AIM" isTargeting={isTargeting} />
               
               <div className="corners-alt pointer-events-none z-10"></div>
               <div className="absolute top-2 left-2 z-10 text-[9px] lg:text-[11px] bg-[#2a241c]/90 px-2 py-1 text-[#f59e0b] border border-[#f59e0b]/50 tracking-widest font-bold flex items-center gap-2 transition-all">

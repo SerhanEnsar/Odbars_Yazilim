@@ -1,77 +1,87 @@
 import cv2
 import time
+import numpy as np
 from flask import Flask, Response, jsonify
 
 app = Flask(__name__)
 
-# Kameralar için VideoCapture objeleri (Bilgisayarın kamerasını veya USB kameraları temsil eder)
-# Gerçek sahada bunlar Jetson'un CSI kameraları veya RTSP streamleri olabilir.
-cameras = {
-    'fwd': cv2.VideoCapture(0), # 0 numaralı varsayılan kamera (FWD)
-    # Eğer birden fazla kamera takılıysa cv2.VideoCapture(1) vs yapılabilir.
-    # Şimdilik arka ve nişan kamerasını simüle etmek için dummy döneceğiz.
-}
+# Kamera objeleri - izin hatası için güvenli başlatma
+cameras = {}
+
+try:
+    cap = cv2.VideoCapture(0)
+    if cap.isOpened():
+        cameras['fwd'] = cap
+        print("✅ Kamera 0 (FWD) başarıyla açıldı.")
+    else:
+        print("⚠️  Kamera 0 açılamadı, dummy mod aktif.")
+except Exception as e:
+    print(f"⚠️  Kamera başlatma hatası: {e}")
+
+
+def make_dummy_frame(cam_id, message="NO SIGNAL"):
+    """Sinyal yoksa siyah ekranda metin gösteren dummy kare üretir."""
+    frame = np.zeros((480, 640, 3), dtype=np.uint8)
+    cv2.putText(frame, f"CAM_{cam_id.upper()}", (200, 210),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.2, (80, 80, 80), 2)
+    cv2.putText(frame, message, (220, 260),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 80, 200), 2)
+    return frame
+
 
 def generate_frames(cam_id):
     """Kameradan kareleri okuyup MJPEG formatında yayınlar."""
     cap = cameras.get(cam_id)
-    
-    # Eğer kamera yoksa boş siyah ekran / dummy frame üret
+
+    # Kamera yoksa dummy akış
     if cap is None or not cap.isOpened():
         while True:
-            # Siyah ekran oluştur (640x480)
-            import numpy as np
-            frame = np.zeros((480, 640, 3), dtype=np.uint8)
-            cv2.putText(frame, f"CAM_{cam_id.upper()} NOT FOUND", (100, 240), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-            
+            frame = make_dummy_frame(cam_id)
             ret, buffer = cv2.imencode('.jpg', frame)
-            frame_bytes = buffer.tobytes()
             yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+                   b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
             time.sleep(0.1)
-    
-    # Kamera başarılıysa gerçek akış
+        return
+
+    # Gerçek kamera akışı
     while True:
         success, frame = cap.read()
         if not success:
-            break
+            # Okuma başarısız olursa dummy göster
+            frame = make_dummy_frame(cam_id, "READ ERROR")
         else:
-            # Burada Görüntü İşleme (YOLO / OpenCV) algoritmaları çalışacak
-            # Örnek: Hedef kutusu çizimi (Demo)
+            # --- GORUNTU ISLEME ALANI ---
+            # Buraya YOLO / OpenCV algoritmaları eklenecek
             if cam_id == 'fwd':
-                cv2.putText(frame, "ODBARS VISION CORE ONLINE", (20, 40), 
+                cv2.putText(frame, "ODBARS VISION CORE ONLINE", (20, 40),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-            
-            # Kareyi JPEG formatına dönüştür
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame_bytes = buffer.tobytes()
-            
-            # MJPEG formatında yield et
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+        ret, buffer = cv2.imencode('.jpg', frame)
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+
 
 @app.route('/cam_fwd')
 def cam_fwd():
-    """Ön Kamera Akışı"""
     return Response(generate_frames('fwd'), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/cam_rear')
 def cam_rear():
-    """Arka Kamera Akışı (Şimdilik dummy)"""
     return Response(generate_frames('rear'), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/cam_aim')
 def cam_aim():
-    """Nişan (Atış) Kamerası Akışı (Şimdilik dummy)"""
     return Response(generate_frames('aim'), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/api/status')
 def status():
-    return jsonify({"status": "online", "cameras": {k: v.isOpened() for k, v in cameras.items()}})
+    return jsonify({
+        "status": "online",
+        "cameras": {k: v.isOpened() for k, v in cameras.items()}
+    })
 
 if __name__ == '__main__':
-    # React ile aynı bilgisayarda çalıştığı için localhost (127.0.0.1) ve Port 5000 üzerinden yayın yapar.
-    # Jetson'a geçtiğinizde host='0.0.0.0' yaparak ağa açmalısınız.
     print("🚀 ODBARS Vision Core başlatılıyor...")
-    app.run(host='0.0.0.0', port=5000, threaded=True)
+    print("   Stream URL'leri: http://127.0.0.1:8765/cam_fwd")
+    # Port 8765 (Mac AirPlay 5000'i kullanır)
+    app.run(host='0.0.0.0', port=8765, threaded=True)
