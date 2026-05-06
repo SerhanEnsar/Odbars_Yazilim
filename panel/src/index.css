@@ -1,17 +1,90 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #10b981; /* Emerald 500 */
-  --color-dark-bg: #0f172a; /* Slate 900 */
-  --color-panel-bg: #1e293b; /* Slate 800 */
-  --color-danger: #ef4444; /* Red 500 */
-  --color-warning: #f59e0b; /* Amber 500 */
+  --color-tactical-bg: #050505;
+  --color-tactical-panel: #0a0a0a;
+  --color-tactical-green: #00ff41;
+  --color-tactical-darkgreen: #008f11;
+  --color-tactical-amber: #ffb000;
+  --color-tactical-red: #ff003c;
 }
 
 html, body {
   margin: 0;
   padding: 0;
-  background-color: var(--color-dark-bg);
-  color: #f8fafc;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-tactical-bg);
+  color: #e2e8f0;
+  font-family: 'Space Mono', 'Courier New', Courier, monospace;
+}
+
+/* Taktiksel Scanline Efekti */
+.scanlines {
+  position: relative;
+}
+.scanlines::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 50;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+/* Köşeli Taktik Çerçeve Efekti (Corner Brackets) */
+.tactical-border {
+  position: relative;
+  border: 1px solid rgba(0, 255, 65, 0.2);
+}
+.tactical-border::before, .tactical-border::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: #00ff41;
+  border-style: solid;
+  pointer-events: none;
+  z-index: 10;
+}
+.tactical-border::before {
+  top: -1px; left: -1px;
+  border-width: 2px 0 0 2px;
+}
+.tactical-border::after {
+  bottom: -1px; right: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+/* İkinci set köşeler için */
+.tactical-border .corners-alt::before, .tactical-border .corners-alt::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: #00ff41;
+  border-style: solid;
+  pointer-events: none;
+  z-index: 10;
+}
+.tactical-border .corners-alt::before {
+  top: -1px; right: -1px;
+  border-width: 2px 2px 0 0;
+}
+.tactical-border .corners-alt::after {
+  bottom: -1px; left: -1px;
+  border-width: 0 0 2px 2px;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+::-webkit-scrollbar-thumb {
+  background: #008f11;
 }
