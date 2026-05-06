@@ -210,7 +210,7 @@ export default function App() {
               <div className="flex-1 bg-black border border-neutral-800 p-2 overflow-y-auto text-[10px] space-y-1 tracking-widest leading-relaxed">
                 <div className="text-[#00ff41]"><span className="text-neutral-600">[14:21:05]</span> SYS_AUTH: Otonom mod aktif. Sürüş kontrolü devredildi.</div>
                 <div className="text-neutral-300"><span className="text-neutral-600">[14:21:08]</span> VISION_CORE: Su geçişi tespit edildi.</div>
-                <div className="text-neutral-300"><span className="text-neutral-600">[14:21:08]</span> NAV_CORE: Hız adaptasyonu -> 1.5m/s.</div>
+                <div className="text-neutral-300"><span className="text-neutral-600">[14:21:08]</span> NAV_CORE: Hız adaptasyonu -&gt; 1.5m/s.</div>
                 <div className="text-neutral-300"><span className="text-neutral-600">[14:21:20]</span> NAV_CORE: Engel aşıldı, normal seyre dönülüyor.</div>
                 <div className="text-[#ffb000]"><span className="text-neutral-600">[14:22:15]</span> VISION_WARN: Kayar engel algılandı, geçiş penceresi hesaplanıyor...</div>
                 <div className="text-[#00ff41] animate-pulse"><span className="text-neutral-600">[14:22:18]</span> NAV_ACTION: Taktik bekleme devrede. (3s)</div>
