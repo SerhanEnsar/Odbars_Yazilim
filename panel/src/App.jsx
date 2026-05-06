@@ -4,10 +4,36 @@ import {
   Play, Pause, AlertOctagon, Settings2, ListTodo, Target, Navigation, Unlock, Lock
 } from 'lucide-react';
 
+const Keybox = ({ letter, label, pressed, unassigned, wide }) => {
+  return (
+    <div className={`flex items-center justify-center font-bold text-[10px] uppercase transition-all duration-100 
+      ${wide ? 'w-24' : 'w-8'} h-8 
+      ${unassigned 
+        ? 'bg-[#161412] text-stone-500 border border-[#f59e0b]/50' // Unassigned: Turuncu çerçeve
+        : pressed 
+          ? 'bg-[#22c55e] text-black shadow-[0_0_10px_#22c55e] border border-[#22c55e]' 
+          : 'bg-[#161412] text-stone-300 border border-[#22c55e]' // Assigned: Yeşil çerçeve
+      }`}>
+      {label || letter}
+    </div>
+  );
+};
+
 export default function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeTask, setActiveTask] = useState(3);
-  const isTargeting = activeTask === 7;
+  
+  // Sürüş Modu ve Tuşlar
+  const [driveMode, setDriveMode] = useState("OTONOM");
+  const [pressedKeys, setPressedKeys] = useState(new Set());
+
+  // Görev Durumları
+  const [taskStatuses, setTaskStatuses] = useState({
+    1: 'TAMAM', 2: 'TAMAM', 3: 'AKTİF', 4: 'BEKLEME', 5: 'BEKLEME', 6: 'BEKLEME', 7: 'BEKLEME'
+  });
+  const [popupMenu, setPopupMenu] = useState({ visible: false, taskId: null, x: 0, y: 0 });
+  
+  const isTargeting = taskStatuses[7] === 'AKTİF';
+
   const [telemetry, setTelemetry] = useState({
     battery: 84,
     speed: '0.0',
@@ -16,32 +42,71 @@ export default function App() {
     ping: 12
   });
 
+  // Saat, Telemetri ve Klavye Listener
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    
     let removeListener = null;
 
-    // Electron'dan gelen canlı telemetri simülasyonunu dinle
     if (window.electronAPI && window.electronAPI.onTelemetryUpdate) {
       removeListener = window.electronAPI.onTelemetryUpdate((data) => {
         setTelemetry(data);
       });
     }
 
+    const handleKeyDown = (e) => {
+      if (driveMode === 'MANUEL') {
+        setPressedKeys(prev => new Set(prev).add(e.key.toLowerCase()));
+      }
+    };
+    const handleKeyUp = (e) => {
+      if (driveMode === 'MANUEL') {
+        setPressedKeys(prev => {
+          const next = new Set(prev);
+          next.delete(e.key.toLowerCase());
+          return next;
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
     return () => {
       clearInterval(timer);
       if (removeListener) removeListener();
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [driveMode]);
+
+  const updateTaskStatus = (id, status) => {
+    setTaskStatuses(prev => ({ ...prev, [id]: status }));
+    setPopupMenu({ visible: false, taskId: null, x: 0, y: 0 });
+  };
 
   return (
-    <div className="h-screen w-screen bg-transparent text-stone-200 p-4 font-mono select-none flex flex-col overflow-hidden scanlines box-border">
+    <div className="h-screen w-screen bg-transparent text-stone-200 p-4 font-mono select-none flex flex-col overflow-hidden scanlines box-border" onClick={() => popupMenu.visible && setPopupMenu({ ...popupMenu, visible: false })}>
       
+      {/* Görev Popup Menüsü */}
+      {popupMenu.visible && (
+        <div 
+          className="fixed z-50 bg-[#2a241c] border border-stone-500 shadow-xl p-1 flex flex-col gap-1"
+          style={{ top: popupMenu.y, left: popupMenu.x }}
+          onClick={(e) => e.stopPropagation()}
+          onMouseLeave={() => setPopupMenu({ ...popupMenu, visible: false })}
+        >
+          <div className="text-[8px] text-stone-400 font-bold px-1 mb-1 border-b border-stone-600 pb-1 uppercase tracking-widest">Durum Seçin</div>
+          <button onClick={() => updateTaskStatus(popupMenu.taskId, 'TAMAM')} className="text-[10px] bg-[#22c55e]/20 text-[#22c55e] hover:bg-[#22c55e]/40 px-3 py-1 font-bold text-left tracking-widest">TAMAM</button>
+          <button onClick={() => updateTaskStatus(popupMenu.taskId, 'AKTİF')} className="text-[10px] bg-[#f59e0b]/20 text-[#f59e0b] hover:bg-[#f59e0b]/40 px-3 py-1 font-bold text-left tracking-widest">AKTİF</button>
+          <button onClick={() => updateTaskStatus(popupMenu.taskId, 'BEKLEME')} className="text-[10px] bg-stone-700/50 text-stone-300 hover:bg-stone-600 px-3 py-1 font-bold text-left tracking-widest">BEKLEME</button>
+        </div>
+      )}
+
       {/* Header */}
       <header className="flex justify-between items-center bg-[#2a241c] p-2 lg:p-3 tactical-border shadow-lg mb-3 shrink-0">
         <div className="corners-alt"></div>
         <div className="flex items-center space-x-3 ml-2">
-          <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#f59e0b]/10 flex items-center justify-center border border-[#f59e0b]/50">
+          <div className="w-10 h-10 lg:w-12 h-12 bg-[#f59e0b]/10 flex items-center justify-center border border-[#f59e0b]/50">
             <Target className="text-[#f59e0b] animate-pulse" size={24} />
           </div>
           <div>
@@ -80,7 +145,7 @@ export default function App() {
         {/* Left Column: Mission & Telemetry */}
         <div className="col-span-3 flex flex-col gap-3 h-full min-h-0">
           
-          {/* Active Mode */}
+          {/* Active Mode & Keyboard Controls */}
           <div className="bg-[#2a241c] p-3 tactical-border relative shrink-0">
             <div className="corners-alt"></div>
             <div className="flex items-center justify-between mb-3 border-b border-stone-600 pb-2">
@@ -89,13 +154,40 @@ export default function App() {
                 Hareket Modu
               </h2>
             </div>
+            
             <div className="grid grid-cols-2 gap-2">
-              <button className="bg-[#f59e0b] text-black py-1.5 font-bold hover:bg-amber-400 transition-colors tracking-widest shadow-md text-xs">
+              <button 
+                onClick={() => { setDriveMode('OTONOM'); setPressedKeys(new Set()); }}
+                className={`py-1.5 font-bold transition-colors tracking-widest shadow-md text-xs ${driveMode === 'OTONOM' ? 'bg-[#f59e0b] text-black' : 'bg-[#161412] text-stone-400 border border-stone-600 hover:text-stone-200'}`}
+              >
                 OTONOM
               </button>
-              <button className="bg-[#161412] border border-stone-600 text-stone-400 py-1.5 font-bold hover:text-stone-200 transition-colors tracking-widest text-xs">
+              <button 
+                onClick={() => setDriveMode('MANUEL')}
+                className={`py-1.5 font-bold transition-colors tracking-widest text-xs ${driveMode === 'MANUEL' ? 'bg-[#f59e0b] text-black' : 'bg-[#161412] border border-stone-600 text-stone-400 hover:text-stone-200'}`}
+              >
                 MANUEL
               </button>
+            </div>
+
+            {/* Klavye Göstergesi */}
+            <div className={`mt-3 transition-opacity duration-300 ${driveMode === 'MANUEL' ? 'opacity-100' : 'opacity-30 pointer-events-none grayscale'}`}>
+              <span className="text-[8px] text-stone-400 font-bold block mb-2 text-center tracking-widest uppercase">Manuel Sürüş Kontrolleri</span>
+              <div className="flex flex-col items-center gap-1">
+                <div className="flex justify-center gap-1">
+                   <Keybox letter="q" unassigned />
+                   <Keybox letter="w" pressed={pressedKeys.has('w')} />
+                   <Keybox letter="e" unassigned />
+                </div>
+                <div className="flex justify-center gap-1">
+                   <Keybox letter="a" pressed={pressedKeys.has('a')} />
+                   <Keybox letter="s" pressed={pressedKeys.has('s')} />
+                   <Keybox letter="d" pressed={pressedKeys.has('d')} />
+                </div>
+                <div className="flex justify-center mt-1">
+                   <Keybox letter="space" label="FREN" pressed={pressedKeys.has(' ')} wide />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -113,7 +205,7 @@ export default function App() {
               </div>
             </div>
             
-            <div className="space-y-1.5 mt-2 overflow-y-auto pr-1 pb-1">
+            <div className="space-y-1.5 mt-2 overflow-y-auto pr-1 pb-1 relative">
               {[
                 { id: 1, name: "Su Geçişi" },
                 { id: 2, name: "Taşlı Yol" },
@@ -123,14 +215,19 @@ export default function App() {
                 { id: 6, name: "Yan Eğim" },
                 { id: 7, name: "Atış Görevi" },
               ].map(task => {
-                const isCompleted = task.id < activeTask;
-                const isActive = task.id === activeTask;
-                const isPending = task.id > activeTask;
+                const status = taskStatuses[task.id];
+                const isCompleted = status === 'TAMAM';
+                const isActive = status === 'AKTİF';
+                const isPending = status === 'BEKLEME';
 
                 return (
                   <div 
                     key={task.id} 
-                    onClick={() => setActiveTask(task.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      setPopupMenu({ visible: true, taskId: task.id, x: rect.right - 100, y: rect.bottom - 10 });
+                    }}
                     className={`flex items-center justify-between p-1.5 relative overflow-hidden transition-colors cursor-pointer hover:border-stone-400
                       ${isCompleted ? 'bg-[#22c55e]/10 border border-[#22c55e]/50' : ''}
                       ${isActive ? 'bg-[#161412] border-2 border-[#f59e0b]' : ''}
@@ -152,7 +249,7 @@ export default function App() {
                       ${isActive ? 'bg-[#f59e0b] text-black animate-pulse' : ''}
                       ${isPending ? 'bg-stone-700 text-stone-300' : ''}
                     `}>
-                      {isCompleted ? 'TAMAM' : isActive ? 'AKTİF' : 'BEKLEME'}
+                      {status}
                     </span>
                   </div>
                 );
