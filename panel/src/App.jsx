@@ -19,6 +19,46 @@ const Keybox = ({ letter, label, pressed, unassigned, wide }) => {
   );
 };
 
+const CameraFeed = ({ url, label, isTargeting }) => {
+  const [hasSignal, setHasSignal] = useState(false);
+  const [retryKey, setRetryKey] = useState(Date.now());
+
+  useEffect(() => {
+    let interval;
+    if (!hasSignal && url) {
+      interval = setInterval(() => {
+        setRetryKey(Date.now());
+      }, 3000); // 3 saniyede bir yeniden bağlanmayı dene
+    }
+    return () => clearInterval(interval);
+  }, [hasSignal, url]);
+
+  return (
+    <div className="w-full h-full absolute inset-0 z-0 bg-[#0a0a0a]">
+      {url && (
+        <img 
+          src={`${url}?t=${retryKey}`} 
+          alt={label}
+          className={`w-full h-full object-cover transition-opacity duration-1000 ${hasSignal ? 'opacity-100' : 'opacity-0'}`}
+          onLoad={() => setHasSignal(true)}
+          onError={() => setHasSignal(false)}
+        />
+      )}
+      
+      {!hasSignal && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center opacity-40 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-stone-900 to-black">
+          <Camera size={isTargeting ? 64 : 48} className="text-stone-600 mb-3" />
+          <div className="flex gap-1">
+            <span className="w-1.5 h-1.5 bg-stone-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+            <span className="w-1.5 h-1.5 bg-stone-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+            <span className="w-1.5 h-1.5 bg-stone-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
   
@@ -490,16 +530,18 @@ export default function App() {
               ? 'top-[65%] left-0 w-1/2 h-[35%] opacity-80' 
               : 'top-0 left-0 w-full h-[65%] opacity-100'}`}
           >
-            <div className="w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-stone-800 to-[#161412]">
-              <div className="corners-alt"></div>
+            <div className="w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden">
+              <CameraFeed url="http://127.0.0.1:5000/cam_fwd" label="CAM_01_FWD" isTargeting={isTargeting} />
+              
+              <div className="corners-alt pointer-events-none z-10"></div>
               <div className="absolute top-2 left-2 z-10 flex items-center gap-2 bg-[#2a241c]/90 px-2 py-1 border border-stone-600 shadow-md">
                 <div className={`w-2 h-2 ${isTargeting ? 'bg-stone-500' : 'bg-[#ef4444] animate-pulse'}`}></div>
                 <span className="text-[9px] lg:text-xs font-bold text-stone-200 tracking-widest">CAM_01_FWD</span>
               </div>
               
               {/* Fake AI Overlay - Only visible when large */}
-              <div className={`absolute inset-0 transition-opacity duration-300 ${isTargeting ? 'opacity-0' : 'opacity-100'}`}>
-                <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-40">
+              <div className={`absolute inset-0 transition-opacity duration-300 pointer-events-none z-10 ${isTargeting ? 'opacity-0' : 'opacity-100'}`}>
+                <div className="absolute inset-0 flex items-center justify-center opacity-40">
                   <div className="w-full h-[1px] bg-[#f59e0b]/50 absolute"></div>
                   <div className="h-full w-[1px] bg-[#f59e0b]/50 absolute"></div>
                 </div>
@@ -507,7 +549,6 @@ export default function App() {
                   <div className="bg-[#f59e0b] text-black text-[9px] font-bold px-1 uppercase tracking-widest">TGT: ENGEL (82%)</div>
                 </div>
               </div>
-              <Camera size={48} className="text-stone-600 absolute" />
             </div>
           </div>
 
@@ -518,9 +559,11 @@ export default function App() {
               ? 'top-[65%] left-1/2 w-1/2 h-[35%] opacity-80' 
               : 'top-[65%] left-0 w-1/2 h-[35%] opacity-80'}`}
           >
-            <div className="w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden bg-[#1e1b18]">
+            <div className="w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden">
+              <CameraFeed url="http://127.0.0.1:5000/cam_rear" label="CAM_02_REAR" isTargeting={false} />
+              
+              <div className="corners-alt pointer-events-none z-10"></div>
               <div className="absolute top-1 left-1 z-10 text-[9px] lg:text-[10px] font-bold bg-[#2a241c]/90 px-2 py-1 text-stone-300 border border-stone-600 tracking-widest">CAM_02_REAR</div>
-              <span className="text-stone-500 text-[9px] lg:text-[11px] font-bold tracking-widest uppercase">Sinyal Aranıyor...</span>
             </div>
           </div>
 
@@ -531,21 +574,23 @@ export default function App() {
               ? 'top-0 left-0 w-full h-[65%] opacity-100' 
               : 'top-[65%] left-1/2 w-1/2 h-[35%] opacity-80'}`}
           >
-            <div className={`w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden bg-[#1e1b18] transition-all duration-700 ${isTargeting ? 'border-2 border-[#ef4444]/50 shadow-[0_0_30px_rgba(239,68,68,0.15)]' : ''}`}>
-              <div className="corners-alt"></div>
+            <div className={`w-full h-full relative tactical-border flex flex-col justify-center items-center overflow-hidden transition-all duration-700 ${isTargeting ? 'border-2 border-[#ef4444]/50 shadow-[0_0_30px_rgba(239,68,68,0.15)]' : ''}`}>
+              <CameraFeed url="http://127.0.0.1:5000/cam_aim" label="CAM_03_AIM" isTargeting={isTargeting} />
+              
+              <div className="corners-alt pointer-events-none z-10"></div>
               <div className="absolute top-2 left-2 z-10 text-[9px] lg:text-[11px] bg-[#2a241c]/90 px-2 py-1 text-[#f59e0b] border border-[#f59e0b]/50 tracking-widest font-bold flex items-center gap-2 transition-all">
                 <Crosshair size={isTargeting ? 14 : 12} className={isTargeting ? "text-[#ef4444] animate-pulse" : ""} /> CAM_03_AIM
               </div>
               
               {/* Fake target scope - Scales based on state */}
-              <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-700 ${isTargeting ? 'opacity-100 scale-125' : 'opacity-60 scale-75'}`}>
+              <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-700 z-10 ${isTargeting ? 'opacity-100 scale-125' : 'opacity-60 scale-75'}`}>
                 <div className={`rounded-full border-2 border-[#ef4444] relative transition-all duration-700 ${isTargeting ? 'w-48 h-48 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : 'w-20 h-20'}`}>
                   <div className="absolute top-1/2 left-[-20px] right-[-20px] h-[2px] bg-[#ef4444]"></div>
                   <div className="absolute left-1/2 top-[-20px] bottom-[-20px] w-[2px] bg-[#ef4444]"></div>
                   <div className={`rounded-full border border-[#ef4444]/50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ${isTargeting ? 'w-24 h-24' : 'w-10 h-10'}`}></div>
                 </div>
               </div>
-              <span className={`text-[#ef4444] font-bold tracking-widest uppercase mt-32 transition-all duration-500 ${isTargeting ? 'text-sm opacity-100' : 'text-[9px] opacity-60'}`}>
+              <span className={`text-[#ef4444] font-bold tracking-widest uppercase mt-32 transition-all duration-500 z-10 ${isTargeting ? 'text-sm opacity-100' : 'text-[9px] opacity-60'}`}>
                 {isTargeting ? 'HEDEF ARANIYOR...' : 'BEKLEMEDE'}
               </span>
             </div>
