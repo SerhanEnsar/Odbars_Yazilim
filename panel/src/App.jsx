@@ -53,16 +53,20 @@ export default function App() {
       });
     }
 
+    const validKeys = ['w', 'a', 's', 'd', ' '];
+    
     const handleKeyDown = (e) => {
-      if (driveMode === 'MANUEL') {
-        setPressedKeys(prev => new Set(prev).add(e.key.toLowerCase()));
+      const key = e.key.toLowerCase();
+      if (driveMode === 'MANUEL' && validKeys.includes(key)) {
+        setPressedKeys(prev => new Set(prev).add(key));
       }
     };
     const handleKeyUp = (e) => {
-      if (driveMode === 'MANUEL') {
+      const key = e.key.toLowerCase();
+      if (driveMode === 'MANUEL' && validKeys.includes(key)) {
         setPressedKeys(prev => {
           const next = new Set(prev);
-          next.delete(e.key.toLowerCase());
+          next.delete(key);
           return next;
         });
       }
