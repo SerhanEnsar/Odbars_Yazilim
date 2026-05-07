@@ -330,7 +330,7 @@ class SynthGUI:
         ttk.Button(f_dir, text="Seç", command=lambda: self._pick_dir(self.out_dir)).grid(row=1, column=2, padx=4)
 
         # ── Sınıf Sayıları ──
-        f_cnt = ttk.LabelFrame(self.root, text=" 🎯  Sınıf Başına Görüntü Sayısı ", padding=8)
+        f_cnt = ttk.LabelFrame(parent, text=" 🎯  Sınıf Başına Görüntü Sayısı ", padding=8)
         f_cnt.grid(row=1, column=0, sticky="nsew", **pad)
 
         self.n_tabela = tk.IntVar(value=150)
@@ -347,7 +347,7 @@ class SynthGUI:
                         width=8, font=("Helvetica", 11)).grid(row=row, column=1, padx=8, pady=3)
 
         # ── Boyut ve Perspektif ──
-        f_opt = ttk.LabelFrame(self.root, text=" ⚙️  Boyut & Perspektif ", padding=8)
+        f_opt = ttk.LabelFrame(parent, text=" ⚙️  Boyut & Perspektif ", padding=8)
         f_opt.grid(row=1, column=1, sticky="nsew", **pad)
 
         self.r_min   = tk.IntVar(value=35)
