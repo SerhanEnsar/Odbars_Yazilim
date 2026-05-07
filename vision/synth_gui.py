@@ -77,59 +77,100 @@ def apply_perspective(canvas, x1, y1, w, h, strength=0.18):
 # Nesne çiziciler
 # ─────────────────────────────────────────────
 
-TABELA_TEXTS = ["SU GEÇİŞİ","TAŞLI YOL","KAYAR ENGEL","DİK EĞİM","YAN EĞİM","ATIŞ","1","2","3","4","5","6","7"]
+TABELA_TEXTS = ["SU GECİSİ","TASLI YOL","KAYAR ENGEL","DİK EGİM","YAN EGİM","ATIS","1","2","3","4","5","6","7"]
+
+
+def _draw_text_centered(pil_img, cx, cy, text, font, fill=(235,235,235), shadow=(30,30,30)):
+    """PIL üzerinde metni (cx, cy) noktasına tam ortalı yazar."""
+    d = ImageDraw.Draw(pil_img)
+    bb = d.textbbox((0, 0), text, font=font)   # (left, top, right, bottom)
+    # offset'i çıkar → gerçek boyut
+    tw = bb[2] - bb[0]
+    th = bb[3] - bb[1]
+    tx = cx - tw // 2 - bb[0]   # bb[0] = sol offset
+    ty = cy - th // 2 - bb[1]   # bb[1] = üst offset
+    # Gölge
+    d.text((tx + 1, ty + 1), text, font=font, fill=shadow)
+    # Asıl metin
+    d.text((tx, ty), text, font=font, fill=fill)
+    return pil_img
+
 
 def draw_tabela(canvas, x, y, radius, persp_strength=0.15):
-    cv2.circle(canvas, (x, y), radius, (8, 8, 8), -1)
-    bt = max(3, radius // 8)
-    cv2.circle(canvas, (x, y), radius, (240, 240, 240), bt)
-    cv2.circle(canvas, (x, y), int(radius * 0.82), (210, 210, 210), max(1, bt // 2))
+    """Şartname: Arial Black, siyah dolgu daire, beyaz dış kenarlık halkası."""
+    # Dış siyah daire
+    cv2.circle(canvas, (x, y), radius, (10, 10, 10), -1)
+    # Beyaz dış kenarlık
+    bt = max(4, radius // 7)
+    cv2.circle(canvas, (x, y), radius, (240, 240, 240), bt, lineType=cv2.LINE_AA)
+    # İç beyaz ince çember çizgisi (şartneme tabelasındaki gibi)
+    inner_r = int(radius * 0.84)
+    cv2.circle(canvas, (x, y), inner_r, (180, 180, 180), max(1, bt // 3), lineType=cv2.LINE_AA)
+
     text = random.choice(TABELA_TEXTS)
     if PIL_AVAILABLE:
-        font = get_font(max(12, radius // 2))
+        # Yazı boyutunu yarıçapa göre otomatik ayarla
+        font_size = max(10, int(radius * 0.55))
+        font = get_font(font_size)
         pil = cv_to_pil(canvas)
-        d = ImageDraw.Draw(pil)
-        bb = d.textbbox((0,0), text, font=font)
-        tw, th = bb[2]-bb[0], bb[3]-bb[1]
-        d.text((x - tw//2 + 1, y - th//2 + 1), text, font=font, fill=(40,40,40))
-        d.text((x - tw//2, y - th//2), text, font=font, fill=(235,235,235))
+        pil = _draw_text_centered(pil, x, y, text, font)
         canvas = pil_to_cv(pil)
+
     if persp_strength > 0:
-        canvas = apply_perspective(canvas, x-radius, y-radius, radius*2, radius*2, persp_strength)
-    return canvas, (x-radius, y-radius, radius*2, radius*2)
+        canvas = apply_perspective(canvas, x - radius, y - radius, radius * 2, radius * 2, persp_strength)
+    return canvas, (x - radius, y - radius, radius * 2, radius * 2)
 
 
 def draw_stop(canvas, x, y, radius, persp_strength=0.15):
-    cv2.circle(canvas, (x, y), radius, (8, 8, 8), -1)
-    bt = max(3, radius // 8)
-    cv2.circle(canvas, (x, y), radius, (30, 30, 200), bt)
-    cv2.circle(canvas, (x, y), int(radius * 0.82), (200, 200, 200), max(1, bt // 2))
+    """STOP levhası: tabela formatında, kırmızı kenarlık farkıyla ayrışır."""
+    cv2.circle(canvas, (x, y), radius, (10, 10, 10), -1)
+    bt = max(4, radius // 7)
+    cv2.circle(canvas, (x, y), radius, (40, 40, 210), bt, lineType=cv2.LINE_AA)
+    inner_r = int(radius * 0.84)
+    cv2.circle(canvas, (x, y), inner_r, (160, 160, 200), max(1, bt // 3), lineType=cv2.LINE_AA)
     if PIL_AVAILABLE:
-        font = get_font(max(12, radius // 2))
+        font_size = max(10, int(radius * 0.55))
+        font = get_font(font_size)
         pil = cv_to_pil(canvas)
-        d = ImageDraw.Draw(pil)
-        bb = d.textbbox((0,0), "STOP", font=font)
-        tw, th = bb[2]-bb[0], bb[3]-bb[1]
-        d.text((x-tw//2+1, y-th//2+1), "STOP", font=font, fill=(40,40,40))
-        d.text((x-tw//2, y-th//2), "STOP", font=font, fill=(230,230,230))
+        pil = _draw_text_centered(pil, x, y, "STOP", font, fill=(230, 230, 230))
         canvas = pil_to_cv(pil)
     if persp_strength > 0:
-        canvas = apply_perspective(canvas, x-radius, y-radius, radius*2, radius*2, persp_strength)
-    return canvas, (x-radius, y-radius, radius*2, radius*2)
+        canvas = apply_perspective(canvas, x - radius, y - radius, radius * 2, radius * 2, persp_strength)
+    return canvas, (x - radius, y - radius, radius * 2, radius * 2)
 
 
 def draw_hedef(canvas, x, y, w, h, persp_strength=0.12):
-    cx, cy = x+w//2, y+h//2
-    max_r  = min(w, h)//2 - 4
-    cv2.rectangle(canvas, (x,y), (x+w,y+h), (245,245,245), -1)
-    cv2.rectangle(canvas, (x,y), (x+w,y+h), (30,30,30), 2)
-    rings = [(1.00,(30,30,30)),(0.80,(220,220,220)),(0.60,(20,20,180)),(0.40,(220,220,220)),(0.20,(20,20,180))]
-    for ratio, color in rings:
+    """A3 oranlı atış hedefi: eşmerkezli halkalar + crosshair + merkez nokta."""
+    cx, cy = x + w // 2, y + h // 2
+    max_r  = min(w, h) // 2 - 4
+
+    # Beyaz arka zemin
+    cv2.rectangle(canvas, (x, y), (x + w, y + h), (245, 245, 245), -1)
+
+    # Eşmerkezli halkalar (dıştan içe)
+    ring_defs = [
+        (1.00, (30,  30,  30)),    # siyah dış
+        (0.78, (255, 255, 255)),   # beyaz
+        (0.58, (0,   0,  200)),   # mavi/kırmızı
+        (0.38, (255, 255, 255)),   # beyaz
+        (0.20, (0,   0,  200)),   # iç mavi/kırmızı
+    ]
+    for ratio, color in ring_defs:
         r = int(max_r * ratio)
-        if r > 1: cv2.circle(canvas, (cx,cy), r, color, -1)
-    cv2.line(canvas, (cx-max_r,cy),(cx+max_r,cy),(60,60,60),1)
-    cv2.line(canvas, (cx,cy-max_r),(cx,cy+max_r),(60,60,60),1)
-    cv2.circle(canvas, (cx,cy), max(2,max_r//8),(255,255,255),-1)
+        if r > 2:
+            cv2.circle(canvas, (cx, cy), r, color, -1, lineType=cv2.LINE_AA)
+
+    # Crosshair çizgileri
+    lc = (80, 80, 80)
+    cv2.line(canvas, (cx - max_r, cy), (cx + max_r, cy), lc, 1, lineType=cv2.LINE_AA)
+    cv2.line(canvas, (cx, cy - max_r), (cx, cy + max_r), lc, 1, lineType=cv2.LINE_AA)
+
+    # Kare dış çerçeve
+    cv2.rectangle(canvas, (x, y), (x + w, y + h), (30, 30, 30), 2)
+
+    # Merkez beyaz nokta
+    cv2.circle(canvas, (cx, cy), max(3, max_r // 7), (255, 255, 255), -1, lineType=cv2.LINE_AA)
+
     if persp_strength > 0:
         canvas = apply_perspective(canvas, x, y, w, h, persp_strength)
     return canvas, (x, y, w, h)
