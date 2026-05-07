@@ -101,11 +101,18 @@ def _pick_terrain():
 
 
 def create_ground():
-    """Zemin düzlemi. terrain_dir klasöründen her seferinde rastgele doku seçer."""
+    """Zemin düzlemi. Subdivide edilir ve doku kullanılarak 3D displacement uygulanır."""
     terrain_path = _pick_terrain()
+    
+    # 1. Mesh oluştur ve subdivide et (3D derinlik için)
     bpy.ops.mesh.primitive_plane_add(size=40, location=(0, 0, 0))
     ground = bpy.context.active_object
     ground.name = "Ground"
+    
+    # Edit moduna geçip bölüyoruz
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.subdivide(number_cuts=60) # 60x60 = 3600 yüzey (hız için makul)
+    bpy.ops.object.mode_set(mode='OBJECT')
 
     mat = bpy.data.materials.new("GroundMat")
     mat.use_nodes = True
@@ -114,12 +121,29 @@ def create_ground():
     bsdf = nodes.get("Principled BSDF")
 
     if terrain_path:
+        img = bpy.data.images.load(terrain_path)
         tex_node = nodes.new("ShaderNodeTexImage")
-        tex_node.image = bpy.data.images.load(terrain_path)
-        coord = nodes.new("ShaderNodeTexCoord")
-        links.new(coord.outputs["UV"], tex_node.inputs["Vector"])
+        tex_node.image = img
+        
+        # Base Color
         links.new(tex_node.outputs["Color"], bsdf.inputs["Base Color"])
-        print(f"  Terrain: {Path(terrain_path).name}")
+        
+        # 2. Displacement Uygula (Gerçek 3D kabartma)
+        # Modifier kullanarak yapmak daha kontrollü
+        tex = bpy.data.textures.new("GroundTex", type='IMAGE')
+        tex.image = img
+        
+        disp_mod = ground.modifiers.new(name="Displace", type='DISPLACE')
+        disp_mod.texture = tex
+        disp_mod.strength = 0.4 # Kabarıklık şiddeti
+        disp_mod.mid_level = 0.5
+        
+        # Yumuşatma
+        bpy.ops.object.modifier_add(type='SUBSURF')
+        ground.modifiers["Subdivision"].levels = 1
+        bpy.ops.object.shade_smooth()
+        
+        print(f"  3D Terrain: {Path(terrain_path).name}")
     else:
         bsdf.inputs["Base Color"].default_value = (0.35, 0.30, 0.22, 1.0)
         bsdf.inputs["Roughness"].default_value = 1.0
@@ -132,20 +156,34 @@ def create_ground():
 # TABELA (class 0)
 # ─────────────────────────────────────────────
 def create_tabela(text_str, border_color=(0.9, 0.9, 0.9, 1.0), label_class=0):
+    """Şartnameye uygun tabela: metal direk + siyah disk + renkli kenarlık."""
     objs = []
 
-    # Disk (60cm çap = 0.3m yarıçap)
+    # 1. Direk (Sign Post)
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.015, depth=2.0, location=(0, 0, -0.7))
+    post = bpy.context.active_object
+    post.name = f"Sign_Post_{label_class}"
+    post_mat = make_material(f"PostMat_{label_class}", (0.5, 0.5, 0.5, 1.0))
+    # Metalik yap
+    post_mat.node_tree.nodes.get("Principled BSDF").inputs["Metallic"].default_value = 1.0
+    post_mat.node_tree.nodes.get("Principled BSDF").inputs["Roughness"].default_value = 0.3
+    assign_material(post, post_mat)
+    objs.append(post)
+
+    # 2. Disk (60cm çap)
     bpy.ops.mesh.primitive_circle_add(vertices=64, radius=0.30, fill_type='NGON', location=(0, 0, 0))
     disk = bpy.context.active_object
     disk.name = f"Sign_Disk_{label_class}"
-    assign_material(disk, make_material(f"DiskMat_{label_class}", (0.02, 0.02, 0.02, 1.0)))
+    disk_mat = make_material(f"DiskMat_{label_class}", (0.01, 0.01, 0.01, 1.0))
+    disk_mat.node_tree.nodes.get("Principled BSDF").inputs["Roughness"].default_value = 0.5
+    assign_material(disk, disk_mat)
     objs.append(disk)
 
-    # Dış kenarlık halkası
+    # 3. Dış kenarlık halkası (Torus)
     bpy.ops.mesh.primitive_torus_add(
-        location=(0, 0, 0.001),
+        location=(0, 0, 0.002),
         major_radius=0.30,
-        minor_radius=0.025,
+        minor_radius=0.02,
         major_segments=64,
         minor_segments=12,
     )
@@ -154,43 +192,25 @@ def create_tabela(text_str, border_color=(0.9, 0.9, 0.9, 1.0), label_class=0):
     assign_material(ring, make_material(f"RingMat_{label_class}", border_color))
     objs.append(ring)
 
-    # İç ince halka
-    bpy.ops.mesh.primitive_torus_add(
-        location=(0, 0, 0.001),
-        major_radius=0.25,
-        minor_radius=0.008,
-        major_segments=64,
-        minor_segments=8,
-    )
-    inner = bpy.context.active_object
-    inner.name = f"Sign_InnerRing_{label_class}"
-    assign_material(inner, make_material(f"InnerRingMat_{label_class}", border_color))
-    objs.append(inner)
-
-    # Metin
-    bpy.ops.object.text_add(location=(0, 0, 0.002))
+    # 4. Metin (Görev Numarası)
+    bpy.ops.object.text_add(location=(0, 0, 0.005))
     txt_obj = bpy.context.active_object
     txt_obj.name = f"Sign_Text_{label_class}"
     txt_obj.data.body = text_str
     txt_obj.data.align_x = 'CENTER'
     txt_obj.data.align_y = 'CENTER'
-    txt_obj.data.size = 0.06  # yazı boyutu (metre)
-    txt_obj.data.extrude = 0.002
+    txt_obj.data.size = 0.20  # Daha büyük ve net
+    txt_obj.data.extrude = 0.005
 
-    # Font yükle
     font_path = CONFIG["font_path"]
     if Path(font_path).exists():
-        font = bpy.data.fonts.load(font_path)
-        txt_obj.data.font = font
+        txt_obj.data.font = bpy.data.fonts.load(font_path)
 
-    txt_mat = make_material(f"TextMat_{label_class}", (0.92, 0.92, 0.92, 1.0))
-    if txt_obj.data.materials:
-        txt_obj.data.materials[0] = txt_mat
-    else:
-        txt_obj.data.materials.append(txt_mat)
+    txt_mat = make_material(f"TextMat_{label_class}", (0.95, 0.95, 0.95, 1.0))
+    assign_material(txt_obj, txt_mat)
     objs.append(txt_obj)
 
-    # Hepsini parent'la → Empty
+    # 5. Parent & Empty
     bpy.ops.object.empty_add(type='PLAIN_AXES', location=(0, 0, 0))
     parent = bpy.context.active_object
     parent.name = f"Sign_Parent_{label_class}"
@@ -208,14 +228,25 @@ def create_stop():
 # HEdef (class 2) — A3 levha + halka dokusu
 # ─────────────────────────────────────────────
 def create_hedef():
-    # A3: 297x420mm → 0.297 x 0.42m
+    """A3 levha + metal direk + hedef dokusu."""
+    objs = []
+    
+    # 1. Direk
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.015, depth=2.0, location=(0, 0, -0.6))
+    post = bpy.context.active_object
+    post.name = "Hedef_Post"
+    assign_material(post, make_material("PostMat_Hedef", (0.5, 0.5, 0.5, 1.0)))
+    post.data.materials[0].node_tree.nodes.get("Principled BSDF").inputs["Metallic"].default_value = 1.0
+    objs.append(post)
+
+    # 2. A3 Levha
     bpy.ops.mesh.primitive_plane_add(size=1, location=(0, 0, 0))
     plane = bpy.context.active_object
     plane.name = "Hedef_Board"
     plane.scale = (0.297, 0.42, 1.0)
     bpy.ops.object.transform_apply(scale=True)
 
-    # Beyaz zemin
+    # Materyal & Doku
     mat = bpy.data.materials.new("HedefMat")
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
@@ -223,14 +254,12 @@ def create_hedef():
     bsdf = nodes.get("Principled BSDF")
     bsdf.inputs["Base Color"].default_value = (0.95, 0.95, 0.95, 1.0)
 
-    # Eşmerkezli halka dokusu — Gradient + ColorRamp ile
     tex_coord = nodes.new("ShaderNodeTexCoord")
     mapping = nodes.new("ShaderNodeMapping")
     gradient = nodes.new("ShaderNodeTexGradient")
     gradient.gradient_type = 'RADIAL'
     color_ramp = nodes.new("ShaderNodeValToRGB")
 
-    # Halka renkleri: siyah-beyaz-mavi-beyaz-mavi
     cr = color_ramp.color_ramp
     cr.elements[0].position = 0.0;  cr.elements[0].color = (0.05, 0.05, 0.05, 1)
     cr.elements[1].position = 1.0;  cr.elements[1].color = (1.0, 1.0, 1.0, 1)
@@ -245,20 +274,24 @@ def create_hedef():
     links.new(color_ramp.outputs["Color"], bsdf.inputs["Base Color"])
 
     assign_material(plane, mat)
+    objs.append(plane)
 
-    # Çerçeve
-    bpy.ops.mesh.primitive_plane_add(size=1, location=(0, 0, -0.001))
+    # 3. Çerçeve (Backing)
+    bpy.ops.mesh.primitive_plane_add(size=1, location=(0, 0, -0.002))
     frame = bpy.context.active_object
     frame.name = "Hedef_Frame"
     frame.scale = (0.31, 0.44, 1.0)
     bpy.ops.object.transform_apply(scale=True)
     assign_material(frame, make_material("FrameMat", (0.05, 0.05, 0.05, 1.0)))
+    objs.append(frame)
 
+    # Parent & Empty
     bpy.ops.object.empty_add(type='PLAIN_AXES', location=(0,0,0))
     parent = bpy.context.active_object
     parent.name = "Hedef_Parent"
-    plane.parent = parent
-    frame.parent = parent
+    for o in objs:
+        o.parent = parent
+        
     return parent
 
 
