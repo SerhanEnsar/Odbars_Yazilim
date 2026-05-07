@@ -32,8 +32,10 @@ CONFIG = {
     "render_w":       1920,
     "render_h":       1080,
     "class_weights":  [0.4, 0.3, 0.3],
-    "camera_distance_range": (1.5, 8.0),
-    "camera_height_range":   (0.2, 0.5),    # Araç kamerası yüksekliği (metre)
+    "camera_distance_range": (2.0, 8.0),
+    "camera_height_range":   (0.2, 0.6),    # Araç kamerası yüksekliği (metre)
+    "retry_limit": 5,                       # Nesne görünmezse kaç kez tekrar denenecek
+    "file_prefix": "",                      # GUI'den gelecek önek
 }
 
 # Şartname: tabelada sadece görev numarası yazıyor
@@ -403,15 +405,15 @@ def aim_camera_at(cam, target_loc):
     h_min, h_max = CONFIG["camera_height_range"]
 
     dist   = random.uniform(d_min, d_max)
-    # Yalnızca kameranın önünden (120° yatay açı) bakış
-    angle  = random.uniform(-math.pi * 0.33, math.pi * 0.33)
+    # Daha dar açı (-20° ile +20°) nesnenin kadrajda kalma şansını artırır
+    angle  = random.uniform(-math.pi * 0.12, math.pi * 0.12)
     # Kamera zemin seviyesinde
     cam_h  = random.uniform(h_min, h_max)
 
     cam.location = mathutils.Vector((
-        target_loc.x - dist * math.sin(angle),  # nesnenin önünde
+        target_loc.x - dist * math.sin(angle),
         target_loc.y - dist * math.cos(angle),
-        cam_h,                                   # zemine yakın sabit yükseklik
+        cam_h,
     ))
 
     # Kamera nesnenin merkezine doğrudan baktırılır
@@ -439,69 +441,79 @@ def setup_render(w, h):
 # ANA DÖNGÜ
 # ─────────────────────────────────────────────
 def main():
-    random.seed(42)
+    import time
+    random.seed(int(time.time()))
     setup_render(CONFIG["render_w"], CONFIG["render_h"])
 
-    # Sınıf → üretici fonksiyon
     creators = {
         0: lambda: create_tabela(random.choice(TABELA_TEXTS)),
         1: lambda: create_stop(),
         2: lambda: create_hedef(),
     }
-    weights = CONFIG["class_weights"]
+
+    OUT_PATH = Path(CONFIG["output_dir"])
+    out_imgs = OUT_PATH / "images" / "train"
+    out_lbls = OUT_PATH / "labels" / "train"
+    out_imgs.mkdir(parents=True, exist_ok=True)
+    out_lbls.mkdir(parents=True, exist_ok=True)
+
+    timestamp = int(time.time() * 1000) % 100000
     n = CONFIG["n_renders"]
-    img_w = CONFIG["render_w"]
-    img_h = CONFIG["render_h"]
-    out_imgs = OUT / "images" / "train"
-    out_lbls = OUT / "labels" / "train"
 
     for i in range(n):
         print(f"[{i+1}/{n}] Render alınıyor...")
-
+        
         # Sahneyi sıfırla
+        clear_scene()
         purge()
-        bpy.ops.object.select_all(action='SELECT')
-        bpy.ops.object.delete()
 
         # Zemin
-        create_ground()  # terrain_dir'den otomatik rastgele seçer
+        create_ground()
 
-        # Sınıf seç (1–3 nesne arası)
-        n_objects = random.randint(1, 3)
-        class_ids = random.choices([0, 1, 2], weights=weights, k=n_objects)
+        # Sınıf seç
+        cls_id = random.choices([0, 1, 2], weights=CONFIG["class_weights"])[0]
+        obj = creators[cls_id]()
+        
+        # Rastgele konum
+        ox = random.uniform(-3, 3)
+        oy = random.uniform(-3, 3)
+        obj.location = mathutils.Vector((ox, oy, 0))
 
-        # Kamera ve ışık kur
+        # Kamera ve ışık
         cam = setup_camera()
         setup_lights()
 
-        created_pairs = []  # (class_id, obj)
-        for cls_id in class_ids:
-            obj = creators[cls_id]()
-            # Artık içerde dikey yapılıyor, burada ek rotasyona gerek yok
-            ox = random.uniform(-4, 4)
-            oy = random.uniform(-4, 4)
-            obj.location = mathutils.Vector((ox, oy, 0)) # Zemin üzerinde (z=0)
-            created_pairs.append((cls_id, obj))
+        # --- GÖRÜNÜRLÜK KONTROLÜ VE RETRY ---
+        bbox = None
+        for attempt in range(CONFIG["retry_limit"]):
+            # Tabelanın merkezine (yerden ~1.2m) odaklan
+            aim_camera_at(cam, obj.location + mathutils.Vector((0,0,1.0)))
+            bpy.context.view_layer.update()
+            bbox = get_2d_bbox(obj, cam, CONFIG["render_w"], CONFIG["render_h"])
+            if bbox: break
+        
+        if not bbox:
+            print(f"  ❌ Nesne kadraja girmedi, atlanıyor.")
+            continue
 
-        # Kamerayı ilk nesneye yönelt (ya da rastgele bir noktaya)
-        target = created_pairs[0][1].location if created_pairs else mathutils.Vector((0,0,1))
-        aim_camera_at(cam, target)
-
-        # Render
-        img_path = str(out_imgs / f"render_{i:05d}.jpg")
+        # Dosya ismi (çakışma olmaması için timestamp + index)
+        prefix = CONFIG.get("file_prefix", "render")
+        if not prefix: prefix = "render"
+        filename = f"{prefix}_{timestamp}_{i:04d}"
+        
+        # Render ve Kaydet
+        img_path = str(out_imgs / f"{filename}.jpg")
         bpy.context.scene.render.filepath = img_path
         bpy.ops.render.render(write_still=True)
 
-        # YOLO label yaz
-        lbl_path = out_lbls / f"render_{i:05d}.txt"
-        with open(lbl_path, 'w') as f:
-            for cls_id, obj in created_pairs:
-                bbox = get_2d_bbox(obj, cam, img_w, img_h)
-                if bbox:
-                    cx, cy, bw, bh = bbox
-                    f.write(f"{cls_id} {cx:.6f} {cy:.6f} {bw:.6f} {bh:.6f}\n")
+        # Label Kaydet
+        lbl_path = out_lbls / f"{filename}.txt"
+        with open(lbl_path, "w") as f:
+            f.write(f"{cls_id} {bbox[0]:.6f} {bbox[1]:.6f} {bbox[2]:.6f} {bbox[3]:.6f}\n")
+        
+        print(f"  ✅ Saved: {filename}.jpg")
 
-    print(f"\n✅ {n} render tamamlandı → {OUT}")
+    print(f"\n✅ {n} render işlemi bitti.")
 
 
 if __name__ == "__main__":

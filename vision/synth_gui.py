@@ -289,12 +289,20 @@ class SynthGUI:
 
         self.tab_2d = ttk.Frame(self.notebook)
         self.tab_3d = ttk.Frame(self.notebook)
+        self.tab_view = ttk.Frame(self.notebook)
 
         self.notebook.add(self.tab_2d, text="  🖼️  2D Sentetik  ")
         self.notebook.add(self.tab_3d, text="  🧊  Blender (3D)  ")
+        self.notebook.add(self.tab_view, text="  🔍  Veri Kontrolü  ")
+
+        self.blender_status = "idle" # idle, running, paused
+        self.blender_queue = []
+        self.blender_done_count = 0
+        self.blender_total_count = 0
 
         self._build_2d_ui()
         self._build_3d_ui()
+        self._build_viewer_ui()
         self._build_status_ui()
 
     def _build_status_ui(self):
@@ -423,106 +431,206 @@ class SynthGUI:
 
         self.terrain_vars = {} # {filename: (bool_var, count_var)}
 
-        btn_f = ttk.Frame(parent, padding=10)
-        btn_f.pack(fill="x")
-        ttk.Button(btn_f, text="🧊  Blender Render Başlat", command=self._start_blender).pack(side="right", padx=10)
-        ttk.Button(btn_f, text="🔄  Listeyi Yenile", command=self._refresh_terrain_list).pack(side="right")
-
-    def _pick_blender_terrain(self):
-        d = filedialog.askdirectory()
-        if d:
-            self.blender_terrain_dir.set(d)
-            self._refresh_terrain_list()
-
-    def _refresh_terrain_list(self):
-        for child in self.terrain_list_frame.winfo_children():
-            child.destroy()
+        self.f_blender_controls = ttk.Frame(parent, padding=10)
+        self.f_blender_controls.pack(fill="x")
         
-        self.terrain_vars = {}
-        td = Path(self.blender_terrain_dir.get())
-        if not td.is_dir(): return
+        self.btn_blender_start = ttk.Button(self.f_blender_controls, text="🧊  Başlat", command=self._start_blender)
+        self.btn_blender_start.pack(side="left", padx=5)
+        
+        self.btn_blender_stop = ttk.Button(self.f_blender_controls, text="⏹  Durdur", command=self._stop_blender, state="disabled")
+        self.btn_blender_stop.pack(side="left", padx=5)
+        
+        ttk.Button(self.f_blender_controls, text="🔄  Listeyi Yenile", command=self._refresh_terrain_list).pack(side="right")
 
-        files = sorted(list(td.glob("*.jpg")) + list(td.glob("*.png")) + list(td.glob("*.jpeg")))
-        for i, f in enumerate(files):
-            b_var = tk.BooleanVar(value=True)
-            c_var = tk.IntVar(value=10)
-            self.terrain_vars[f.name] = (b_var, c_var)
+    def _build_viewer_ui(self):
+        parent = self.tab_view
+        f_top = ttk.Frame(parent, padding=5)
+        f_top.pack(fill="x")
 
-            f_row = ttk.Frame(self.terrain_list_frame)
-            f_row.pack(fill="x", pady=2)
-            ttk.Checkbutton(f_row, variable=b_var).pack(side="left")
-            ttk.Label(f_row, text=f.name, width=25).pack(side="left", padx=5)
-            ttk.Label(f_row, text="Adet:").pack(side="left")
-            ttk.Entry(f_row, textvariable=c_var, width=5).pack(side="left", padx=5)
+        self.view_img_dir = tk.StringVar()
+        self.view_lbl_dir = tk.StringVar()
 
-        self.terrain_list_frame.update_idletasks()
-        self.terrain_canvas.config(scrollregion=self.terrain_canvas.bbox("all"))
+        ttk.Label(f_top, text="Images:").grid(row=0, column=0)
+        ttk.Entry(f_top, textvariable=self.view_img_dir, width=30).grid(row=0, column=1)
+        ttk.Button(f_top, text="Seç", command=lambda: self._pick_dir(self.view_img_dir)).grid(row=0, column=2)
+
+        ttk.Label(f_top, text="Labels:").grid(row=0, column=3)
+        ttk.Entry(f_top, textvariable=self.view_lbl_dir, width=30).grid(row=0, column=4)
+        ttk.Button(f_top, text="Seç", command=lambda: self._pick_dir(self.view_lbl_dir)).grid(row=0, column=5)
+        
+        ttk.Button(f_top, text="🔄 Yükle", command=self._load_viewer_data).grid(row=0, column=6, padx=10)
+
+        self.paned = ttk.PanedWindow(parent, orient="horizontal")
+        self.paned.pack(fill="both", expand=True, padx=5, pady=5)
+
+        # Liste
+        self.view_list = tk.Listbox(self.paned, width=25, bg="#1a1a1a", fg="#d4c5a0", selectbackground="#f59e0b")
+        self.view_list.bind("<<ListboxSelect>>", self._on_view_select)
+        self.paned.add(self.view_list, weight=1)
+
+        # Görsel Alanı
+        self.f_view_imgs = ttk.Frame(self.paned)
+        self.paned.add(self.f_view_imgs, weight=4)
+        
+        self.lbl_view_raw = ttk.Label(self.f_view_imgs, text="Orijinal")
+        self.lbl_view_raw.grid(row=0, column=0)
+        self.canvas_raw = tk.Label(self.f_view_imgs, bg="#000")
+        self.canvas_raw.grid(row=1, column=0, padx=2)
+
+        self.lbl_view_bbox = ttk.Label(self.f_view_imgs, text="Bbox")
+        self.lbl_view_bbox.grid(row=0, column=1)
+        self.canvas_bbox = tk.Label(self.f_view_imgs, bg="#000")
+        self.canvas_bbox.grid(row=1, column=1, padx=2)
+
+        # Label İçeriği
+        self.txt_view_label = tk.Text(self.paned, width=20, bg="#0f0f0f", fg="#f59e0b", font=("Courier", 10))
+        self.paned.add(self.txt_view_label, weight=1)
+
+    def _load_viewer_data(self):
+        idat = Path(self.view_img_dir.get())
+        ldat = Path(self.view_lbl_dir.get())
+        if not idat.is_dir(): return
+        
+        self.view_list.delete(0, "end")
+        self.viewer_files = sorted([f.stem for f in idat.glob("*.jpg")])
+        for f in self.viewer_files:
+            self.view_list.insert("end", f)
+        
+        # Hata kontrolü
+        missing_lbl = [f for f in self.viewer_files if not (ldat / f"{f}.txt").exists()]
+        if missing_lbl:
+            self._log(f"⚠️ Uyarı: {len(missing_lbl)} görselin etiketi yok!")
+
+    def _on_view_select(self, event):
+        idx = self.view_list.curselection()
+        if not idx: return
+        fname = self.viewer_files[idx[0]]
+        img_p = Path(self.view_img_dir.get()) / f"{fname}.jpg"
+        lbl_p = Path(self.view_lbl_dir.get()) / f"{fname}.txt"
+
+        img = cv2.imread(str(img_p))
+        if img is None: return
+        
+        # Orijinal
+        h, w = img.shape[:2]
+        ratio = min(400/w, 400/h)
+        img_disp = cv2.resize(img, (int(w*ratio), int(h*ratio)))
+        
+        img_tk_raw = ImageTk.PhotoImage(cv_to_pil(img_disp))
+        self.canvas_raw.config(image=img_tk_raw)
+        self.canvas_raw.image = img_tk_raw
+
+        # Bbox çiz
+        img_bbox = img.copy()
+        lbl_text = ""
+        if lbl_p.exists():
+            with open(lbl_p, "r") as f:
+                lbl_text = f.read()
+                f.seek(0)
+                for line in f:
+                    parts = line.strip().split()
+                    if len(parts) == 5:
+                        cid, cx, cy, bw, bh = map(float, parts)
+                        x1 = int((cx - bw/2) * w)
+                        y1 = int((cy - bh/2) * h)
+                        x2 = int((cx + bw/2) * w)
+                        y2 = int((cy + bh/2) * h)
+                        cv2.rectangle(img_bbox, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                        cv2.putText(img_bbox, f"Class {int(cid)}", (x1, y1-5), 
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+
+        img_disp_bbox = cv2.resize(img_bbox, (int(w*ratio), int(h*ratio)))
+        img_tk_bbox = ImageTk.PhotoImage(cv_to_pil(img_disp_bbox))
+        self.canvas_bbox.config(image=img_tk_bbox)
+        self.canvas_bbox.image = img_tk_bbox
+
+        self.txt_view_label.delete("1.0", "end")
+        self.txt_view_label.insert("end", lbl_text)
+
+    def _stop_blender(self):
+        self.blender_status = "stopping"
+        self._log("⏹ Durduruluyor... (Mevcut render bitince duracak)")
 
     def _start_blender(self):
+        if self.blender_status == "running": return
+        
         td = self.blender_terrain_dir.get()
         od = self.blender_output_dir.get()
         if not td: return messagebox.showerror("Hata", "Terrain klasörü seçilmedi.")
 
-        # Geçici bir klasör oluşturup her seçilen terrain için ayrı CONFIG üretip çalıştırmaktansa,
-        # blender_render.py'a terrain_listesi ve total_n göndermek daha iyi.
-        # Ama kullanıcı her zemin için farklı sayı istediği için döngüde çalıştıracağız.
-
-        selected = [(name, var[1].get()) for name, var in self.terrain_vars.items() if var[0].get()]
-        if not selected: return messagebox.showwarning("Uyarı", "Hiç zemin seçilmedi.")
-
-        total = sum(n for _, n in selected)
-        self.progress["maximum"] = total
-        self.progress["value"] = 0
-        self._log(f"🧊 Blender Render Başlıyor... Toplam: {total} görüntü")
+        if self.blender_status != "paused":
+            selected = [(name, var[1].get()) for name, var in self.terrain_vars.items() if var[0].get()]
+            if not selected: return messagebox.showwarning("Uyarı", "Hiç zemin seçilmedi.")
+            self.blender_queue = selected
+            self.blender_done_count = 0
+            self.blender_total_count = sum(n for _, n in selected)
+            self.progress["maximum"] = self.blender_total_count
+        
+        self.blender_status = "running"
+        self.btn_blender_start.config(text="🧊  Devam Et", state="disabled")
+        self.btn_blender_stop.config(state="normal")
+        self._log(f"🧊 Blender Render Başlıyor...")
 
         def run():
-            done = 0
-            for fname, n in selected:
+            cfg_path = Path(od) / "temp_gui_config.json"
+            cfg_path.parent.mkdir(parents=True, exist_ok=True)
+
+            while self.blender_queue and self.blender_status == "running":
+                fname, n = self.blender_queue.pop(0)
                 temp_cfg = {
-                    "n_renders": n,
-                    "output_dir": od,
-                    "terrain_dir": td, # Sadece klasörü veriyoruz, script içinden seçtirebiliriz
-                    "render_w": 1920,
-                    "render_h": 1080
+                    "n_renders": n, "output_dir": od, "terrain_dir": td,
+                    "render_w": 1920, "render_h": 1080, "file_prefix": fname.split(".")[0]
                 }
-                # Script o an sadece bu dosyayı seçsin diye geçici bir terrain_dir yapabiliriz
-                # veya script'i güncelleyip tek dosya da alabilir hale getirebiliriz.
-                # Şimdilik script'in CONFIG'ini overwrite eden bir json yazalım.
-                # AMA script her seferinde klasörden random seçiyor. 
-                # O yüzden script'e spesifik dosya vermemiz lazım.
                 
-                # blender_render.py'da "terrain_path" diye bir parametre ekleyelim.
-                
-                cfg_path = Path(od) / "temp_gui_config.json"
-                cfg_path.parent.mkdir(parents=True, exist_ok=True)
-                
-                # Her dosya için ayrı klasör gibi davranalım (hızlı çözüm)
                 import tempfile, shutil
                 with tempfile.TemporaryDirectory() as tmp_td:
                     shutil.copy(Path(td)/fname, Path(tmp_td)/fname)
                     temp_cfg["terrain_dir"] = tmp_td
-                    with open(cfg_path, 'w') as f:
-                        json.dump(temp_cfg, f)
+                    with open(cfg_path, 'w') as f: json.dump(temp_cfg, f)
                     
-                    cmd = [
-                        self.blender_path.get(),
-                        "--background",
-                        "--python", str(Path(__file__).parent / "blender_render.py"),
-                        "--", str(cfg_path)
-                    ]
+                    cmd = [self.blender_path.get(), "--background", "--python", 
+                           str(Path(__file__).parent / "blender_render.py"), "--", str(cfg_path)]
                     
-                    self.root.after(0, lambda f=fname, count=n: self._log(f"🚀 Render: {f} ({count} adet)..."))
+                    self.root.after(0, lambda f=fname: self._log(f"🚀 Render: {f}..."))
                     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
                     for line in process.stdout:
                         if "Saved:" in line:
-                            done += 1
-                            self.root.after(0, lambda v=done: self.progress.configure(value=v))
+                            self.blender_done_count += 1
+                            pct = (self.blender_done_count / self.blender_total_count) * 100
+                            self.root.after(0, lambda c=self.blender_done_count, p=pct: self._update_progress(c, p))
                     process.wait()
 
-            self.root.after(0, lambda: self._log("✅ Blender üretimi tamamlandı!"))
-            messagebox.showinfo("Başarılı", f"Blender render işlemi tamamlandı.\nÇıkış: {od}")
+            if self.blender_status == "stopping":
+                self.blender_status = "paused"
+                self.root.after(0, lambda: self._log("⏸ Duraklatıldı."))
+            elif not self.blender_queue:
+                self.blender_status = "idle"
+                self.root.after(0, lambda: self._log("✅ Blender üretimi TAMAMLANDI!"))
+                self.root.after(0, self._show_blender_report)
+
+            self.root.after(0, lambda: self.btn_blender_start.config(state="normal"))
+            self.root.after(0, lambda: self.btn_blender_stop.config(state="disabled"))
 
         threading.Thread(target=run, daemon=True).start()
+
+    def _update_progress(self, val, pct):
+        self.progress["value"] = val
+        # Progress bar üzerinde yazı göstermek Tkinter'da zordur, label'ı güncelleyelim
+        self.root.title(f"ODBARS — %{int(pct)} Tamamlandı")
+
+    def _show_blender_report(self):
+        od = Path(self.blender_output_dir.get())
+        imgs = list((od / "images" / "train").glob("*.jpg"))
+        report = f"\n--- ÜRETİM RAPORU ---\n"
+        report += f"Toplam Görsel: {len(imgs)}\n"
+        report += f"Çıkış Dizini: {od}\n"
+        report += "---------------------\n"
+        self._log(report)
+        messagebox.showinfo("Rapor", f"Üretim bitti. {len(imgs)} görsel hazır.")
+        # Viewer dizinlerini otomatik ayarla
+        self.view_img_dir.set(str(od / "images" / "train"))
+        self.view_lbl_dir.set(str(od / "labels" / "train"))
+        self._load_viewer_data()
 
     def _lbl(self, parent, text, col, row, **kw):
         ttk.Label(parent, text=text).grid(column=col, row=row, sticky="w", padx=8, pady=3, **kw)
