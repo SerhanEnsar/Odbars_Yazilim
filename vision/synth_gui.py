@@ -269,7 +269,7 @@ def generate_dataset(cfg, progress_cb=None, log_cb=None):
 class SynthGUI:
     def __init__(self, root):
         self.root = root
-        root.title("ODBARS — Sentetik Veri Üretici")
+        root.title("ODBARS — GUNCEL VERSION")
         root.resizable(False, False)
         root.configure(bg="#1a1a1a")
 
@@ -285,7 +285,6 @@ class SynthGUI:
         style.configure("Horizontal.TProgressbar", troughcolor="#2a241c", background="#f59e0b")
 
         self.notebook = ttk.Notebook(self.root)
-        self.notebook.pack(expand=True, fill="both", padx=10, pady=10)
 
         self.tab_2d = ttk.Frame(self.notebook)
         self.tab_3d = ttk.Frame(self.notebook)
@@ -302,8 +301,11 @@ class SynthGUI:
 
         self._build_2d_ui()
         self._build_3d_ui()
-        self._build_viewer_ui()
+        self._build_viewer_ui(self.tab_view)
         self._build_status_ui()
+        
+        # En son notebook'u paketle ki alt panel ezilmesin
+        self.notebook.pack(expand=True, fill="both", padx=10, pady=10)
 
     def _build_status_ui(self):
         # Durum ve İlerleme Paneli (En altta sabit)
@@ -440,16 +442,26 @@ class SynthGUI:
         self.btn_blender_stop = ttk.Button(self.f_blender_controls, text="⏹  Durdur", command=self._stop_blender, state="disabled")
         self.btn_blender_stop.pack(side="left", padx=5)
         
+        self.blender_use_steps = tk.BooleanVar(value=True)
+        ttk.Checkbutton(self.f_blender_controls, text="Mesafe Adımları", variable=self.blender_use_steps).pack(side="left", padx=5)
+        
+        self.blender_dist_min = tk.DoubleVar(value=2.0)
+        self.blender_dist_max = tk.DoubleVar(value=8.0)
+        ttk.Label(self.f_blender_controls, text="Mesafe (m):").pack(side="left", padx=(10,2))
+        ttk.Entry(self.f_blender_controls, textvariable=self.blender_dist_min, width=4).pack(side="left")
+        ttk.Label(self.f_blender_controls, text="-").pack(side="left")
+        ttk.Entry(self.f_blender_controls, textvariable=self.blender_dist_max, width=4).pack(side="left")
+        
         ttk.Button(self.f_blender_controls, text="🔄  Listeyi Yenile", command=self._refresh_terrain_list).pack(side="right")
 
-    def _build_viewer_ui(self):
-        parent = self.tab_view
-        f_top = ttk.Frame(parent, padding=5)
-        f_top.pack(fill="x")
-
+    def _build_viewer_ui(self, parent):
         self.view_img_dir = tk.StringVar()
         self.view_lbl_dir = tk.StringVar()
 
+        # Üst Panel: Klasör Seçimi
+        f_top = ttk.Frame(parent, padding=10)
+        f_top.pack(fill="x")
+        
         ttk.Label(f_top, text="Images:").grid(row=0, column=0)
         ttk.Entry(f_top, textvariable=self.view_img_dir, width=30).grid(row=0, column=1)
         ttk.Button(f_top, text="Seç", command=lambda: self._pick_dir(self.view_img_dir)).grid(row=0, column=2)
@@ -460,92 +472,182 @@ class SynthGUI:
         
         ttk.Button(f_top, text="🔄 Yükle", command=self._load_viewer_data).grid(row=0, column=6, padx=10)
 
-        self.paned = ttk.PanedWindow(parent, orient="horizontal")
-        self.paned.pack(fill="both", expand=True, padx=5, pady=5)
-
-        # Liste
-        self.view_list = tk.Listbox(self.paned, width=25, bg="#1a1a1a", fg="#d4c5a0", selectbackground="#f59e0b")
-        self.view_list.bind("<<ListboxSelect>>", self._on_view_select)
-        self.paned.add(self.view_list, weight=1)
-
-        # Görsel Alanı
-        self.f_view_imgs = ttk.Frame(self.paned)
-        self.paned.add(self.f_view_imgs, weight=4)
+        # Ana İçerik Alanı
+        f_main = ttk.Frame(parent, padding=5)
+        f_main.pack(fill="both", expand=True)
         
-        self.lbl_view_raw = ttk.Label(self.f_view_imgs, text="Orijinal")
-        self.lbl_view_raw.grid(row=0, column=0)
-        self.canvas_raw = tk.Label(self.f_view_imgs, bg="#000")
-        self.canvas_raw.grid(row=1, column=0, padx=2)
+        f_main.columnconfigure(1, weight=3)
+        f_main.columnconfigure(2, weight=1)
+        f_main.rowconfigure(0, weight=1)
 
-        self.lbl_view_bbox = ttk.Label(self.f_view_imgs, text="Bbox")
-        self.lbl_view_bbox.grid(row=0, column=1)
-        self.canvas_bbox = tk.Label(self.f_view_imgs, bg="#000")
-        self.canvas_bbox.grid(row=1, column=1, padx=2)
+        # 1. SOL: Liste
+        f_list = ttk.Frame(f_main, padding=5)
+        f_list.grid(row=0, column=0, sticky="nsw")
 
-        # Label İçeriği
-        self.txt_view_label = tk.Text(self.paned, width=20, bg="#0f0f0f", fg="#f59e0b", font=("Courier", 10))
-        self.paned.add(self.txt_view_label, weight=1)
+        ttk.Label(f_list, text="Dosya Listesi").pack(pady=2)
+        self.view_list = tk.Listbox(f_list, width=25, height=25, bg="#1a1a1a", fg="#d4c5a0", selectbackground="#f59e0b")
+        self.view_list.pack(fill="both", expand=True)
+        self.view_list.bind("<<ListboxSelect>>", self._on_view_select)
+        self.view_list.bind("<Double-1>", self._on_view_select) # Çift tıklama desteği
+        
+        ttk.Button(f_list, text="👁️ Seçiliyi Görüntüle", command=lambda: self._on_view_select(None)).pack(fill="x", pady=5)
+
+        # 2. ORTA: Görsel Alanı
+        self.f_view_imgs = ttk.Frame(f_main, padding=5)
+        self.f_view_imgs.grid(row=0, column=1, sticky="nsew")
+        self.f_view_imgs.columnconfigure(0, weight=1)
+        self.f_view_imgs.columnconfigure(1, weight=1)
+
+        ttk.Label(self.f_view_imgs, text="Orijinal Görüntü").grid(row=0, column=0, pady=2)
+        self.canvas_raw = tk.Label(self.f_view_imgs, bg="#000", width=400, height=400)
+        self.canvas_raw.grid(row=1, column=0, padx=2, pady=2)
+
+        ttk.Label(self.f_view_imgs, text="Etiketli (BBox)").grid(row=0, column=1, pady=2)
+        self.canvas_bbox = tk.Label(self.f_view_imgs, bg="#000", width=400, height=400)
+        self.canvas_bbox.grid(row=1, column=1, padx=2, pady=2)
+
+        # 3. SAĞ: Metin Alanı
+        f_text = ttk.Frame(f_main, padding=5)
+        f_text.grid(row=0, column=2, sticky="nsew")
+        ttk.Label(f_text, text="Etiket İçeriği").pack(pady=2)
+        self.txt_view_label = tk.Text(f_text, width=20, bg="#0f0f0f", fg="#f59e0b", font=("Courier", 11))
+        self.txt_view_label.pack(fill="both", expand=True)
+
 
     def _load_viewer_data(self):
-        idat = Path(self.view_img_dir.get())
-        ldat = Path(self.view_lbl_dir.get())
-        if not idat.is_dir(): return
+        # Yolları temizle (tırnak ve boşlukları at)
+        raw_idat = self.view_img_dir.get().strip().strip("'").strip('"')
+        raw_ldat = self.view_lbl_dir.get().strip().strip("'").strip('"')
+        
+        idat = Path(raw_idat)
+        ldat = Path(raw_ldat)
+        
+        print(f"DEBUG: Loading from {idat}", flush=True)
+        
+        if not idat.is_dir():
+            messagebox.showerror("Hata", f"Görsel klasörü bulunamadı:\n{idat}")
+            return
         
         self.view_list.delete(0, "end")
-        self.viewer_files = sorted([f.stem for f in idat.glob("*.jpg")])
+        
+        # Tüm varyasyonları tara
+        exts = ["*.jpg", "*.JPG", "*.jpeg", "*.PNG", "*.png"]
+        files = []
+        for e in exts:
+            files.extend(list(idat.glob(e)))
+        
+        self.viewer_files = sorted(list(set([f.stem for f in files])))
+        print(f"FOUND: {len(self.viewer_files)} files.", flush=True)
+        
         for f in self.viewer_files:
             self.view_list.insert("end", f)
         
+        if not self.viewer_files:
+            self._log(f"⚠️ {idat.name} klasöründe resim bulunamadı!", "yellow")
+            print(f"DEBUG: No files found in {idat}")
+        
         # Hata kontrolü
         missing_lbl = [f for f in self.viewer_files if not (ldat / f"{f}.txt").exists()]
+        missing_img = [f.stem for f in ldat.glob("*.txt") if not (idat / f"{f.stem}.jpg").exists()]
+
         if missing_lbl:
-            self._log(f"⚠️ Uyarı: {len(missing_lbl)} görselin etiketi yok!")
+            self._log(f"❌ HATA: {len(missing_lbl)} görselin etiketi eksik!", color="red")
+        if missing_img:
+            self._log(f"❌ HATA: {len(missing_img)} etiketin görseli eksik!", color="red")
+        
+        if self.viewer_files and not missing_lbl and not missing_img:
+            self._log("✅ Tüm dosyalar eşleşiyor.", color="green")
+
+        if missing_lbl:
+            self._log(f"❌ HATA: {len(missing_lbl)} görselin etiketi eksik!", color="red")
+        if missing_img:
+            self._log(f"❌ HATA: {len(missing_img)} etiketin görseli eksik!", color="red")
+        
+        if not missing_lbl and not missing_img:
+            self._log("✅ Tüm dosyalar eşleşiyor.", color="green")
 
     def _on_view_select(self, event):
+        print("\n--- EVENT TRIGGERED ---", flush=True)
         idx = self.view_list.curselection()
         if not idx: return
         fname = self.viewer_files[idx[0]]
-        img_p = Path(self.view_img_dir.get()) / f"{fname}.jpg"
-        lbl_p = Path(self.view_lbl_dir.get()) / f"{fname}.txt"
-
-        img = cv2.imread(str(img_p))
-        if img is None: return
         
-        # Orijinal
-        h, w = img.shape[:2]
-        ratio = min(400/w, 400/h)
-        img_disp = cv2.resize(img, (int(w*ratio), int(h*ratio)))
+        img_dir = Path(self.view_img_dir.get().strip().strip("'").strip('"'))
+        lbl_dir = Path(self.view_lbl_dir.get().strip().strip("'").strip('"'))
         
-        img_tk_raw = ImageTk.PhotoImage(cv_to_pil(img_disp))
-        self.canvas_raw.config(image=img_tk_raw)
-        self.canvas_raw.image = img_tk_raw
+        # Olası tüm uzantıları dene
+        img_p = None
+        for ext in [".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG"]:
+            p = img_dir / f"{fname}{ext}"
+            if p.exists():
+                img_p = p
+                break
+        
+        if not img_p:
+            print(f"❌ Dosya bulunamadı: {fname}", flush=True)
+            return
 
-        # Bbox çiz
-        img_bbox = img.copy()
-        lbl_text = ""
-        if lbl_p.exists():
-            with open(lbl_p, "r") as f:
-                lbl_text = f.read()
-                f.seek(0)
-                for line in f:
-                    parts = line.strip().split()
-                    if len(parts) == 5:
-                        cid, cx, cy, bw, bh = map(float, parts)
-                        x1 = int((cx - bw/2) * w)
-                        y1 = int((cy - bh/2) * h)
-                        x2 = int((cx + bw/2) * w)
-                        y2 = int((cy + bh/2) * h)
-                        cv2.rectangle(img_bbox, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                        cv2.putText(img_bbox, f"Class {int(cid)}", (x1, y1-5), 
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        lbl_p = lbl_dir / f"{fname}.txt"
+        print(f"✅ Yükleniyor: {img_p.name}", flush=True)
 
-        img_disp_bbox = cv2.resize(img_bbox, (int(w*ratio), int(h*ratio)))
-        img_tk_bbox = ImageTk.PhotoImage(cv_to_pil(img_disp_bbox))
-        self.canvas_bbox.config(image=img_tk_bbox)
-        self.canvas_bbox.image = img_tk_bbox
+        print(f"\n--- Görüntüleniyor: {fname} ---")
 
-        self.txt_view_label.delete("1.0", "end")
-        self.txt_view_label.insert("end", lbl_text)
+        if not img_p.exists():
+            self._log(f"Dosya bulunamadı: {fname}", "red")
+            return
+
+        try:
+            # 1. Orijinal Görüntü
+            pil_img = Image.open(str(img_p)).convert("RGB")
+            orig_w, orig_h = pil_img.size
+            
+            ratio = min(450 / orig_w, 450 / orig_h)
+            new_size = (int(orig_w * ratio), int(orig_h * ratio))
+            
+            pil_disp = pil_img.resize(new_size, Image.Resampling.LANCZOS)
+            tk_img_raw = ImageTk.PhotoImage(pil_disp)
+            
+            self.canvas_raw.config(image=tk_img_raw)
+            self.canvas_raw.image = tk_img_raw
+            print("✅ Orijinal görüntülendi.")
+
+            # 2. Bbox Çizimi
+            pil_bbox = pil_img.copy()
+            draw = ImageDraw.Draw(pil_bbox)
+            lbl_content = ""
+
+            if lbl_p.exists():
+                with open(lbl_p, "r") as f:
+                    lbl_content = f.read()
+                    f.seek(0)
+                    for line in f:
+                        parts = line.strip().split()
+                        if len(parts) == 5:
+                            cid, cx, cy, bw, bh = map(float, parts)
+                            x1 = (cx - bw/2) * orig_w
+                            y1 = (cy - bh/2) * orig_h
+                            x2 = (cx + bw/2) * orig_w
+                            y2 = (cy + bh/2) * orig_h
+                            class_names = ["Tabela", "STOP", "Hedef"]
+                            cname = class_names[int(cid)] if int(cid) < len(class_names) else f"ID {int(cid)}"
+                            
+                            draw.rectangle([x1, y1, x2, y2], outline="red", width=5)
+                            draw.text((x1, y1-20), cname, fill="red")
+
+            pil_disp_bbox = pil_bbox.resize(new_size, Image.Resampling.LANCZOS)
+            tk_img_bbox = ImageTk.PhotoImage(pil_disp_bbox)
+            
+            self.canvas_bbox.config(image=tk_img_bbox)
+            self.canvas_bbox.image = tk_img_bbox
+            
+            self.txt_view_label.delete("1.0", "end")
+            self.txt_view_label.insert("end", lbl_content)
+            
+            self.root.update_idletasks()
+            
+        except Exception as e:
+            print(f"❌ HATA: {str(e)}")
+            self._log(f"Yükleme hatası: {str(e)}", "red")
 
     def _stop_blender(self):
         self.blender_status = "stopping"
@@ -579,7 +681,9 @@ class SynthGUI:
                 fname, n = self.blender_queue.pop(0)
                 temp_cfg = {
                     "n_renders": n, "output_dir": od, "terrain_dir": td,
-                    "render_w": 1920, "render_h": 1080, "file_prefix": fname.split(".")[0]
+                    "render_w": 1920, "render_h": 1080, "file_prefix": fname.split(".")[0],
+                    "use_distance_steps": self.blender_use_steps.get(),
+                    "camera_distance_range": (self.blender_dist_min.get(), self.blender_dist_max.get())
                 }
                 
                 import tempfile, shutil
@@ -639,8 +743,45 @@ class SynthGUI:
         d = filedialog.askdirectory()
         if d: var.set(d)
 
-    def _log(self, msg):
+    def _pick_blender_terrain(self):
+        d = filedialog.askdirectory()
+        if d:
+            self.blender_terrain_dir.set(d)
+            self._refresh_terrain_list()
+
+    def _refresh_terrain_list(self):
+        for child in self.terrain_list_frame.winfo_children():
+            child.destroy()
+        
+        self.terrain_vars = {}
+        td = Path(self.blender_terrain_dir.get())
+        if not td.is_dir(): return
+
+        files = sorted(list(td.glob("*.jpg")) + list(td.glob("*.png")) + list(td.glob("*.jpeg")))
+        for i, f in enumerate(files):
+            b_var = tk.BooleanVar(value=True)
+            c_var = tk.IntVar(value=10)
+            self.terrain_vars[f.name] = (b_var, c_var)
+
+            f_row = ttk.Frame(self.terrain_list_frame)
+            f_row.pack(fill="x", pady=2)
+            ttk.Checkbutton(f_row, variable=b_var).pack(side="left")
+            ttk.Label(f_row, text=f.name, width=25).pack(side="left", padx=5)
+            ttk.Label(f_row, text="Adet:").pack(side="left")
+            ttk.Entry(f_row, textvariable=c_var, width=5).pack(side="left", padx=5)
+
+        self.terrain_list_frame.update_idletasks()
+        self.terrain_canvas.config(scrollregion=self.terrain_canvas.bbox("all"))
+
+    def _log(self, msg, color=None):
+        tags = {"red": "#ff4d4d", "green": "#4dff88", "yellow": "#ffff4d"}
         self.log_text.insert("end", msg + "\n")
+        if color in tags:
+            # Satır sonu indeksini bul
+            end_idx = self.log_text.index("end-1c")
+            start_idx = self.log_text.index(f"{end_idx} linestart")
+            self.log_text.tag_add(color, start_idx, end_idx)
+            self.log_text.tag_config(color, foreground=tags[color])
         self.log_text.see("end")
 
     def _get_cfg(self):
@@ -674,8 +815,23 @@ class SynthGUI:
         for p in imgs[:5]:
             img = cv2.imread(str(p))
             cv2.imshow(f"Önizleme: {p.name}", img)
-        self._log("Pencereyi kapatmak için herhangi bir tuşa basın.")
-        cv2.waitKey(0)
+        self._log("Önizleme pencerelerini kapatmak için bir tuşa basın veya pencereyi kapatın.")
+        
+        while True:
+            # Pencerelerin hala açık olup olmadığını kontrol et
+            active_windows = False
+            for p in imgs[:5]:
+                title = f"Önizleme: {p.name}"
+                try:
+                    if cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) >= 1:
+                        active_windows = True
+                        break
+                except: pass
+            
+            if not active_windows: break
+            if cv2.waitKey(30) & 0xFF == ord('q'): break
+            self.root.update()
+
         cv2.destroyAllWindows()
 
     def _start_2d(self):

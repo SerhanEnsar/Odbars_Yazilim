@@ -33,12 +33,21 @@ CONFIG = {
     "render_h":       1080,
     "class_weights":  [0.4, 0.3, 0.3],
     "camera_distance_range": (2.0, 8.0),
-    "camera_height_range":   (0.2, 0.6),    # Araç kamerası yüksekliği (metre)
-    "retry_limit": 5,                       # Nesne görünmezse kaç kez tekrar denenecek
-    "file_prefix": "",                      # GUI'den gelecek önek
+    "camera_height_range":   (0.2, 0.6),
+    "retry_limit": 10,                      # Kadraj dışı kalırsa deneme sayısı
+    "file_prefix": "",
+    "use_distance_steps": False,            # Mesafe adımları (GUI'den kontrol edilecek)
 }
 
-# Şartname: tabelada sadece görev numarası yazıyor
+# Sınıf Haritası (Kullanıcı isteğine göre detaylandırıldı)
+# 0-6: Tabela 1-7
+# 7: STOP
+# 8: Hedef
+CLASS_MAP = {
+    "Tabela_1": 0, "Tabela_2": 1, "Tabela_3": 2, "Tabela_4": 3,
+    "Tabela_5": 4, "Tabela_6": 5, "Tabela_7": 6,
+    "STOP": 7, "Hedef": 8
+}
 TABELA_TEXTS = ["1", "2", "3", "4", "5", "6", "7"]
 
 OUT = Path(CONFIG["output_dir"])
@@ -157,72 +166,52 @@ def create_ground():
 # ─────────────────────────────────────────────
 # TABELA (class 0)
 # ─────────────────────────────────────────────
-def create_tabela(text_str, border_color=(0.9, 0.9, 0.9, 1.0), label_class=0):
-    """Şartnameye uygun tabela: dikey metal direk + karşıya bakan disk."""
+def create_tabela(text_str, border_color=(0.9, 0, 0, 1.0), label_class=0):
+    """Trafik levhası standardı: Kırmızı çerçeve, beyaz iç alan, siyah yazı."""
     objs = []
+    tz = 1.2 # Yükseklik
 
-    # 1. Direk (Sign Post) - Z ekseninde dikey
+    # 1. Direk (BBox'a girmeyecek)
     bpy.ops.mesh.primitive_cylinder_add(radius=0.015, depth=1.5, location=(0, 0, 0.75))
     post = bpy.context.active_object
-    post.name = f"Sign_Post_{label_class}"
-    post_mat = make_material(f"PostMat_{label_class}", (0.5, 0.5, 0.5, 1.0))
-    post_mat.node_tree.nodes.get("Principled BSDF").inputs["Metallic"].default_value = 1.0
-    post_mat.node_tree.nodes.get("Principled BSDF").inputs["Roughness"].default_value = 0.3
-    assign_material(post, post_mat)
+    post.name = "Post_Mesh"
+    assign_material(post, make_material("MetalPost", (0.5, 0.5, 0.5, 1.0)))
     objs.append(post)
 
-    # Tabela yüksekliği (z=1.2m civarı)
-    tz = 1.2
-
-    # 2. Disk - X ekseninde 90 derece dönük (karşıya bakıyor)
+    # 2. Disk (BBox hedefi - İsmi 'Sign_Disk' olmalı)
     bpy.ops.mesh.primitive_circle_add(vertices=64, radius=0.30, fill_type='NGON', 
-                                     location=(0, -0.02, tz), rotation=(math.radians(90), 0, 0))
+                                     location=(0, -0.01, tz), rotation=(math.radians(90), 0, 0))
     disk = bpy.context.active_object
-    disk.name = f"Sign_Disk_{label_class}"
-    disk_mat = make_material(f"DiskMat_{label_class}", (0.01, 0.01, 0.01, 1.0))
-    disk_mat.node_tree.nodes.get("Principled BSDF").inputs["Roughness"].default_value = 0.5
-    assign_material(disk, disk_mat)
+    disk.name = "Sign_Disk"
+    assign_material(disk, make_material("WhiteCenter", (1.0, 1.0, 1.0, 1.0))) # Tam beyaz
     objs.append(disk)
 
-    # 3. Dış kenarlık halkası (Torus) - disk ile aynı rotasyon
+    # 3. Kenarlık
     bpy.ops.mesh.primitive_torus_add(
-        location=(0, -0.025, tz),
-        rotation=(math.radians(90), 0, 0),
-        major_radius=0.30,
-        minor_radius=0.02,
-        major_segments=64,
-        minor_segments=12,
+        location=(0, -0.01, tz), rotation=(math.radians(90), 0, 0),
+        major_radius=0.30, minor_radius=0.02, major_segments=64
     )
     ring = bpy.context.active_object
-    ring.name = f"Sign_Ring_{label_class}"
-    assign_material(ring, make_material(f"RingMat_{label_class}", border_color))
+    ring.name = "Sign_Disk_Border" # Bu da BBox'a dahil edilebilir
+    assign_material(ring, make_material("RedBorder", border_color))
     objs.append(ring)
 
-    # 4. Metin (Görev Numarası) - önde
-    bpy.ops.object.text_add(location=(0, -0.03, tz), rotation=(math.radians(90), 0, 0))
-    txt_obj = bpy.context.active_object
-    txt_obj.name = f"Sign_Text_{label_class}"
-    txt_obj.data.body = text_str
-    txt_obj.data.align_x = 'CENTER'
-    txt_obj.data.align_y = 'CENTER'
-    txt_obj.data.size = 0.20
-    txt_obj.data.extrude = 0.01
+    # 4. Metin
+    bpy.ops.object.text_add(location=(0, -0.02, tz), rotation=(math.radians(90), 0, 0))
+    txt = bpy.context.active_object
+    txt.name = "Sign_Text"
+    txt.data.body = text_str
+    txt.data.align_x, txt.data.align_y = 'CENTER', 'CENTER'
+    txt.data.size = 0.22 if text_str.isdigit() else 0.15
+    txt_mat = make_material("BlackText", (0.02, 0.02, 0.02, 1.0))
+    assign_material(txt, txt_mat)
+    objs.append(txt)
 
-    font_path = CONFIG["font_path"]
-    if Path(font_path).exists():
-        txt_obj.data.font = bpy.data.fonts.load(font_path)
-
-    txt_mat = make_material(f"TextMat_{label_class}", (0.95, 0.95, 0.95, 1.0))
-    assign_material(txt_obj, txt_mat)
-    objs.append(txt_obj)
-
-    # 5. Parent & Empty
+    # 5. Parent
     bpy.ops.object.empty_add(type='PLAIN_AXES', location=(0, 0, 0))
     parent = bpy.context.active_object
-    parent.name = f"Sign_Parent_{label_class}"
-    for o in objs:
-        o.parent = parent
-
+    parent.name = f"Object_Parent"
+    for o in objs: o.parent = parent
     return parent
 
 
@@ -394,32 +383,32 @@ def get_2d_bbox(parent_obj, cam, render_w, render_h):
 # ─────────────────────────────────────────────
 # Kamerayı rastgele konumlandır, nesneye baktır
 # ─────────────────────────────────────────────
-def aim_camera_at(cam, target_loc):
+def aim_camera_at(cam, target_obj, step_idx=None, total_steps=None):
     """
-    Araç kamerası perspektifi:
-    - Kamera zemine yakın (20-50cm), sabit öne bakan açıda
-    - Nesne kameranın önünde, parkur kenarında dikey duruyor
-    - Uzaklık 2-8m arası rastgele
+    Kamera ve Tabelayı karşılıklı hizalar (Parallel view).
+    Tabelayı kameraya tam paralel döndürür.
     """
     d_min, d_max = CONFIG["camera_distance_range"]
     h_min, h_max = CONFIG["camera_height_range"]
 
-    dist   = random.uniform(d_min, d_max)
-    # Daha dar açı (-20° ile +20°) nesnenin kadrajda kalma şansını artırır
-    angle  = random.uniform(-math.pi * 0.12, math.pi * 0.12)
-    # Kamera zemin seviyesinde
-    cam_h  = random.uniform(h_min, h_max)
+    if CONFIG.get("use_distance_steps") and step_idx is not None and total_steps > 1:
+        dist = d_min + (step_idx / (total_steps - 1)) * (d_max - d_min)
+    else:
+        dist = random.uniform(d_min, d_max)
 
+    # Kamera konumu (Nesnenin tam karşısında)
     cam.location = mathutils.Vector((
-        target_loc.x - dist * math.sin(angle),
-        target_loc.y - dist * math.cos(angle),
-        cam_h,
+        target_obj.location.x,
+        target_obj.location.y - dist,
+        random.uniform(h_min, h_max)
     ))
 
-    # Kamera nesnenin merkezine doğrudan baktırılır
-    direction = target_loc - cam.location
-    rot = direction.to_track_quat('-Z', 'Y')
-    cam.rotation_euler = rot.to_euler()
+    # Tabelayı kameraya tam paralel döndür
+    target_obj.rotation_euler = (0, 0, 0) # Sıfır rotasyon tam kameraya bakar
+    
+    # Kamera nesnenin merkezine (disk seviyesi) baksın
+    direction = (target_obj.location + mathutils.Vector((0,0,1.2))) - cam.location
+    cam.rotation_euler = direction.to_track_quat('-Z', 'Y').to_euler()
 
 
 # ─────────────────────────────────────────────
@@ -461,55 +450,55 @@ def main():
     n = CONFIG["n_renders"]
 
     for i in range(n):
-        print(f"[{i+1}/{n}] Render alınıyor...")
+        print(f"[{i+1}/{n}] Render işlemi başlıyor...")
         
-        # Sahneyi sıfırla
         clear_scene()
         purge()
-
-        # Zemin
         create_ground()
 
-        # Sınıf seç
-        cls_id = random.choices([0, 1, 2], weights=CONFIG["class_weights"])[0]
-        obj = creators[cls_id]()
+        # Sınıf Belirleme
+        # Sınıf seçimi
+        cls_id = random.choices([0, 1, 2], weights=[0.6, 0.2, 0.2])[0]
         
-        # Rastgele konum
-        ox = random.uniform(-3, 3)
-        oy = random.uniform(-3, 3)
+        if cls_id == 0:
+            txt = random.choice(TABELA_TEXTS)
+            obj = create_tabela(txt)
+            final_cls = CLASS_MAP[f"Tabela_{txt}"]
+        elif cls_id == 1:
+            obj = create_stop()
+            final_cls = CLASS_MAP["STOP"]
+        else:
+            obj = create_hedef()
+            final_cls = CLASS_MAP["Hedef"]
+        
+        ox, oy = random.uniform(-1, 1), random.uniform(-1, 1)
         obj.location = mathutils.Vector((ox, oy, 0))
 
-        # Kamera ve ışık
         cam = setup_camera()
         setup_lights()
 
-        # --- GÖRÜNÜRLÜK KONTROLÜ VE RETRY ---
+        # --- HİZALAMA VE RENDER ---
         bbox = None
         for attempt in range(CONFIG["retry_limit"]):
-            # Tabelanın merkezine (yerden ~1.2m) odaklan
-            aim_camera_at(cam, obj.location + mathutils.Vector((0,0,1.0)))
+            aim_camera_at(cam, obj, step_idx=i, total_steps=n)
             bpy.context.view_layer.update()
             bbox = get_2d_bbox(obj, cam, CONFIG["render_w"], CONFIG["render_h"])
             if bbox: break
         
         if not bbox:
-            print(f"  ❌ Nesne kadraja girmedi, atlanıyor.")
+            print(f"  ❌ Kadraj sorunu, atlanıyor.")
             continue
 
-        # Dosya ismi (çakışma olmaması için timestamp + index)
         prefix = CONFIG.get("file_prefix", "render")
-        if not prefix: prefix = "render"
-        filename = f"{prefix}_{timestamp}_{i:04d}"
+        filename = f"{prefix}_{timestamp}_{i:03d}"
         
-        # Render ve Kaydet
         img_path = str(out_imgs / f"{filename}.jpg")
         bpy.context.scene.render.filepath = img_path
         bpy.ops.render.render(write_still=True)
 
-        # Label Kaydet
         lbl_path = out_lbls / f"{filename}.txt"
         with open(lbl_path, "w") as f:
-            f.write(f"{cls_id} {bbox[0]:.6f} {bbox[1]:.6f} {bbox[2]:.6f} {bbox[3]:.6f}\n")
+            f.write(f"{final_cls} {bbox[0]:.6f} {bbox[1]:.6f} {bbox[2]:.6f} {bbox[3]:.6f}\n")
         
         print(f"  ✅ Saved: {filename}.jpg")
 
