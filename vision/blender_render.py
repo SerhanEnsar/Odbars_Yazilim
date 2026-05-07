@@ -25,15 +25,15 @@ from pathlib import Path
 # AYARLAR — ihtiyaca göre değiştirin
 # ─────────────────────────────────────────────
 CONFIG = {
-    "n_renders":      200,          # toplam render sayısı
-    "output_dir":     "/tmp/odbars_dataset",  # çıkış klasörü
-    "terrain_image":  "",           # arazi görseli yolu (boş = düz renk zemin)
+    "n_renders":      200,           # ← istediğin sayıyı gir
+    "output_dir":     "/Users/serhanensar/Desktop/Renders",
+    "terrain_dir":    "",            # ← PNG/JPG'lerin bulunduğu klasör yolu (boş = düz renk)
     "font_path":      "/System/Library/Fonts/Supplemental/Arial Black.ttf",
-    "render_w":       640,
-    "render_h":       640,
-    "class_weights":  [0.4, 0.3, 0.3],  # tabela, stop, hedef olasılıkları
-    "camera_distance_range": (1.5, 8.0),  # kamera-nesne mesafesi (metre)
-    "camera_height_range":   (0.3, 2.5),  # kamera yüksekliği
+    "render_w":       1920,
+    "render_h":       1080,
+    "class_weights":  [0.4, 0.3, 0.3],
+    "camera_distance_range": (1.5, 8.0),
+    "camera_height_range":   (0.3, 2.5),
 }
 
 TABELA_TEXTS = ["SU GECISI", "TASLI YOL", "KAYAR ENGEL",
@@ -88,7 +88,22 @@ def assign_material(obj, mat):
 # ─────────────────────────────────────────────
 # Zemin düzlemi
 # ─────────────────────────────────────────────
-def create_ground(terrain_path=""):
+def _pick_terrain():
+    """terrain_dir klasöründen rastgele bir PNG/JPG seçer."""
+    td = CONFIG.get("terrain_dir", "")
+    if not td:
+        return None
+    td_path = Path(td)
+    if not td_path.is_dir():
+        return None
+    images = (list(td_path.glob("*.jpg")) + list(td_path.glob("*.png"))
+              + list(td_path.glob("*.jpeg")))
+    return str(random.choice(images)) if images else None
+
+
+def create_ground():
+    """Zemin düzlemi. terrain_dir klasöründen her seferinde rastgele doku seçer."""
+    terrain_path = _pick_terrain()
     bpy.ops.mesh.primitive_plane_add(size=40, location=(0, 0, 0))
     ground = bpy.context.active_object
     ground.name = "Ground"
@@ -99,12 +114,13 @@ def create_ground(terrain_path=""):
     links = mat.node_tree.links
     bsdf = nodes.get("Principled BSDF")
 
-    if terrain_path and Path(terrain_path).exists():
+    if terrain_path:
         tex_node = nodes.new("ShaderNodeTexImage")
         tex_node.image = bpy.data.images.load(terrain_path)
         coord = nodes.new("ShaderNodeTexCoord")
         links.new(coord.outputs["UV"], tex_node.inputs["Vector"])
         links.new(tex_node.outputs["Color"], bsdf.inputs["Base Color"])
+        print(f"  Terrain: {Path(terrain_path).name}")
     else:
         bsdf.inputs["Base Color"].default_value = (0.35, 0.30, 0.22, 1.0)
         bsdf.inputs["Roughness"].default_value = 1.0
