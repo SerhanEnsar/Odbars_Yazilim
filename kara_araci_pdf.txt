@@ -1,0 +1,902 @@
+
+--- Page 1 ---
+ 
+is.   
+İNSANSIZ KARA 
+ARACI  
+YARIŞMASI 
+ŞARTNAMESİ 
+ 
+ 
+2026 
+ 
+ 
+--- Page 2 ---
+ 
+VERSİYONLAR 
+ 
+ 
+Versiyon Tarih Açıklama 
+V1.0 29.1.2026 TEKNOFEST 2026 İlk Versiyon 
+V1.1 20.02.2026 Yarışma Takvimi 
+V1.2 14.04.2026 Yarışma Takvimi 
+ 
+Tablo 1 Versiyonlar Tablosu 
+ 
+ 
+ 
+ 
+  
+--- Page 3 ---
+ 
+İÇİNDEKİLER 
+ 
+ 
+VERSİYONLAR ......................................................................................................... 2 
+ŞEKİLLER ................................................................................................................. 2 
+TABLOLAR ............................................................................................................... 3 
+1. YARIŞMAYA YÖNELİK GENEL BİLGİLER ............................................................... 4 
+ Yarışmanın Amacı ................................................................................................ 4 
+1.1. Yarışmanın Kapsamı ....................................................................................... 4 
+1.2. Yarışmaya Katılım Koşulları ............................................................................. 5 
+2. TAKIM OLUŞTURMA .......................................................................................... 5 
+2.1 Danışman Yükümlülükleri ............................................................................ 6 
+2.2 Süreç Bilgileri .............................................................................................. 6 
+2.3 Başvuru Esasları ............................................................................................. 7 
+3. YARIŞMA TAKVİMİ ................................................................................................. 7 
+3.1. İletişim, Soru ve Cevap ................................................................................... 8 
+3.1.1. İletişim .................................................................................................... 8 
+3.1.2. Soru ve Cevap.......................................................................................... 8 
+4. YARIŞMA SÜRECİ ................................................................................................. 9 
+4.1. Teknik Yeterlik Formu .................................................................................. 9 
+4.2. Kritik Tasarım Raporu .................................................................................. 9 
+4.3. Kritik Tasarım Raporu İtiraz Süreci ................................................................ 9 
+4.4. Araç Kanıt Videosu .................................................................................... 10 
+4.5. Teknik Sunum ........................................................................................... 10 
+4.6. Final Yarışması ......................................................................................... 10 
+4.7. Puanlama ................................................................................................ 11 
+5. YARIŞMA ÖNCESİ ............................................................................................... 11 
+5.1. Teknik Kontroller ....................................................................................... 11 
+5.2. Hakem Brifingi .......................................................................................... 11 
+6. YARIŞMA KURGUSU............................................................................................ 12 
+6.1. Yarışma Parkuru ....................................................................................... 12 
+6.2. Parkur Aşamaları ve Görevler ..................................................................... 12 
+6.3. Su Geçişi ve Yağmur ................................................................................. 13 
+6.4. Taşlı / Çakıllı Yol ....................................................................................... 13 
+--- Page 4 ---
+ 
+ 
+ 
+6.5. Yan Eğim .................................................................................................. 13 
+6.6. Dik Engel .................................................................................................. 13 
+6.7. Trafik Konileri ........................................................................................... 13 
+6.8. Kayar Engel .............................................................................................. 14 
+6.9. Engebeli Arazi ........................................................................................... 14 
+6.10. Dik Eğimler ve Atış................................................................................... 14 
+6.11. Hızlanma Parkuru ................................................................................... 15 
+6.12. Kısıtlamalar ............................................................................................ 16 
+6.13. Güvenlik Ve Emniyet ............................................................................... 16 
+6.14. Veri Paketi .............................................................................................. 16 
+6.15. Final Aşaması Genel Kuralları .................................................................. 16 
+7. ARAÇ GENEL ÖZELLİKLERİ .................................................................................. 17 
+7.1. Araç Ölçüleri ............................................................................................ 17 
+7.2. Çekiş Sistemi ........................................................................................... 18 
+7.3. Araç Gövdesi ............................................................................................ 18 
+7.4. Palet/Teker ............................................................................................... 18 
+7.5. Fren Sistemi ............................................................................................. 19 
+7.6. Süspansiyon Sistemi ................................................................................. 19 
+7.7. Montaj ..................................................................................................... 19 
+7.8. Güvenlik Donanımı ................................................................................... 19 
+8. DESTEK VE ÖDÜLLER ......................................................................................... 20 
+Ödül Sıralaması için Minimum Başarı Kriteri ...................................................... 20 
+En İyi Tasarım Ödülü ........................................................................................ 21 
+En İyi Takım Ruhu Ödülü .................................................................................. 21 
+9. NİHAİ DEĞERLENDİRME ..................................................................................... 21 
+GENEL KURALLAR .................................................................................................. 23 
+ETİK KURALLAR ...................................................................................................... 23 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+--- Page 5 ---
+ 
+ 
+ 
+ 
+ 
+ŞEKİLLER 
+ 
+Şekil 1: Kuşbakışı taslak yarışma parkuru görünümü ......................................................... 12 
+Şekil 2: Örnek Parkur Aşama Tabelası ............................................................................... 13 
+Şekil 3: Su Geçişi Ve Yağmur ............................................................................................ 13 
+Şekil 4: Tümsek ............................................................................................................... 14 
+Şekil 5: Atış Hedefi .......................................................................................................... 15 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+--- Page 6 ---
+ 
+ 
+ 
+ 
+ 
+TABLOLAR 
+ 
+Tablo 1 Versiyonlar Tablosu ............................................................................................... 2 
+Tablo 2 Yarışma Takvimi Tablosu ........................................................................................ 7 
+Tablo 3 Puanlama Tablosu ............................................................................................... 11 
+Tablo 4 Destek ve Ödüller Tablosu .................................................................................... 20 
+Tablo 5 Performans Göstergeleri Ve Karşılık Puanları .......................................................... 22 
+--- Page 7 ---
+ 
+ 
+ 
+1. YARIŞMAYA YÖNELİK GENEL BİLGİLER 
+Yarışmanın Amacı 
+İnsan unsuru bulundurmayan, yer küre üzerinde hareket ve savunma kabiliyetine sahip, 
+zırhlı ya da zırhsız, muhtelif ebatlardaki paletli ya da tekerlekli, insan ve yük taşıma, 
+gözetleme ve keşif, ateş desteği sağlama gibi sahaya dönük görevler verilen harp 
+aletlerine İnsansız Kara Aracı (İKA) ismi verilmektedir. 
+TEKNOFEST 2026 Yarışmaları çerçevesinde bu sene ikinci kez düzenlenecek olan 
+İnsansız Kara Araçları yarışmasında amaç ateş desteği vazifesi de dahil olmak üzere 
+İKA’ların harp koşullarında başından geçecek olaylar dizisinin parkur ortamında 
+gerçekleştirilmesi olacaktır. İnsansız kara aracı yarışma süresince uzaktan ve tamamen 
+otonom olarak kontrol edilecek, kara aracının yönlendirilmesi seyrüsefer algoritmaları, 
+arka planda çalışan yazılımlar ve aracın üzerinde yer alacak algılayıcılardan elde edilen 
+verilerin entegrasyonu ile sağlanacaktır. Katılımcı ekiplerin araç dinamiği, mekanik 
+üretim, elektronik tasarım, yazılım geliştirme, sistem seviyesi düşünme, sistem 
+mimarisi, elektronik mimari, sistem tümleştirme kabiliyetleri özelinde uzmanlık 
+düzeyinde bilgiye sahip olması veya süreç içerisinde farklı disiplinlerin bu yetkinliklerini 
+bir araya getirmesi beklenecektir. 
+1.1. Yarışmanın Kapsamı 
+Yarışmaya Türkiye ve yurt dışında yüksek öğretim düzeyinde öğrenim gören 
+öğrencilerden oluşan takımlar hazır tedarik edebilecekleri ya da kendileri tasarlayarak 
+üretecekleri İnsansız Kara Aracı ile katılabilir. Takımların geliştireceği İnsansız Kara Aracı 
+sistemlerini Şekil−2’de kuşbakışı görüntüsü tanımlanan yarışma parkurunu 
+uzaktan−kontrollü ve tam−otonom şeklinde 2 farklı araç kontrol yöntemi vasıtasıyla 
+görevleri başarı ile tamamlaması beklenmektedir. Yarışma parkuruna dair detaylar 
+6−Yarışma Kurgusu, İnsansız Kara Aracı’na dair beklentiler 7−Araç Genel Özellikleri 
+bölümünde detaylandırılmıştır. 
+Yarışmaya başvuran takımlar ve geliştirecekleri sistemler sıralı olarak Teknik Yeterlik 
+Formu, Kritik Tasarım Raporu, Araç Kanıt Videosu, Teknik Sunum aşamalarını geçtikten 
+sonra Final Yarışması’na katılacaktır. 
+Final yarışması esnasında final yarışmasına katılma hakkı kazanan takımların geliştirmiş 
+olduğu İnsansız Kara Araçları, 6−Yarışma Kurgusu kısmında detayları verilen parkurda 2 
+kez koşu yapacaktır: 
+1. Koşu, Uzaktan−Kontrollü (Manuel): Parkur şartlarına uyumlu bir aracın parkuru 
+beklentiler ekseninde tamamlaması, lazer işaretleme ve lazerle temsili atış görevlerinin 
+algıyacılardan da elde edilen veriler ışığında bir uzaktan kontrol (kişisel bilgisayar, tablet 
+bilgisayar, RF kumanda, komuta konsolu gibi) yöntemi ile kullanıcı tarafından 
+yürütüldüğü kullanım senaryosu .
+--- Page 8 ---
+ 
+ 
+ 
+2. Koşu, Tam−Otonom (Otonom Sürüş ve Otonom Atış): Araç hareketi, lazer 
+işaretleme ve lazer atış görevlerinin tamamen otonom olarak, otonomi 
+algoritmaları/yazılımları ve otonomiye yönelik uygun görülen donanımlar marifetiyle 
+gerçekleştirildiği kullanım senaryosu. 
+Yarışmacılar 2 koşudan da bu şartnamede verilen esaslara göre puan toplayacaktır. 
+Yarışma sonunda her takımın 2 koşuda aldığı puanlar toplanacak, takımların final 
+etabından alacakları puan bu toplam puana eşit olacaktır. 
+ 
+1.2. Yarışmaya Katılım Koşulları 
+• Yarışmaya, Türkiye ve yurt dışında öğrenim gören tüm yükseköğretim öğrencileri (ön 
+lisans, lisans, yüksek lisans ve doktora) katılabilir. 
+• Geçmiş yıl TEKNOFEST proje raporları kapsamında www.teknofest.org adresinden 
+yayımlanmış olan raporlar üzerinden alıntı yapılması halinde kaynak belirtilmelidir. 
+Kaynak belirtme formatına şartnamede yer alan genel kurallar başlı ğından 
+ulaşabilirsiniz. 
+• Yarışmacılar farklı projeler ile farklı TEKNOFEST yarışmalarına başvuru yapabilir. 
+• Yarışmacılar aynı proje ile yalnızca tek bir kategoriye veya tek bir yarışmaya 
+başvurulabilir. Aynı proje ile farklı kategori veya TEKNOFEST kapsamında düzenlenen 
+farklı yarışmaya başvuru yapan takımların veya kişilerin başvuruları geçersiz 
+sayılacaktır. 
+• Yarışmacı aynı proje ile daha evvel bir başka yarışmada (TEKNOFEST veya diğer 
+yarışmalar) yer almışsa, katılmış olduğu yarışmanın adı, yeri, tarihi, organizatörü, 
+yarışmada aldığı netice bilgilerini proje dosyası içerisinde bildirmelidir. 
+• Başvurular 28 Şubat 2026 tarihine kadar http://www.t3kys.com başvuru sistemi 
+üzerinden çevrimiçi olarak yapılır. 
+ 
+2. TAKIM OLUŞTURMA 
+• Takımlar en az 3 en fazla 15 kişiden oluşması gerekmektedir. Bu sayıya danışman 
+dahil değildir. 
+• Yarışmaya bireysel katılım sağlanamaz. Yarışmacıların takım halinde başvurmaları 
+gerekmektedir. 
+• Öğrencilerin onaylı öğrenci belgelerini, danışmanların ise çalıştıkları kuruluşu 
+gösteren onaylı belgelerini ıslak imzalı olarak TEKNOFEST Yarışmalar Komitesi 
+tarafından açıklanacak tarihte sisteme yüklemeleri gerekmektedir. Belge şablonları 
+web sitesinde paylaşılacaktır.
+--- Page 9 ---
+ 
+ 
+ 
+• Bu yarışma için bir kişi (danışman, kaptan veya takım üyesi olarak) yalnızca bir 
+takımında bulunabilir. 
+• Takımlar, tek bir okuldan oluşturulabileceği gibi, bir veya birden fazla okuldan 
+öğrencinin bir araya gelmesiyle karma bir takım da oluşturabilir. 
+• Takımlar tek bir ülkeden oluşturulabileceği gibi bir veya birden fazla ülkenin 
+öğrencisinin bir araya gelmesiyle karma bir takım oluşturulabilir. 
+• Başvuru tarihleri arasında takım kaptanı/danışman sistem üzerinden kayıt olur, 
+danışman ve/veya takım kaptanı, takım üyelerinin kaydını doğru ve eksiksiz olarak 
+sistemde oluşturur ve üyelerin e-postalarına davet gönderir. Davet gönderilen üye, 
+başvuru sistemine giriş yaparak “Takım bilgilerim” kısmından gelen daveti kabul 
+eder ve kayıt işlemi tamamlanır. Aksi durumda kayıt işlemi tamamlanmış olmaz 
+ 
+2.1 Danışman Yükümlülükleri 
+• Danışman zorunluluğu yoktur, takımlar akademiden danışmanları takımlarına 
+alabilirler. 
+• Danışman olarak görev yapacak kişinin danışmanlık görevlerini yerine getireceğine 
+dair belgenin ıslak imzalı olarak TEKNOFEST Yarışmalar Komitesinin açıklayacağı 
+tarihte sisteme yüklenmesi gerekmektedir. 
+2.2 Süreç Bilgileri 
+• Yarışma süreci boyunca TEKNOFEST yarışmalar komitesi tarafından yapılacak olan 
+tüm bilgilendirmeler takımın iletişim sorum lusu olarak belirlediği kişiye 
+yapılacaktır. Bu sebeple her takım bir iletişim sorumlusu belirlemelidir. KYS’ ye 
+kayıtlı e-posta adresine bilgilendirme yapılmaktadır. 
+• Süreçlerin (Başvuru Yapma, Rapor Son Yükleme Tarihi, İtiraz Süreci, Doldurulması 
+Gereken Form vb.) takibi iletişim sorumlusunun görevi olup iletişim 
+sorumlusundan kaynaklı gecikmeler ve/veya aksaklıklardan TEKNOFEST 
+yarışmalar komitesi sorumlu değildir. 
+• Yarışma kapsamında gerekli tüm süreçler (Başvuru, Rapor Alımı, Rapor Sonuçları, 
+Maddi Destek Başvurusu, İtiraz Süreçleri, Üye Ekleme Çıkarma işlemleri vb.) KYS 
+sistemi üzerinden yapılmaktadır. Takımların KYS portalı üzerinden süreçleri takip 
+etmesi gerekmektedir. 
+• Yarışma süreci boyunca başvuru yapma, rapor yükleme, itiraz süreci ve form 
+doldurma işlemleri takım kaptanı ve/veya danışmanın yetkisi dahilinde olup 
+yarışma süreçleri bu kişiler üzerinden yönetilmektedir. 
+• Üye ekleme/çıkarma işlemleri Kritik Tasarım Raporu teslim tarihine kadar 
+yapılabilir. Kritik Tasarım Raporu son teslim tarihinden sonra takımlar içerisinde 
+değişiklik yapılmayacaktır. 
+• Takım kaptanı değişiklikleri Kritik Tasarım Raporu teslim tarihine kadar 
+yapılmaktadır. 
+--- Page 10 ---
+ 
+ 
+ 
+• Finale kalan takımlara sağlanacak ulaşım ve konaklama desteği sınırlıdır. Destek 
+verilecek kişi sayısı daha sonra açıklanacak olup TEKNOFEST Yarışmalar 
+Komitesi’nin süreçle ilgili değişiklik yapma hakkı bulunmaktadır. 
+• TEKNOFEST Yarışmalar Komitesi festival alanında bulunacak üye sayısını 
+sınırlandırma yetkisine sahiptir. Sınırlandırma yapılması durumunda komite 
+tarafından bilgilendirme yapılacaktır 
+2.3 Başvuru Esasları 
+Başvurular, TEKNOFEST Havacılık, Uzay ve Teknoloji Festivali Teknoloji Yarışmaları 
+resmî web sitesi (www.teknofest.org) üzerinden alınacaktır. 
+Başvurular 28 Şubat 2026 tarihine kadar www.t3kys.com başvuru sistemi üzerinden 
+çevrim içi olarak yapılır. 
+Yarışmacı, başvuru yapmadan önce yarışma hakkındaki tüm açıklamaları ve katılım 
+koşullarını okuyup onaylamak suretiyle yarışmaya katılabilecektir. 
+Yarışmaya başvuranlar şartnamede yer alan şartların tamamını kabul etmiş oldukları 
+sayılmaktadır. 
+3. YARIŞMA TAKVİMİ  
+Tarih Açıklama 
+28 Şubat 2026 Yarışma Son Başvuru Tarihi 
+31 Mart 2026-17:00 Teknik Yeterlik Formu teslimi son tarihi 
+16 Nisan 2026 Teknik Yeterlik Formu sonuçlarının açıklanması 
+1 Haziran 2026-17:00 Kritik Tasarım Raporu teslimi son tarihi 
+22 Haziran 2026 Kritik Tasarım Raporu sonuçlarının açıklanması 
+20 Temmuz 2026-17:00 Video teslimi son tarihi 
+31 Temmuz 2026 Finalistlerin açıklanması 
+Ağustos-Eylül 2026 Teknik Sunum ve Final Yarışmaları 
+30 Eylül- 4 Ekim 2026 TEKNOFEST Şanlıurfa 
+Tablo 2 Yarışma Takvimi Tablosu 
+ 
+ 
+ 
+ 
+ 
+ 
+--- Page 11 ---
+ 
+ 
+ 
+3.1. İletişim, Soru ve Cevap 
+3.1.1. İletişim 
+Yarışma hakkındaki teknik sorular için iletişim kanalı internet sitesinde 
+(www.teknofest.org) yer alacak olan İnsansız Kara Aracı Yarışması sayfasında verilecektir. 
+Bu grubun aktif olarak takip edilmesi ve her takımdan en az 1 kişinin üye olarak bu 
+gruptaki duyuruları, soru ve cevapları takip etmesi yarışmacı takım sorumluluğundadır. 
+Belirtilen e-posta grubunun takip edilmemesi sonucunda doğacak takımların güncel 
+bilgilendirmelere ulaşamama durumundan hakem ve jüri heyetleri sorumlu değildir. 
+Yarışmanın organizasyonel bölümleri ile ilgili soruların iletisim@teknofest.org e-posta 
+adresi üzerinden iletilmesi gereklidir. 
+Teknik sorularınızı ve organizasyonel sorularınızın yukarıda doğru kanallar üzerinden 
+iletilmesi, sorulan sorulara hızlı dönüş yapılabilmesi açısından önem arz etmektedir. 
+3.1.2. Soru ve Cevap 
+Yarışma ile ilgili detaylar bu şartname içerisinde açıklanmıştır. Yarışmanın sağlıklı bir 
+süreç içerisinde yürütülebilmesi için şartnamenin dikkatle okunması gerekmektedir. 
+Şartnamedeki ilgili kural ve/veya ibarenin açık/anlaşılır olmadığı ya da yetersiz olduğu 
+düşünüldüğü durumlarda ilgili konu hakkında soru sorulması gerekmektedir. 
+Soru ve cevaplar aşağıdaki maddeler için bir kaynak değildir: 
+• Sistem tasarımını hakem ve/veya jüri heyetlerine onaylatmak 
+• Stratejik veya yarışmacı takımın geleceğe yönelik planladığı belirsiz durumlar 
+Zayıf, şartname içerisinden referans gösterilmemiş, ucu açık, net anlaşılmayan ve 
+şartname içerisinde hali hazırda cevabı yer alan sorular cevaplandırılmayacaktır. 
+Cevaplandırılmayacak sorulara örnek olarak aşağıdaki maddeler verilebilir: 
+• Tasarladığımız parça/sistem yarışma için uygunluğu 
+• Açık/net olmayan ya da referans eksikliği sebebiyle anlaşılmayan sorular 
+• Tekrar eden sorular 
+• Şartnamede belirtilen konular 
+--- Page 12 ---
+ 
+ 
+ 
+4. YARIŞMA SÜRECİ 
+Değerlendirmeler aşağıdaki aşamalara göre yapılacaktır: 
+4.1. Teknik Yeterlik Formu 
+Teknik Yeterlik Formu (TYF) 3−Yarışma Takvimi’nde belirtilen tarihte takımın 
+kabiliyetlerini, İnsansız Kara Araçları’na ve İnsansız Kara Aracı yarışmasına 
+yaklaşımlarını, yarışma şartlarını sağlayabilmek adına kavramsal yaklaşımlarını, 
+tasarımlarını, öncül bileşen seçimlerini içeren özet bir çalışma niteliği 
+taşımaktadır. 
+TYF şablonu daha sonra www.teknofest.org sitesinde yarışma sayfasından paylaşılacaktır. 
+ 
+4.2. Kritik Tasarım Raporu 
+Kritik Tasarım Raporu (KTR) aşamasına geçen takımlar, Kritik Tasarım Raporları’nı 
+3−Yarışma Takvimi’nde belirtilen tarihe kadar teslim etmekle yükümlüdürler. 
+Kritik Tasarım Raporu’na ait şablon yarışma son başvuru tarihinden sonra 
+açıklanacaktır. 
+Kritik tasarım raporu en fazla 25 sayfa (kapak, içindekiler, görseller, teknik 
+resimler ve referanslar bölümleri dahil) olacaktır. Sayfa sınırına uymayan raporlar 
+değerlendirmeye alınmayacaktır. 
+Kritik Tasarım Raporu sonuçlarına göre belirlenecek baraj puanının üstünde yer 
+alan takımlar yarışmaya devam edecek olup, Yarışma Danışma Kurulu ve Hakem 
+Heyeti tarafından belirlenen sayıda takıma maddi destek verilecektir. Baraj 
+puanının üzerinde yer alan diğer takımlar maddi desteksiz olarak sürece devam 
+edecektir. 
+KTR şablonu daha sonra www.teknofest.org sitesinde yarışma sayfasından paylaşılacaktır. 
+4.3. Kritik Tasarım Raporu İtiraz Süreci 
+Takımların Kritik Tasarım Raporu değerlendirilmesi sonucunda baraj puanı altında 
+olması durumunda itiraz etme hakkı bulunacaktır. Rapor itirazları, rapor sonuçları 
+açıklandıktan sonraki 48 saat içerisinde KYS üzerinden alınmaktadır. İtirazlar takım 
+danışmanı veya takım kaptanı tarafından yapılmalıdır. Belirlenen süreç içerisinde 
+iletilmeyen itirazlar değerlendirmeye alınmayacaktır. Takımların itirazları farklı hakem 
+heyetlerine gönderilir ve yeniden değerlendirilir. İtiraz süreci hakkında detaylı bilgiye 
+genel kurallardan ulaşabilirsiniz. İtiraz aşamasında da başarılı bulunmayan takımların 
+yüksek itiraz hakkı bulunmaktadır. Yüksek itiraz başvurunuz için 
+iletisim@teknofest.org adresine itiraz gerekçeleriniz ve dilekçenizin yer aldığı e-
+postanın TEKNOFEST Yarışmalar İtiraz Yönetmeliği’nde belirtilen kriterlere göre 
+gönderilmesi gerekmektedir. Yüksek itiraz süreci hakkında detaylı bilgiye genel 
+kurallardan ulaşabilirsiniz. 
+--- Page 13 ---
+ 
+ 
+ 
+4.4. Araç Kanıt Videosu 
+Kritik Tasarım Raporu aşamasını geçen takımların finalist olmaya hak kazanabilmesi 
+için aşağıdaki kıstasları karşılayan Araç Kanıt Videosu (AKV) adında kısa bir kabiliyet 
+videosunun çekmesi gerekmektedir. 
+Videoda Dikkat Edilmesi Gereken Hususlar: 
+• AKV’de temel olarak yarışma parkuruna benzer bir parkurda aracın yarışma 
+esnasında sergileyeceği hareket performansının bir benzerini sergilemesi 
+beklenmektedir.  
+• AKV’de kullanılacak parkurun aşamalarının şartname ile birebir aynı sırada 
+olması şartı aranmamaktadır. Bağımsız aşamalar halinde gösterim yapılabilir.  
+• AKV’de gösterimi yapılacak aracın final yarışmasına katılım gösterecek nihai 
+araç ile en yüksek benzerlikte olması beklenmektedir.  
+• Sistemin istenmeyen hareketini durdurmak amacıyla sistemde bulunacak acil 
+durdurma butonunun çalıştığının gösterilmesi beklenmektedir. Butona 
+basıldığında bütün motorların, çalışan akşamların durup İnsansız Kara 
+Aracı’nın hareketini sonlandırdığı gösterilmelidir. 
+• Videonun çözünürlüğü en az 720 p, toplam süresi ise en az 2 dakika, en fazla 5 
+dakika olmalıdır. 
+• AKV’nin 3−Yarışma Takvimi’nde belirtilen tarihe kadar gönderilmesi 
+zorunludur. 
+• Videolar Youtube’a yüklenecektir. Diğer platformlara yüklenen videolar kabul 
+edilmeyecektir. Videolar ‘Liste−dışı’ olarak yüklenebilir. 
+• Videoların bağlantısı T3 KYS sisteminde açılan forma eklenecektir. Bağlantıda 
+sorun yaşanması halinde takımlar elenecektir. 
+4.5. Teknik Sunum 
+Teknik Sunum aşamasında final yarışmasına katılma hakkı kazanan takımların 
+geliştirmiş olduğu İnsansız Kara Araçları’nı proje geliştirme, sistem geliştirme, detay 
+tasarım ve işbu şartnamede verilen isterlere uygunluğu bakımından Hakem Heyeti ve 
+görevlendireceği personele kısa bir sunum ile aktarması beklenecektir. Sunumun 
+şablonu ve detayları ilerleyen aşamalarda paylaşılacaktır.  
+4.6. Final Yarışması 
+TYF, KTR, AKV isterlere uygunluk noktasında olumlu görülen takımların araçları 
+6‒Yarışma Kurgusu kısmında detayları verilen parkurda 2 kez koşu yapacaktır: 
+• 1. koşu: Uzaktan Kontrollü (manuel) 
+• 2. koşu: Tam−Otonom (otonom sürüş otonom atış) 
+--- Page 14 ---
+ 
+ 
+ 
+Yarışmacılar 2 koşudan da bu şartnamede verilen esaslara göre bağımsız şekilde puan toplayacaktır. 
+Yarışma sonunda her takımın her iki koşuda aldığı puanlar toplanacak, yarışma kazananları bu toplam 
+puana göre belirlenecektir. 
+4.7. Puanlama  
+Aşama Puan Ağırlığı 
+Kritik Tasarım Raporu % 20 
+Teknik Sunum  % 10 
+Final Yarışması % 70 
+Tablo 3 Puanlama Tablosu 
+ 
+5. YARIŞMA ÖNCESİ  
+Final Yarışması öncesinde takımlar tarafından detayları 4.5-Teknik Sunumlar 
+bölümünde verilen teknik sunumlar yapılacak Hakem Heyeti tarafından teknik 
+kontroller gerçekleştirilip yarışmacılara brifing verilecektir.  
+5.1. Teknik Kontroller 
+• İnsansız Kara Aracı Yarışması’nda finale katılmaya hak kazanan takımların araçları, 
+yarışma öncesinde teknik kontrollerden geçirilecektir. 
+• Teknik kontroller, Hakem Heyeti tarafından yapılacaktır. 
+• Her takım, belirlenen sıra ile yarışa cağı araçlarının teknik kontrollerini 
+yaptıracaktır. Takım üyeleri, teknik kontrol sıralarını takip etmekle yükümlüdür. 
+Teknik kontrollerini gerçekleştirmemiş bir takım, hiçbir şekilde yarışamayacak, 
+yarışma ile ilgili bir hak talep edemeyecektir. 
+• Bu kontroller, Hakem Heyeti ve takım üyelerinden 1 kişi ile gerçekleştirilecektir. 
+• Teknik kontrolleri tamamlayamayan araçlar yarışa dahil olamayacaktır. 
+• Teknik kontrollere girip, teknik kontroller sonucunda olumsuz ya da yetersiz 
+bulunan bir takım, hiçbir şekilde yarışamayacak, yarışma ile ilgili bir hak talep 
+edemeyecektir. Bu konuda, Hakem Heyeti yetkilidir. 
+• Teknik kontroller, işbu dokümanın 7−Araç Genel Özellikleri başlıkta belirtilen 
+isterler çerçevesinde yapılacaktır. 
+5.2. Hakem Brifingi 
+• Final aşamasında, yarışma hakkındaki genel hususların yarışmacılara aktarıldığı 
+hakem brifingi yapılacaktır. 
+• Brifing final yarışmasında uygulanacak kuralları içerecektir. 
+• Brifingde verilen bilgiler kural niteliğinde olup gerekli bilgileri almak takımların 
+sorumluluğundadır. 
+ 
+ 
+--- Page 15 ---
+ 
+ 
+ 
+6. YARIŞMA KURGUSU 
+6.1. Yarışma Parkuru 
+ 
+ 
+ 
+ Şekil 1: Kuşbakışı taslak yarışma parkuru görünümü 
+ 
+ 
+Yol genişliği 3 metre olacaktır. Yol genişliği iki kenardan yol bariyerler i ile 
+sınırlandırılacaktır. Yol kenarındaki bariyerler kırmızı ve beyaz renklerde, 80 cm ± 10 cm 
+yüksekliğinde, yolun tamamını kapsayacak şekilde (virajlar dahil) sürekli olacaktır. 
+Düzlük parkur bölümleri 20 metre uzunluğunda olacaktır. 
+ 
+6.2. Parkur Aşamaları ve Görevler 
+Parkur kenarında her aşamayı belirtmek üzere Şekil-3’e benzer, yazı tipi olarak ‘Arial 
+Black’ kullanan, dış çapı 60 cm olan tabelalar bulunacaktır. Otonom görevlerde 
+yarışmacılar bu tabelaları tanıyarak ilgili parkura geldiklerini algılayacaktır. 
+ 
+ 
+
+--- Page 16 ---
+ 
+ 
+ 
+ 
+Şekil 2: Örnek Parkur Aşama Tabelası 
+6.3. Su Geçişi ve Yağmur 
+Parkurun bu bölümünde aracın eş zamanlı olarak 40 cm (bkz. Şekil 3) derinliğindeki 
+sudan ve tepedeki yağmurlamadan geçmesi gerekmektedir. 
+  
+Şekil 3: Su Geçişi Ve Yağmur 
+ 
+6.4. Taşlı / Çakıllı Yol 
+Parkurun 2 numara ile gösterilen bölgesi en büyüğü 5 cm çapa sahip olacak taşlardan ve 
+çakıllardan oluşabilecektir. 
+6.5. Yan Eğim 
+Parkurun bu bölümünde aracın % 20’luk bir yan eğimde ilerlemesi gerekmektedir. 
+ 
+6.6. Dik Engel 
+Takımların parkurun bu aşamasında 15 cm yüksekliğindeki dik blok engelin üzerine 
+sağlıklı bir şekilde çıkarak ve inerek geçmesi beklenmektedir.  
+ 
+6.7. Trafik Konileri 
+Trafik konileri 40 cm ± 10 cm x 40 ± 10 cm kare tabanlı, 75 cm ± 5 cm yükseklikte kırmızı 
+beyaz ya da turuncu beyaz renklerde olacaktır. Aracın koni engellerine dokunmadan 
+ilerlemesi beklenmektedir. Konilerin yerleşimi hakem heyeti tarafından yarışma 
+sırasında belirlenecektir. 
+ 
+
+--- Page 17 ---
+ 
+ 
+ 
+6.8. Kayar Engel 
+Parkurun üzerinde, genişliği 1 metre olan ve tamamen parkurun dışına çıkabilen 1 adet 
+kayar engel bulunacaktır. Kayar engel sağa ve sola doğru 20 cm/s hızla sürekli rejimde 
+git-gel yaparak hareket edecektir. Engel parkur dışına çıktığı noktada beklemeden 20 
+cm/s hızla ters yönde hareketine devam edecektir. Yarışmacı takımların kayar engelin 
+pozisyonunu ve hareket yönünü tespit edip engele temas etmeden geçmeleri 
+beklenmektedir.  
+6.9. Engebeli Arazi 
+Parkurun ile başlayan ve viraja kadar devam eden kısmı tümsek parkuru olup 
+kullanılacak tümseklerin kesiti Şekil 4’te verilmiştir. Tümseklerin sayısı ve yerleşimi 
+yarışma sırasında hakem heyeti tarafından belirlenecektir.  
+Şekil 4: Tümsek 
+Tümsekli bölüm geçilirken, parkurun olabildiğince ortalanması gerekmektedir. Aracın 
+tamamının aynı tümsek dizisi üzerinden geçirilmesi tabloda belirtilen cezaya tabidir. 
+6.10. Dik Eğimler ve Atış 
+Dik eğim parkuru % 45 eğimde çıkış ve inişten oluşmaktadır. 
+Dik eğim aşamasında rampa çıkılırken ve inilirken rampa üzerindeki işaretli yerlerde 
+(‘stop’ ifadeleri ile gösterilmiştir) araç tamamen durdurulacak, en az 2 s beklendikten 
+sonra harekete devam ettirilecektir. Bu beklemeleri yapmayan takımlar dik eğim 
+aşamasından puan alamayacaktır. 
+Atış (lazer ile işaretleme) minimum 10 metre uzaklıkta bulunan, bir çerçeveye 
+oturtulmuş, A3 kâğıt boyutundaki Şekil 5’te verilen hedefe yapılacaktır. Nişan alma 
+işlemi lazer kapalı halde kameralar ile yapılacak, lazer yalnız nişan alma bittikten sonra 
+atış anında aktif edilebilecektir.
+
+--- Page 18 ---
+ 
+ 
+ 
+Lazer aktif edildikten sonra en az 1 s hedefte kalacaktır. Lazerin aktif olduğu süre 
+zarfında araca veya lazer yönlendiriciye hareket verilmeyecektir. Verilmesi durumunda, 
+tekrar deneme şansı verilmeksizin tabloda verilen ceza puanı ile aşama tamamlanmış 
+sayılacaktır. 
+Atış aşamasında kullanıcı tarafından tercih edilecek şekilde takımların en fazla 3 
+deneme hakkı vardır (tamamının kullanılması zorunlu değildir). Bu 3 denemeden en 
+başarılı olanında alınan puan geçerli sayılacaktır. Lazerin çizgi üzerinde olduğu 
+durumlarda yüksek puanlı çemberden puan alınacaktır (Ör. lazer tam 6 cm çaplı 
+çemberin dış çizgisi üzerinde ise 6 cm çaplı çemberin puanı geçerli olacaktır). 
+ 
+                                                      Şekil 5: Atış Hedefi 
+6.11. Hızlanma Parkuru 
+ 
+30 metre boyunca sıfır hızdan başlanarak 30. metrenin sonuna kadar ivmeli şekilde diğer 
+takımların araçları ile yarış halinde olunacaktır. Final yarışması toplam katılımcı takım 
+sayısı nezdinde eş zamanlı olarak kaç takımın yan yana hızlanma parkurunda 
+yarışacağını belirleyecektir.  Hızlanma Parkuru Şekil-1’de görüldüğü üzere ana parkur 
+dışında konumlanacaktır. Hızlanma parkurunun bitiminde 10 metrelik güvenli ve 
+emniyetli durma mesafesi yarışmacılara sağlanacaktır. 10 metrelik mesafede çevreye ve 
+diğer araçlara zarar vermeden duramayan araçlara cezai puan uygulanacaktır. 
+
+--- Page 19 ---
+ 
+ 
+ 
+ 
+6.12. Kısıtlamalar 
+Her koşuda ilgili parkurun (atış dahil) en fazla 15 dakika içerisinde tamamlanması 
+gerekmektedir. 15 dakika içerisinde parkuru tamamlayamayan yarışmacılar başarıyla 
+geçtikleri aşamalardan puan alabileceklerdir. Ancak 15 dakika sonra parkurdan çıkmak 
+durumunda olacaklardır. 15 dakika içerisinde koşuyu tamamlayamayan yarışmacılar 9- 
+Nihai Değerlendirme bölümü altında tanımlanan ‘Koşu tamamlanma süresi’ kıstasından 
+puan alamayacaktır.  
+Araçlarda ileri sürüş, geri sürüş ve nişan kamerası olmak üzere en az 3 kamera ve atış 
+benzetimi için nişan alma düzeneği üzerine kurulu lazer işaretleyici bulunması 
+zorunludur. Lazer işaretleyicinin 10 m mesafedeki nokta çapı 1,5 cm’den büyük 
+olmayacaktır. 
+Kumanda ile kontrol koşusu esnasında yarışmacılar parkuru görebilecek mesafede 
+konumlanacak ancak parkur boyunca araç yanında kumanda ile dolaşamayacaklar, 
+parkur üzerinde araç sensörleri ve kameraları ile ilerleyebilecek ve atış 
+yapabileceklerdir. 
+6.13. Güvenlik Ve Emniyet 
+Takımlar ancak gerekli güvenlik kurallarını tatbik ettikten sonra sistemlerine enerji 
+sağlayabilirler. 
+Yarışma öncesinde her ekibe hareket kabiliyetlerini denemek için 5 dakika verilecektir. 
+Bu sürede ilgili ayarlamaları yapmaları beklenecektir. 
+İnsansız Kara Aracı’nın yarışacağı alan izleyicilerden kısmen izole, kontrolsüz 
+hareketlerden izleyicileri koruyacak şekilde olacaktır. 
+6.14. Veri Paketi 
+Yarışmacılar parkur boyunca araç sürüş (ileri ve geri) kameralarından ve nişan 
+kamerasından aldıkları görüntüleri kaydedecek ve parkur tamamlandıktan sonra hakem 
+heyetine iletecektir. Veri paketi ile ilgili bilgilendirme daha sonra paylaşılacaktır. 
+6.15. Final Aşaması Genel Kuralları 
+• Yarışma sırasında ortaya çıkabilecek güvenlik ve emniyet endişeleri ile sorunları 
+kapsamında Hakem Heyeti yarışmayı durdurma ve parkurdan çıkarma yetkisine 
+sahiptir. 
+• Hakem Heyeti ihtiyaç duyulması halinde yarışma sürecinde takımların sistemleri ile 
+ilgili bir mülakat talep edebilecektir. İKA’yı geliştiren yarışmacı takımın araç ile ilgili 
+teknik sorulara cevap verebiliyor olması beklenmektedir. Danışmanlar mülakata 
+katılamayacaktır. 
+• Yarışma alanında ve takım masalarının bulunduğu alanda takım üyesi ve danışmanı 
+haricinde kimse bulunamayacaktır. 
+--- Page 20 ---
+ 
+ 
+ 
+• Dışarıdan herhangi bir bilgilendirme ve yönlendirmenin anlaşılması durumunda 
+hakem kararıyla yarışmacı takım yarışma dışı bırakılabilecektir. 
+• Yarışma alanı içerisine konulacak kameralar ve hakemler vasıtasıyla kontrol 
+masasına bilgi aktarımı, etapların tamamlanıp tamamlanmadığı gibi konularda 
+takımlar takip edilebilecektir. 
+• Kamera sistemi takımlar tarafından yapılacak herhangi bir itiraz durumunun 
+değerlendirilmesi ve olası hilelerin önlenmesi amacıyla devrede olacaktır. Ayrıca 
+yarışma sırasında takımların gösterimi kayıt altına alınarak tanıtım malzemesi 
+olarak da kullanılabilecektir. 
+• Yarışma sırasında ortaya çıkabilecek özel durumlar için hakemler vaka üzerine 
+toplanıp karar verecektir. 
+• Alan içerisinde 220 V AC elektrik çıkışları sağlanacaktır. 
+• Yarışma alanından ayrı bir konumda katılan her yarışmacı takımın kullanması için 
+birer masanın konumlandığı bir alan olacaktır. 
+ 
+7. ARAÇ GENEL ÖZELLİKLERİ 
+İnsansız kara aracı yarışmasında yarışacak takımların bu başlıkta belirtilen araç genel 
+özellikleri sınırları içinde kalması zorunludur. 
+Araçların zorlu arazi (eğimli, engebeli, taşlı yol profillerine) ve asfalt yol koşullarına uygun 
+paletli ve/veya tekerlekli çekiş sistemine sahip olması beklenmektedir. Tekerlekli çekiş 
+sistemi kullanılması durumunda aracın en az 4 tekerleğe sahip olması gerekmektedir. 
+Tüm tekerlerden çekiş olması zorunlu değildir. 
+7.1. Araç Ölçüleri 
+Aracın boyutlarının denge, manevra kabiliyeti ve geçeceği zemin ve engel türlerine göre 
+belirlenmesi gerekeceği göz önünde bulundurulmalıdır. Aşağıdaki ölçüler yarış 
+öncesinde hakem heyeti tarafından kontrol edilip uygunsuzluk durumunda katılımcı 
+diskalifiye edilecektir. 
+• Araç boyu en az 1,2 m en fazla 2,0 m olmalıdır. Boyutlandırma için en fazla donanımı 
+alabilecek kadar küçük, engellerden geçerken dengesinin bozulmayacağı kadar 
+uzun olacağı düşünülmelidir. 
+• Araç genişliği en az 0,75 m en fazla 1,2 m olmalıdır. Genişlik belirlenirken parkur ve 
+engel limitleri göz önünde bulundurulmalıdır. 
+• Araç yüksekliği (lazer yönlendirici ve anten hariç araç en yüksek noktasından zemine 
+olan mesafe) en az 0,4 m olmalıdır ve araç genişliğinin 1,25 katından daha az 
+olmalıdır. 
+• Aracın karın altı yüksekliği seçilirken dik engel geçme ve sudan geçme kriterleri göz 
+önünde bulundurulmalıdır. 
+ 
+ 
+ 
+ 
+--- Page 21 ---
+ 
+ 
+ 
+7.2. Çekiş Sistemi 
+• Araç % 45 (24,5 derece) dik eğimi geçebilmelidir. 
+• Araç çekiş sistemi dik eğime çıkarken yeterli güç ve tork sağlanmalıdır. Çıkış 
+esnasında kesiksiz bir hareket sağlanmalıdır. 
+• Araç 20 cm dik engeli geçebilecek anlık torku sağlayabilmelidir. 
+7.3. Araç Gövdesi 
+• Araç en az 15 cm dik engeli geçerken gövdeyi koruyabilecek yükseklikte olmalıdır. 
+• Dik eğim esnasında şahlanma görülmemeli, araç paletlerinin/tekerleklerinin yerle 
+temasının sürekli olması göz önünde bulundurulmalıdır. 
+• Araç gövdesi % 20 yan eğimden geçebilecek stabiliteye sahip olmalı, parkuru 
+geçerken lastik/tekerlerin yol ile temasının sürekli olması göz önünde 
+bulundurulmalıdır. 
+• Aracın kontrol sistemine ait tüm donanımlar (sensör, kablaj, kontrolcü v.b.) araç 
+kabuğunun içinde olmalı ve görünmemelidir (kullanım amacı gereği araç dışında 
+bulunması gereken kamera, lidar benzeri sensörler hariç). Bu ve benzeri 
+donanımların araç gövdesi dışına monte edilmesi gereken durumlarda ilgili 
+donanımların sızdırmazlığı ve darbelere karşı koruyucu ek donanımları 
+sağlanmalıdır. 
+• Araç donanımları haricinde parkurda tehlike yaratabilecek tüm unsurlar araç 
+gövdesinin içine entegre edilmelidir. 
+• Araç gövdesinin içine entegre edilecek elektronik aksamın yanma ve kısa devre 
+riskleri göz önünde bulundurularak gereken önlemler alınmalıdır. Teknik 
+kontrollerde bu tip risk unsurlarına alınan önlemler değerlendirilecektir. 
+• Araç gövdesinde parkura ve insana zarar verebilecek keskin çıkıntılar olmamalıdır. 
+• Suyun elektronik ve mekanik bileşenlerin içine girmesini engellemek için 
+sızdırmazlıklar ve suya dayanıklı muhafazalar tasarlanmalıdır. 
+• Araç elektronik birimleri yağmura karşı sızdırmazlık koruması olması 
+önerilmektedir. 
+• Araç üzerinde aydınlatma sağlayacak far sistemi kullanılmalıdır. 
+7.4. Palet/Teker 
+• Aracın direksiyon / dümenleme sistemi ve dingil mesafesi 5 metrelik dönüş 
+yarıçapını sağlayacak şekilde tasarlanacaktır. 
+• Araç en az 15 cm dik engeli geçebilecek uygun yaklaşma açısını sağlamalıdır. 
+• Dönüş esnasında araç dengesi sağlanmalı, araç dönüşlerinde tekerleğin/paletin yol 
+teması kesilmemelidir. 
+• Araç dönüşlerinde araç 3 m’lik bir koridor içerisinde kalabilmelidir. 
+• Sudan geçişlerde, eğer tekerlek kullanılıyorsa, aracın çamurlu veya ıslak koşullarda 
+çalışabilmesi için yüzeyde daha fazla tutunma gücü sağlamak amacıyla daha büyük 
+çaplı tekerlekler kullanılabilir. 
+--- Page 22 ---
+ 
+ 
+ 
+• Sudan geçişlerde, eğer paletler kullanılıyorsa, yeterli yerden yüksekliğe sahip olmalı 
+ve ıslak ve çamurlu ortamlarda çalışabilmelidir. 
+7.5. Fren Sistemi 
+• Fren sistemi % 45 dik eğimde durma torkunu sağlayabilecek şekilde 
+tasarlanmalıdır. 
+• Normal olarak frenler kapalı, tahrik verildiğinde açılır yapıda olmalıdır. 
+• Fren tahrik sisteminde hidrolik veya mekanik sistemler kullanılmalıdır. 
+7.6. Süspansiyon Sistemi 
+Süspansiyon sistemi, istikrarı korumak, engebeli arazilerde düzgün geçiş sağlamak ve 
+hendekler ve engeller gibi zorluklar geçilirken darbeleri emmek için çok önemlidir. 
+Süspansiyon, çeşitli arazilerde çalışabilmesi için yeterli hareketliliğe ve artikülasyona 
+sahip olmalıdır. 
+• Araç engebeli zeminden geçtiğinde aracın bütünselliğinin, sensörlerin konumlarının 
+ve elektronik birimlerin üzerindeki bağlantıların korunuyor olması beklenmektedir. 
+• Araç eğimli zeminlerden geçerken ve engelleri aşarken araç gövdesini korumak için 
+yaylı amortisörler, hava süspansiyonu veya hidrolik amortisörler gibi sistemlerin 
+kullanılması tavsiye edilmektedir. 
+7.7. Montaj 
+• Yerleştirilen sensör ve kameraların görüş açısı ile araç gövdesi en az girişim yapacak 
+şekilde yerleştirilmelidir. 
+• Sensörler ve kameraların bağlantı arayüzlerinin yağmur altında sızdırmaz olması 
+önerilmektedir. 
+• Kritik parçaların montajında uygun bağlantı elemanı kullanılması zorunludur. 
+(Güçlü yapıştırıcıdan veya silikondan montaj amaçlı yardım alınması yasaktır.) 
+• Yarıştan hemen önce hiçbir parçanın montajı ile ilgili majör değişiklik yapılamaz. 
+• Sızdırmazlık gereken yüzeylerin birleşiminde uygun sızdırmazlık elemanı (sıvı silikon, 
+o-ring, conta ve benzeri) uygulanmalı ancak sızdırmazlık elemanı dışarıdan 
+görünmemelidir. 
+7.8. Güvenlik Donanımı 
+Aşağıdaki maddeler yarış öncesinde hakem heyeti tarafından kontrol edilip uygunsuzluk 
+durumunda katılımcı diskalifiye edilecektir. 
+• Kumanda ile haberleşme kesilme durumunda araç acil durma moduna geçmelidir. 
+• Araç kumanda paneli üzerinde ‘acil durdurma’ butonu bulunmalıdır. Bu butona 
+basıldığında araca hiçbir şekilde hareket verilemeyecektir. 
+• Araç en yüksek hızı tasarımcılar tarafından güvenlik tehdidi oluşturmayacak şekilde 
+sınırlandırılmalıdır. 
+--- Page 23 ---
+ 
+ 
+ 
+• Lityum-iyon hücre ve batarya kullanımı durumunda batarya içerisinde bataryanın 
+gerekli aşırı akım, kısa devre, aşırı ısı, aşırı gerilim, aşırı şarj ve deşarj korumalarını 
+sağlayacak ve bataryanın sağlıklı aralıkta çalışmasını kontrol altında tutacak bir 
+batarya yönetim sistemi (BMS) bulunacaktır. Batarya ve içindeki bileşenler fiziksel 
+hasara uğramamış olmalıdır. Batarya bloku içerisinde su girişi engellenmelidir. 
+• Araç üzerindeki tüm güç çıkış ve besleme hatları aşırı akım ve kısa devre korumalı 
+olacaktır. 
+• Haberleşmenin kesilip kesilmediği, acil durdurma butonuna basılıp basılmadığı gibi 
+güvenlik ve emniyet kontrolünü gerçekleştiren alt sistemin elektronik donanımı ve 
+yazılımı ana aracın kendi kontrol donanımı ve yazılımından ayrı tutulmalıdır. Bu 
+ayrılık ilkesi ile araç kontrolü gerçekleştiren donanım ve yazılımda meydana gelecek 
+olası sorunların güvenlik kontrolü donanım ve yazılımını etkilememesi sağlanmış 
+olacaktır. 
+• Sistemlerin üzerinde bulunacak olan bütün kabloların elektrik yalıtımı tam ve uygun 
+olmalıdır. Herhangi bir şekilde açıkta kablo, elektriksel bağlantı olmayacaktır. 
+8. DESTEK VE ÖDÜLLER 
+Ödül sıralamasına giren takımlar arasında dereceye giren takımlara aşağıdaki tabloda 
+belirtilen para ödülleri verilecektir. Bu tabloda belirtilen ödüller ödül almaya hak kazanan 
+takımlara verilecek toplam tutarı göstermektedir, bireysel ödüllendirme yapılmayacaktır. 
+Birincilik, ikincilik ve üçüncülük ödülleri banka hesabına yatırılacaktır. Takım 
+danışmanına da tabloda belirtildiği miktarda para ödülü verilecektir. Değerlendiriciler 
+Final Yarışması’na katılan takımların yarışma esnasındaki performanslarını yeterli 
+bulmadığı durumlarda yarışma birincisi, ikincisi, üçüncüsü derecelerini takdir 
+etmeyebilir. Benzer şekilde derece alamayan takımlar arasından belirleme hakkına sahip 
+olduğu En İyi Tasarım Ödülü ve En İyi Takım Ruhu Ödülü’nü de kullanmayabilir. 
+ 
+ÖDÜL MİKTARI 
+DERECE TAKIM DANIŞMAN 
+Birinci 300.000 TL 20.000 TL 
+İkinci 250.000 TL 15.000 TL 
+Üçüncü 200.000 TL 12.000 TL 
+Tablo 4 Destek ve Ödüller Tablos 
+Ödül Sıralaması için Minimum Başarı Kriteri 
+Ödül sıralamasına girebilmek için takımların 1. koşuyu tamamlayabilmeleri 
+beklenmektedir. 
+ 
+ 
+--- Page 24 ---
+ 
+ 
+ 
+En İyi Tasarım Ödülü 
+Görsellik itibarıyla profesyonel intiba uyandıran, çağdaş endüstriyel tasarım anlayışına 
+sahip, genel tasarım anlayışlarına riayet eden, kullanıcılarda satın alma intibası 
+uyandıracak İnsansız Kara Araçları’na sahip yarışmacı takımlara yarışma komitesi 
+tarafından uygun görülen ödüldür. Ödül maddi ödülleri kazanan takımların ödülleri ile 
+çakışamaz, maddi ödül kazanmayan takımlara verilebilir.  
+Komitenin uygun görmemesi durumunda ‘En İyi Tasarım Ödülü’ yarışmacı takımlara 
+verilmeyebilir. Belirtilen ödül prestij amaçlı olup maddi bir karşılığı bulunmamaktadır. 
+En İyi Takım Ruhu Ödülü 
+Takımın kendi üyeleri içerisindeki, takım ile diğer takımlar arasındaki, takım ile komite 
+üyeleri arasındaki ilişkiler nezdinde en sinerjik yaklaşıma sahip takımlara uygun 
+görülecek ödüldür. Maddi ödül kazanamayanlar arasından komitenin uygun görmesi 
+durumuna göre ‘En İyi Takım Ruhu Ödülü’nü verilir. Ödüle uygun görülen takım 
+olmaması durumunda ‘En İyi Takım Ruhu Ödülü’ verilmez. Belirtilen ödül prestij amaçlı 
+olup maddi bir karşılığı bulunmamaktadır. 
+ 
+9. NİHAİ DEĞERLENDİRME 
+Aşağıdaki tabloda yer alan performans göstergelerine karşılık gelen pozitif ve negatif 
+puanlamalar ekseninde 4.6’da tanımlanan Final Yarışmaları esnasında yarışmacı 
+takımlar tarafından toplanan toplam puan ile 4.1, 4.2, 4.4 ve 4.5’te tanımlanan Teknik 
+Yeterlik Formu, Kritik Tasarım Raporu, Araç Kanıt Videosu ve Teknik Sunum 
+aşamalarındaki değerlendirmeler yarışmayı kazananı belirleyecektir. 
+ 
+Su geçişi ve yağmur  10 puan 
+Çakıllı / taşlı yol  5 puan 
+Yan eğim  5 puan 
+Dik engel  5 puan  
+Trafik konileri 50 puan (her temasta −5 puan) 
+Kayar engel 50 puan (temassız geçilmesi durumunda) 
+Engebeli arazi  
+ 
+5 puan (Engele hatalı çıkma durumunda 
+bu parkurdan −5 puan alınacaktır.) 
+Dik eğimler parkuru 15 puan (çıkışta ve inişte 2 s durma şartı 
+ile) 
+--- Page 25 ---
+ 
+ 
+ 
+10 puan (çıkışta ve inişin birisinde 
+durmadan tamamlanması durumunda) 
+Otonom modda atış parkurunda hedefi 
+tespit edebilme 10 puan 
+ 
+Atış 
+İç Daire: 50 puan 
+Orta Halka: 25 puan  
+Dış Halka: 15 puan 
+Lazer aktifken araca/lazere hareket 
+verme 
+ 
+−10 puan 
+Parkur bariyerlerine her temas −5 puan 
+ 
+ 
+ 
+ 
+Koşu tamamlama süresi 
+En yüksek 100 puan (her koşuda) 
+1. takım (en kısa süre) 100 puan 
+2. takım 95 puan 
+  . 
+. 
+. 
+20. takım 5 puan 
+21. takım ve sonrası 0 puan. 
+ 
+ 
+ 
+Hızlanma 
+En yüksek 25 puan (her koşuda) 
+1. takım 25 puan 
+2. takım 20 puan 
+3. takım 15 puan 
+4. takım 10 puan 
+5. takım 5 puan 
+6. takım ve sonrası 0 puan. 
+Tablo 5 Performans Göstergeleri Ve Karşılık Puanları 
+Koşu puanı, her bir koşu aşamasında parkurdan alınan puanların bağımsız şekilde 
+toplanması ile hesaplanacaktır. Toplam final yarışması puanı iki koşuda alınan puanların 
+toplamı olacaktır. 
+Pas Hakkı: Yarışmacıların her bir koşuda 1 parkur aşamasını pas geçme hakları 
+bulunmaktadır.  
+Pas geçme durumunda takımlar üyeleri parkura girerek araçlarını pas geçilen parkurun 
+sonuna insan gücüyle taşıyarak konumlandıracaktır. Taşıma esnasında koşu süresi 
+durdurulmayacaktır. Taşıma esnasında gerekli güvenlik ve emniyet tedbirlerinin alınması 
+takım üyelerinin sorumluluğunda olacaktır.  
+Pas geçilmesi durumunda bahse konu parkur aşamasına denk gelen puan eksi puan 
+olarak toplam puana yansıtılacaktır.  
+Örneğin dik engel aşamasının pas geçilmesi durumunda ─5 puan alınacaktır.  
+--- Page 26 ---
+ 
+ 
+ 
+Eksi puan, bahse konu parkur aşamasından alınabilecek en yüksek puana eşit olacaktır. 
+Örneğin atış aşamasının pas geçilmesi yoluna gidilirse ─50 puan cezaya tabi olunacaktır.  
+Pas geçilemeyecek parkur aşamaları Hızlanma Parkuru ve otonom koşu esnasında trafik 
+konileri aşaması şeklindedir.  
+GENEL KURALLAR 
+Yarışma kapsamında genel kurallar dokümanına ulaşmak için tıklayınız. 
+ 
+ETİK KURALLAR 
+Yarışma kapsamında etik kurallar dokümanına ulaşmak için tıklayınız. 
+T3 Vakfı ve TEKNOFEST, yarışmacıların teslim etmiş olduğu herhangi bir üründen veya 
+yarışmacıdan kaynaklanan herhangi bir yaralanma veya hasardan hiçbir şekilde sorumlu 
+değildir. Yarışmacıların 3. kişilere verdiği zararlardan T3 Vakfı ve organizasyon yetkilileri 
+sorumlu değildir. T3 Vakfı ve TEKNOFEST, takımların kendi sistemlerini Türkiy e 
+Cumhuriyeti yasaları çerçevesinde hazırlamalarını ve uygulamalarını sağlamaktan 
+sorumlu değildir. 
+Türkiye Teknoloji Takımı Vakfı işbu şartnamede her türlü değişiklik yapma hakkını 
+saklı tut ar. 
+--- Page 27 ---
+ 
+ 
+ 
+ 
+ 
