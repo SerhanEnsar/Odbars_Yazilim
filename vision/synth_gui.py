@@ -10,6 +10,9 @@ import threading
 import cv2
 import numpy as np
 import random
+import os
+import json
+import subprocess
 from pathlib import Path
 
 try:
@@ -281,22 +284,38 @@ class SynthGUI:
         style.configure("TCombobox", fieldbackground="#2a241c", foreground="#d4c5a0")
         style.configure("Horizontal.TProgressbar", troughcolor="#2a241c", background="#f59e0b")
 
-        self._build_ui()
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(expand=True, fill="both", padx=10, pady=10)
 
-    def _lbl(self, parent, text, col, row, **kw):
-        ttk.Label(parent, text=text).grid(column=col, row=row, sticky="w", padx=8, pady=3, **kw)
+        self.tab_2d = ttk.Frame(self.notebook)
+        self.tab_3d = ttk.Frame(self.notebook)
 
-    def _entry(self, parent, var, col, row, width=8):
-        e = ttk.Entry(parent, textvariable=var, width=width, font=("Helvetica", 11))
-        e.configure(style="TEntry")
-        e.grid(column=col, row=row, padx=8, pady=3, sticky="w")
-        return e
+        self.notebook.add(self.tab_2d, text="  🖼️  2D Sentetik  ")
+        self.notebook.add(self.tab_3d, text="  🧊  Blender (3D)  ")
 
-    def _build_ui(self):
+        self._build_2d_ui()
+        self._build_3d_ui()
+        self._build_status_ui()
+
+    def _build_status_ui(self):
+        # Durum ve İlerleme Paneli (En altta sabit)
+        f_stat = ttk.Frame(self.root, padding=5)
+        f_stat.pack(side="bottom", fill="x")
+
+        self.progress = ttk.Progressbar(f_stat, orient="horizontal", length=460,
+                                        mode="determinate", style="Horizontal.TProgressbar")
+        self.progress.pack(fill="x", padx=10, pady=5)
+
+        self.log_text = tk.Text(f_stat, height=6, bg="#0f0f0f", fg="#a3b59a",
+                                font=("Courier", 10), bd=0, relief="flat")
+        self.log_text.pack(fill="x", padx=10, pady=5)
+
+    def _build_2d_ui(self):
         pad = {"padx": 12, "pady": 6}
+        parent = self.tab_2d
 
         # ── Klasör Seçimi ──
-        f_dir = ttk.LabelFrame(self.root, text=" 📁  Klasörler ", padding=8)
+        f_dir = ttk.LabelFrame(parent, text=" 📁  Klasörler ", padding=8)
         f_dir.grid(row=0, column=0, columnspan=2, sticky="ew", **pad)
 
         self.bg_dir   = tk.StringVar(value="")
@@ -363,26 +382,154 @@ class SynthGUI:
         ttk.Combobox(f_opt, textvariable=self.split, values=["train","val","test"],
                      width=8, state="readonly").grid(row=6, column=1, padx=8, pady=3)
 
-        # ── Önizleme Butonu ──
-        f_btns = ttk.Frame(self.root)
-        f_btns.grid(row=2, column=0, columnspan=2, pady=6)
+        # ── Üretimi Başlat ──
+        f_btns = ttk.Frame(parent)
+        f_btns.grid(row=2, column=0, columnspan=2, pady=10)
         ttk.Button(f_btns, text="🔍  Önizle (5 görüntü)", command=self._preview).grid(row=0, column=0, padx=10)
-        ttk.Button(f_btns, text="▶  Üretimi Başlat",      command=self._start).grid(row=0, column=1, padx=10)
+        ttk.Button(f_btns, text="▶  Üretimi Başlat",      command=self._start_2d).grid(row=0, column=1, padx=10)
 
-        # ── İlerleme ──
-        self.progress = ttk.Progressbar(self.root, orient="horizontal", length=460,
-                                        mode="determinate", style="Horizontal.TProgressbar")
-        self.progress.grid(row=3, column=0, columnspan=2, padx=12, pady=4)
+    def _build_3d_ui(self):
+        parent = self.tab_3d
+        pad = {"padx": 12, "pady": 6}
 
-        # ── Log ──
-        self.log_text = tk.Text(self.root, height=6, bg="#0f0f0f", fg="#a3b59a",
-                                font=("Courier", 10), bd=0, relief="flat")
-        self.log_text.grid(row=4, column=0, columnspan=2, padx=12, pady=(0,10), sticky="ew")
+        f_top = ttk.Frame(parent, padding=5)
+        f_top.pack(fill="x")
+
+        self.blender_terrain_dir = tk.StringVar(value="")
+        self.blender_output_dir  = tk.StringVar(value=str(Path(__file__).parent / "dataset_blender"))
+        self.blender_path = tk.StringVar(value="/Applications/Blender.app/Contents/MacOS/Blender")
+
+        ttk.Label(f_top, text="Terrain Klasörü:").grid(row=0, column=0, sticky="w")
+        ttk.Entry(f_top, textvariable=self.blender_terrain_dir, width=35).grid(row=0, column=1, padx=5)
+        ttk.Button(f_top, text="Seç", command=self._pick_blender_terrain).grid(row=0, column=2)
+
+        ttk.Label(f_top, text="Çıkış Klasörü:").grid(row=1, column=0, sticky="w")
+        ttk.Entry(f_top, textvariable=self.blender_output_dir, width=35).grid(row=1, column=1, padx=5)
+        ttk.Button(f_top, text="Seç", command=lambda: self._pick_dir(self.blender_output_dir)).grid(row=1, column=2)
+
+        # Terrain Listesi
+        lbl_f = ttk.LabelFrame(parent, text=" 🏔️  Zemin Seçimi ve Sayı Ayarı ", padding=8)
+        lbl_f.pack(fill="both", expand=True, padx=10, pady=5)
+
+        self.terrain_canvas = tk.Canvas(lbl_f, bg="#1a1a1a", highlightthickness=0)
+        self.terrain_scroll = ttk.Scrollbar(lbl_f, orient="vertical", command=self.terrain_canvas.yview)
+        self.terrain_list_frame = ttk.Frame(self.terrain_canvas)
+
+        self.terrain_canvas.create_window((0, 0), window=self.terrain_list_frame, anchor="nw")
+        self.terrain_canvas.configure(yscrollcommand=self.terrain_scroll.set)
+
+        self.terrain_canvas.pack(side="left", fill="both", expand=True)
+        self.terrain_scroll.pack(side="right", fill="y")
+
+        self.terrain_vars = {} # {filename: (bool_var, count_var)}
+
+        btn_f = ttk.Frame(parent, padding=10)
+        btn_f.pack(fill="x")
+        ttk.Button(btn_f, text="🧊  Blender Render Başlat", command=self._start_blender).pack(side="right", padx=10)
+        ttk.Button(btn_f, text="🔄  Listeyi Yenile", command=self._refresh_terrain_list).pack(side="right")
+
+    def _pick_blender_terrain(self):
+        d = filedialog.askdirectory()
+        if d:
+            self.blender_terrain_dir.set(d)
+            self._refresh_terrain_list()
+
+    def _refresh_terrain_list(self):
+        for child in self.terrain_list_frame.winfo_children():
+            child.destroy()
+        
+        self.terrain_vars = {}
+        td = Path(self.blender_terrain_dir.get())
+        if not td.is_dir(): return
+
+        files = sorted(list(td.glob("*.jpg")) + list(td.glob("*.png")) + list(td.glob("*.jpeg")))
+        for i, f in enumerate(files):
+            b_var = tk.BooleanVar(value=True)
+            c_var = tk.IntVar(value=10)
+            self.terrain_vars[f.name] = (b_var, c_var)
+
+            f_row = ttk.Frame(self.terrain_list_frame)
+            f_row.pack(fill="x", pady=2)
+            ttk.Checkbutton(f_row, variable=b_var).pack(side="left")
+            ttk.Label(f_row, text=f.name, width=25).pack(side="left", padx=5)
+            ttk.Label(f_row, text="Adet:").pack(side="left")
+            ttk.Entry(f_row, textvariable=c_var, width=5).pack(side="left", padx=5)
+
+        self.terrain_list_frame.update_idletasks()
+        self.terrain_canvas.config(scrollregion=self.terrain_canvas.bbox("all"))
+
+    def _start_blender(self):
+        td = self.blender_terrain_dir.get()
+        od = self.blender_output_dir.get()
+        if not td: return messagebox.showerror("Hata", "Terrain klasörü seçilmedi.")
+
+        # Geçici bir klasör oluşturup her seçilen terrain için ayrı CONFIG üretip çalıştırmaktansa,
+        # blender_render.py'a terrain_listesi ve total_n göndermek daha iyi.
+        # Ama kullanıcı her zemin için farklı sayı istediği için döngüde çalıştıracağız.
+
+        selected = [(name, var[1].get()) for name, var in self.terrain_vars.items() if var[0].get()]
+        if not selected: return messagebox.showwarning("Uyarı", "Hiç zemin seçilmedi.")
+
+        total = sum(n for _, n in selected)
+        self.progress["maximum"] = total
+        self.progress["value"] = 0
+        self._log(f"🧊 Blender Render Başlıyor... Toplam: {total} görüntü")
+
+        def run():
+            done = 0
+            for fname, n in selected:
+                temp_cfg = {
+                    "n_renders": n,
+                    "output_dir": od,
+                    "terrain_dir": td, # Sadece klasörü veriyoruz, script içinden seçtirebiliriz
+                    "render_w": 1920,
+                    "render_h": 1080
+                }
+                # Script o an sadece bu dosyayı seçsin diye geçici bir terrain_dir yapabiliriz
+                # veya script'i güncelleyip tek dosya da alabilir hale getirebiliriz.
+                # Şimdilik script'in CONFIG'ini overwrite eden bir json yazalım.
+                # AMA script her seferinde klasörden random seçiyor. 
+                # O yüzden script'e spesifik dosya vermemiz lazım.
+                
+                # blender_render.py'da "terrain_path" diye bir parametre ekleyelim.
+                
+                cfg_path = Path(od) / "temp_gui_config.json"
+                cfg_path.parent.mkdir(parents=True, exist_ok=True)
+                
+                # Her dosya için ayrı klasör gibi davranalım (hızlı çözüm)
+                import tempfile, shutil
+                with tempfile.TemporaryDirectory() as tmp_td:
+                    shutil.copy(Path(td)/fname, Path(tmp_td)/fname)
+                    temp_cfg["terrain_dir"] = tmp_td
+                    with open(cfg_path, 'w') as f:
+                        json.dump(temp_cfg, f)
+                    
+                    cmd = [
+                        self.blender_path.get(),
+                        "--background",
+                        "--python", str(Path(__file__).parent / "blender_render.py"),
+                        "--", str(cfg_path)
+                    ]
+                    
+                    self.root.after(0, lambda f=fname, count=n: self._log(f"🚀 Render: {f} ({count} adet)..."))
+                    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                    for line in process.stdout:
+                        if "Saved:" in line:
+                            done += 1
+                            self.root.after(0, lambda v=done: self.progress.configure(value=v))
+                    process.wait()
+
+            self.root.after(0, lambda: self._log("✅ Blender üretimi tamamlandı!"))
+            messagebox.showinfo("Başarılı", f"Blender render işlemi tamamlandı.\nÇıkış: {od}")
+
+        threading.Thread(target=run, daemon=True).start()
+
+    def _lbl(self, parent, text, col, row, **kw):
+        ttk.Label(parent, text=text).grid(column=col, row=row, sticky="w", padx=8, pady=3, **kw)
 
     def _pick_dir(self, var):
         d = filedialog.askdirectory()
-        if d:
-            var.set(d)
+        if d: var.set(d)
 
     def _log(self, msg):
         self.log_text.insert("end", msg + "\n")
@@ -409,10 +556,9 @@ class SynthGUI:
         cfg["n_tabela"] = 2
         cfg["n_stop"]   = 2
         cfg["n_hedef"]  = 1
-        import tempfile, os
+        import tempfile
         cfg["out_dir"] = tempfile.mkdtemp()
         cfg["split"]   = "preview"
-
         self._log("Önizleme oluşturuluyor...")
         generate_dataset(cfg)
         img_dir = Path(cfg["out_dir"]) / "images" / "preview"
@@ -424,22 +570,16 @@ class SynthGUI:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def _start(self):
+    def _start_2d(self):
         cfg = self._get_cfg()
         total = cfg["n_tabela"] + cfg["n_stop"] + cfg["n_hedef"]
         self.progress["maximum"] = total
         self.progress["value"] = 0
-        self._log(f"Üretim başlatılıyor... Toplam: {total} görüntü")
-
+        self._log(f"2D Üretim başlatılıyor... Toplam: {total} görüntü")
         def run():
-            def prog_cb(done, tot):
-                self.root.after(0, lambda: self.progress.configure(value=done))
-            generate_dataset(cfg,
-                             progress_cb=prog_cb,
-                             log_cb=lambda m: self.root.after(0, lambda msg=m: self._log(msg)))
-
+            def prog_cb(done, tot): self.root.after(0, lambda: self.progress.configure(value=done))
+            generate_dataset(cfg, prog_cb, lambda m: self.root.after(0, lambda msg=m: self._log(msg)))
         threading.Thread(target=run, daemon=True).start()
-
 
 if __name__ == "__main__":
     root = tk.Tk()

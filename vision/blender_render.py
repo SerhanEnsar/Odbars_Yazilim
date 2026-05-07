@@ -156,22 +156,25 @@ def create_ground():
 # TABELA (class 0)
 # ─────────────────────────────────────────────
 def create_tabela(text_str, border_color=(0.9, 0.9, 0.9, 1.0), label_class=0):
-    """Şartnameye uygun tabela: metal direk + siyah disk + renkli kenarlık."""
+    """Şartnameye uygun tabela: dikey metal direk + karşıya bakan disk."""
     objs = []
 
-    # 1. Direk (Sign Post)
-    bpy.ops.mesh.primitive_cylinder_add(radius=0.015, depth=2.0, location=(0, 0, -0.7))
+    # 1. Direk (Sign Post) - Z ekseninde dikey
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.015, depth=1.5, location=(0, 0, 0.75))
     post = bpy.context.active_object
     post.name = f"Sign_Post_{label_class}"
     post_mat = make_material(f"PostMat_{label_class}", (0.5, 0.5, 0.5, 1.0))
-    # Metalik yap
     post_mat.node_tree.nodes.get("Principled BSDF").inputs["Metallic"].default_value = 1.0
     post_mat.node_tree.nodes.get("Principled BSDF").inputs["Roughness"].default_value = 0.3
     assign_material(post, post_mat)
     objs.append(post)
 
-    # 2. Disk (60cm çap)
-    bpy.ops.mesh.primitive_circle_add(vertices=64, radius=0.30, fill_type='NGON', location=(0, 0, 0))
+    # Tabela yüksekliği (z=1.2m civarı)
+    tz = 1.2
+
+    # 2. Disk - X ekseninde 90 derece dönük (karşıya bakıyor)
+    bpy.ops.mesh.primitive_circle_add(vertices=64, radius=0.30, fill_type='NGON', 
+                                     location=(0, -0.02, tz), rotation=(math.radians(90), 0, 0))
     disk = bpy.context.active_object
     disk.name = f"Sign_Disk_{label_class}"
     disk_mat = make_material(f"DiskMat_{label_class}", (0.01, 0.01, 0.01, 1.0))
@@ -179,9 +182,10 @@ def create_tabela(text_str, border_color=(0.9, 0.9, 0.9, 1.0), label_class=0):
     assign_material(disk, disk_mat)
     objs.append(disk)
 
-    # 3. Dış kenarlık halkası (Torus)
+    # 3. Dış kenarlık halkası (Torus) - disk ile aynı rotasyon
     bpy.ops.mesh.primitive_torus_add(
-        location=(0, 0, 0.002),
+        location=(0, -0.025, tz),
+        rotation=(math.radians(90), 0, 0),
         major_radius=0.30,
         minor_radius=0.02,
         major_segments=64,
@@ -192,15 +196,15 @@ def create_tabela(text_str, border_color=(0.9, 0.9, 0.9, 1.0), label_class=0):
     assign_material(ring, make_material(f"RingMat_{label_class}", border_color))
     objs.append(ring)
 
-    # 4. Metin (Görev Numarası)
-    bpy.ops.object.text_add(location=(0, 0, 0.005))
+    # 4. Metin (Görev Numarası) - önde
+    bpy.ops.object.text_add(location=(0, -0.03, tz), rotation=(math.radians(90), 0, 0))
     txt_obj = bpy.context.active_object
     txt_obj.name = f"Sign_Text_{label_class}"
     txt_obj.data.body = text_str
     txt_obj.data.align_x = 'CENTER'
     txt_obj.data.align_y = 'CENTER'
-    txt_obj.data.size = 0.20  # Daha büyük ve net
-    txt_obj.data.extrude = 0.005
+    txt_obj.data.size = 0.20
+    txt_obj.data.extrude = 0.01
 
     font_path = CONFIG["font_path"]
     if Path(font_path).exists():
@@ -232,15 +236,17 @@ def create_hedef():
     objs = []
     
     # 1. Direk
-    bpy.ops.mesh.primitive_cylinder_add(radius=0.015, depth=2.0, location=(0, 0, -0.6))
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.015, depth=1.5, location=(0, 0, 0.75))
     post = bpy.context.active_object
     post.name = "Hedef_Post"
     assign_material(post, make_material("PostMat_Hedef", (0.5, 0.5, 0.5, 1.0)))
     post.data.materials[0].node_tree.nodes.get("Principled BSDF").inputs["Metallic"].default_value = 1.0
     objs.append(post)
 
-    # 2. A3 Levha
-    bpy.ops.mesh.primitive_plane_add(size=1, location=(0, 0, 0))
+    hz = 1.0 # Hedef merkezi yüksekliği
+
+    # 2. A3 Levha - Karşıya bakan (X rotasyon 90)
+    bpy.ops.mesh.primitive_plane_add(size=1, location=(0, -0.02, hz), rotation=(math.radians(90), 0, 0))
     plane = bpy.context.active_object
     plane.name = "Hedef_Board"
     plane.scale = (0.297, 0.42, 1.0)
@@ -256,6 +262,7 @@ def create_hedef():
 
     tex_coord = nodes.new("ShaderNodeTexCoord")
     mapping = nodes.new("ShaderNodeMapping")
+    # UV düzeltme: hedef dokusunu ortalamak için mapping ayarı gerekebilir
     gradient = nodes.new("ShaderNodeTexGradient")
     gradient.gradient_type = 'RADIAL'
     color_ramp = nodes.new("ShaderNodeValToRGB")
@@ -277,7 +284,7 @@ def create_hedef():
     objs.append(plane)
 
     # 3. Çerçeve (Backing)
-    bpy.ops.mesh.primitive_plane_add(size=1, location=(0, 0, -0.002))
+    bpy.ops.mesh.primitive_plane_add(size=1, location=(0, -0.015, hz), rotation=(math.radians(90), 0, 0))
     frame = bpy.context.active_object
     frame.name = "Hedef_Frame"
     frame.scale = (0.31, 0.44, 1.0)
@@ -286,7 +293,7 @@ def create_hedef():
     objs.append(frame)
 
     # Parent & Empty
-    bpy.ops.object.empty_add(type='PLAIN_AXES', location=(0,0,0))
+    bpy.ops.object.empty_add(type='PLAIN_AXES', location=(0, 0, 0))
     parent = bpy.context.active_object
     parent.name = "Hedef_Parent"
     for o in objs:
@@ -329,10 +336,10 @@ def setup_lights():
 # ─────────────────────────────────────────────
 # 3D → 2D projeksiyon (YOLO bbox için)
 # ─────────────────────────────────────────────
-def get_2d_bbox(obj, cam, render_w, render_h):
+def get_2d_bbox(parent_obj, cam, render_w, render_h):
     """
-    Nesnenin 3D bounding box köşelerini 2D'ye projekte eder.
-    Normalize edilmiş YOLO koordinatları döner: (cx, cy, w, h)
+    Empty (parent) nesnenin içindeki tüm mesh çocuklarını bulur 
+    ve hepsini kapsayan bir 2D bounding box hesaplar.
     """
     scene = bpy.context.scene
     mat = cam.matrix_world.normalized().inverted()
@@ -340,39 +347,45 @@ def get_2d_bbox(obj, cam, render_w, render_h):
 
     def project(co_world):
         co_cam = mat @ co_world
-        # Kamera koordinat sistemi: z negatif ileriye bakar
-        if co_cam.z >= 0:
-            return None
+        if co_cam.z >= 0: return None
         fov_x = 2 * math.atan(cam_data.sensor_width / (2 * cam_data.lens))
         fov_y = 2 * math.atan(cam_data.sensor_height / (2 * cam_data.lens))
-        # Normalize [-1, 1]
         nx = -co_cam.x / (-co_cam.z * math.tan(fov_x / 2))
         ny =  co_cam.y / (-co_cam.z * math.tan(fov_y / 2))
-        # Pixel
         px = (nx + 1) / 2 * render_w
         py = (1 - (ny + 1) / 2) * render_h
         return (px, py)
 
-    corners = [mathutils.Vector(c) for c in obj.bound_box]
-    world_corners = [obj.matrix_world @ c for c in corners]
+    all_points = []
+    
+    # Parent ve tüm alt nesnelerin (direk, disk, metin) köşelerini topla
+    # Sadece mesh olanları veya text olanları al
+    to_check = [parent_obj] + list(parent_obj.children_recursive)
+    
+    for obj in to_check:
+        if obj.type in ['MESH', 'CURVE', 'FONT']:
+            # bound_box yerel koordinattadır, dünya koordinatına çevir
+            corners = [obj.matrix_world @ mathutils.Vector(c) for c in obj.bound_box]
+            for c in corners:
+                p = project(c)
+                if p: all_points.append(p)
 
-    points_2d = [project(c) for c in world_corners]
-    points_2d = [p for p in points_2d if p is not None]
-    if not points_2d:
+    if not all_points:
         return None
 
-    xs = [p[0] for p in points_2d]
-    ys = [p[1] for p in points_2d]
+    xs = [p[0] for p in all_points]
+    ys = [p[1] for p in all_points]
+    
     x1, x2 = max(0, min(xs)), min(render_w, max(xs))
     y1, y2 = max(0, min(ys)), min(render_h, max(ys))
 
-    if x2 <= x1 or y2 <= y1:
-        return None
+    if (x2 - x1) < 1 or (y2 - y1) < 1: return None
 
     cx = ((x1 + x2) / 2) / render_w
     cy = ((y1 + y2) / 2) / render_h
     bw = (x2 - x1) / render_w
     bh = (y2 - y1) / render_h
+    
     return (cx, cy, bw, bh)
 
 
@@ -464,13 +477,10 @@ def main():
         created_pairs = []  # (class_id, obj)
         for cls_id in class_ids:
             obj = creators[cls_id]()
-            # Tabela / hedef sahneye dik durur (X ekseninde 90° döndür)
-            obj.rotation_euler.x = math.radians(90)
-            # Rastgele konum (zemin düzlemi üzerinde dikey)
+            # Artık içerde dikey yapılıyor, burada ek rotasyona gerek yok
             ox = random.uniform(-4, 4)
             oy = random.uniform(-4, 4)
-            oz = random.uniform(0.4, 1.6)   # yerden yükseklik
-            obj.location = mathutils.Vector((ox, oy, oz))
+            obj.location = mathutils.Vector((ox, oy, 0)) # Zemin üzerinde (z=0)
             created_pairs.append((cls_id, obj))
 
         # Kamerayı ilk nesneye yönelt (ya da rastgele bir noktaya)
@@ -495,4 +505,16 @@ def main():
 
 
 if __name__ == "__main__":
+    import sys
+    # Komut satırı argümanlarını kontrol et: blender --python script.py -- --config path.json
+    if "--" in sys.argv:
+        args = sys.argv[sys.argv.index("--") + 1:]
+        if args and args[0].endswith(".json"):
+            config_path = Path(args[0])
+            if config_path.exists():
+                with open(config_path, 'r') as f:
+                    new_cfg = json.load(f)
+                    CONFIG.update(new_cfg)
+                    print(f"✅ Harici konfigürasyon yüklendi: {config_path.name}")
+
     main()
