@@ -117,54 +117,42 @@ def draw_tabela(canvas, x, y, radius):
     return canvas
 
 
-def draw_stop(canvas, x, y, w, h):
+def draw_stop(canvas, x, y, radius):
     """
-    Şartnameye göre: Rampa yüzeyi üzerine BOYANMIŞ yazı (levha değil).
-    Beton/asfalt zemin rengi + beyaz/sarı kalın "STOP" yazısı.
-    Perspective eğriltmesi Roboflow augmentation'da halledilecek.
+    STOP tabelası: Tabela ile aynı dairesel levha formatı.
+    Şartneme parkur görselinde de dairesel levha olarak gösterilmiş.
+    Siyah dolu daire, beyaz kenarlık, Arial Black ile 'STOP' yazısı.
     """
-    # Rampa yüzeyi rengi (beton gri tonları, hafif dokulu)
-    ramp_colors = [
-        (110, 115, 112), (130, 128, 125), (95, 98, 96),
-        (140, 138, 133), (120, 122, 118),
-    ]
-    ramp_color = random.choice(ramp_colors)
-
-    # Yüzey alanını boya (rampa zemini simülasyonu)
-    roi = canvas[y:y+h, x:x+w]
-    roi[:] = ramp_color
-    # Hafif gürültü → zemin dokusu
-    noise = np.random.randint(-18, 18, roi.shape, dtype=np.int16)
-    roi = np.clip(roi.astype(np.int16) + noise, 0, 255).astype(np.uint8)
-    canvas[y:y+h, x:x+w] = roi
-
-    # Yazı rengi: Beyaz veya sarı (yol boyası)
-    text_color = random.choice([(255, 255, 255), (240, 230, 30), (255, 250, 200)])
+    # Dış daire — kırmızı gölgeli siyah (stop renk vurgusu)
+    cv2.circle(canvas, (x, y), radius, (8, 8, 8), -1)
+    border_t = max(3, radius // 8)
+    # Kırmızı dış kenarlık (STOP levhası vurgusu)
+    cv2.circle(canvas, (x, y), radius, (30, 30, 200), border_t)
+    # İç beyaz halka
+    inner_r = int(radius * 0.82)
+    cv2.circle(canvas, (x, y), inner_r, (200, 200, 200), max(1, border_t // 2))
 
     if PIL_AVAILABLE:
-        font_size = max(14, int(h * 0.65))
+        font_size = max(12, radius // 2)
         font = get_font(font_size)
         pil_img = cv_to_pil(canvas)
         draw   = ImageDraw.Draw(pil_img)
 
         bbox = draw.textbbox((0, 0), "STOP", font=font)
         tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
-        tx = x + (w - tw) // 2
-        ty = y + (h - th) // 2
+        tx = x - tw // 2
+        ty = y - th // 2
 
-        # İnce siyah kontur (yol boyası etkisi)
-        for dx, dy in [(-1, -1), (1, -1), (-1, 1), (1, 1)]:
-            draw.text((tx + dx, ty + dy), "STOP", font=font, fill=(0, 0, 0))
-        draw.text((tx, ty), "STOP", font=font, fill=text_color)
+        # Gölge + beyaz metin
+        draw.text((tx + 1, ty + 1), "STOP", font=font, fill=(40, 40, 40))
+        draw.text((tx, ty), "STOP", font=font, fill=(230, 230, 230))
         canvas = pil_to_cv(pil_img)
     else:
-        fs = w / 130.0
-        th = max(2, int(w / 30))
+        fs = radius / 50.0
+        th = max(1, radius // 16)
         (tw, _), _ = cv2.getTextSize("STOP", cv2.FONT_HERSHEY_DUPLEX, fs, th)
-        tx = x + (w - tw) // 2
-        ty = y + (h + int(h * 0.3)) // 2
-        cv2.putText(canvas, "STOP", (tx, ty),
-                    cv2.FONT_HERSHEY_DUPLEX, fs, (255, 255, 255), th, cv2.LINE_AA)
+        cv2.putText(canvas, "STOP", (x - tw // 2, y + int(radius * 0.15)),
+                    cv2.FONT_HERSHEY_DUPLEX, fs, (225, 225, 225), th, cv2.LINE_AA)
     return canvas
 
 
@@ -275,13 +263,12 @@ def generate(n_images, bg_dir, split="train"):
                 canvas = draw_tabela(canvas, x, y, radius)
                 write_label(lbl_path, 0, x - radius, y - radius, radius * 2, radius * 2)
 
-            elif class_id == 1:  # stop (zemin yazısı)
-                w = random.randint(100, 260)
-                h = random.randint(45, 110)
-                x = random.randint(0, IMG_W - w)
-                y = random.randint(0, IMG_H - h)
-                canvas = draw_stop(canvas, x, y, w, h)
-                write_label(lbl_path, 1, x, y, w, h)
+            elif class_id == 1:  # stop levhası (tabela formatında, kırmızı kenarlık)
+                radius = random.randint(35, 110)
+                x = random.randint(radius + 5, IMG_W - radius - 5)
+                y = random.randint(radius + 5, IMG_H - radius - 5)
+                canvas = draw_stop(canvas, x, y, radius)
+                write_label(lbl_path, 1, x - radius, y - radius, radius * 2, radius * 2)
 
             elif class_id == 2:  # hedef
                 w = random.randint(60, 200)
