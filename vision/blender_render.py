@@ -25,7 +25,7 @@ from pathlib import Path
 # AYARLAR — ihtiyaca göre değiştirin
 # ─────────────────────────────────────────────
 CONFIG = {
-    "n_renders":      20,           # ← istediğin sayıyı gir
+    "n_renders":      5,           # ← istediğin sayıyı gir
     "output_dir":     "/Users/serhanensar/Desktop/Renders",
     "terrain_dir":    "/Users/serhanensar/Desktop/Terrains",            # ← PNG/JPG'lerin bulunduğu klasör yolu (boş = düz renk)
     "font_path":      "/System/Library/Fonts/Supplemental/Arial Black.ttf",
@@ -33,12 +33,11 @@ CONFIG = {
     "render_h":       1080,
     "class_weights":  [0.4, 0.3, 0.3],
     "camera_distance_range": (1.5, 8.0),
-    "camera_height_range":   (0.3, 2.5),
+    "camera_height_range":   (0.2, 0.5),    # Araç kamerası yüksekliği (metre)
 }
 
-TABELA_TEXTS = ["SU GECISI", "TASLI YOL", "KAYAR ENGEL",
-                "DIK EGIM", "YAN EGIM", "ATIS",
-                "1", "2", "3", "4", "5", "6", "7"]
+# Şartname: tabelada sadece görev numarası yazıyor
+TABELA_TEXTS = ["1", "2", "3", "4", "5", "6", "7"]
 
 OUT = Path(CONFIG["output_dir"])
 (OUT / "images" / "train").mkdir(parents=True, exist_ok=True)
@@ -348,18 +347,28 @@ def get_2d_bbox(obj, cam, render_w, render_h):
 # Kamerayı rastgele konumlandır, nesneye baktır
 # ─────────────────────────────────────────────
 def aim_camera_at(cam, target_loc):
+    """
+    Araç kamerası perspektifi:
+    - Kamera zemine yakın (20-50cm), sabit öne bakan açıda
+    - Nesne kameranın önünde, parkur kenarında dikey duruyor
+    - Uzaklık 2-8m arası rastgele
+    """
     d_min, d_max = CONFIG["camera_distance_range"]
     h_min, h_max = CONFIG["camera_height_range"]
-    dist = random.uniform(d_min, d_max)
-    angle = random.uniform(0, 2 * math.pi)
-    height = random.uniform(h_min, h_max)
+
+    dist   = random.uniform(d_min, d_max)
+    # Yalnızca kameranın önünden (120° yatay açı) bakış
+    angle  = random.uniform(-math.pi * 0.33, math.pi * 0.33)
+    # Kamera zemin seviyesinde
+    cam_h  = random.uniform(h_min, h_max)
 
     cam.location = mathutils.Vector((
-        target_loc.x + dist * math.cos(angle),
-        target_loc.y + dist * math.sin(angle),
-        target_loc.z + height,
+        target_loc.x - dist * math.sin(angle),  # nesnenin önünde
+        target_loc.y - dist * math.cos(angle),
+        cam_h,                                   # zemine yakın sabit yükseklik
     ))
-    # Nesneye baktır
+
+    # Kamera nesnenin merkezine doğrudan baktırılır
     direction = target_loc - cam.location
     rot = direction.to_track_quat('-Z', 'Y')
     cam.rotation_euler = rot.to_euler()
