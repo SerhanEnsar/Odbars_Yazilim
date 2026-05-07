@@ -25,9 +25,9 @@ from pathlib import Path
 # AYARLAR — ihtiyaca göre değiştirin
 # ─────────────────────────────────────────────
 CONFIG = {
-    "n_renders":      200,           # ← istediğin sayıyı gir
+    "n_renders":      20,           # ← istediğin sayıyı gir
     "output_dir":     "/Users/serhanensar/Desktop/Renders",
-    "terrain_dir":    "",            # ← PNG/JPG'lerin bulunduğu klasör yolu (boş = düz renk)
+    "terrain_dir":    "/Users/serhanensar/Desktop/Terrains",            # ← PNG/JPG'lerin bulunduğu klasör yolu (boş = düz renk)
     "font_path":      "/System/Library/Fonts/Supplemental/Arial Black.ttf",
     "render_w":       1920,
     "render_h":       1080,
@@ -409,7 +409,7 @@ def main():
         bpy.ops.object.delete()
 
         # Zemin
-        create_ground(CONFIG["terrain_image"])
+        create_ground()  # terrain_dir'den otomatik rastgele seçer
 
         # Sınıf seç (1–3 nesne arası)
         n_objects = random.randint(1, 3)
