@@ -1,17 +1,14 @@
 """
-ODBARS Sentetik Veri Üretici
-==============================
-Şartnamede tanımlanan 3 nesne sınıfını programatik olarak üretir:
-  0: tabela  - 60cm çaplı daire, siyah zemin, beyaz metin
-  1: stop    - "STOP" yazısı (dik eğim üzerindeki işaret)
-  2: hedef   - A3 boyutunda atış hedefi
+ODBARS Sentetik Veri Üretici (v2 — Şartnameye Uyumlu)
+=======================================================
+Şartname referansları:
+  - Tabela: "Arial Black" yazı tipi, dış çapı 60cm, siyah zemin, beyaz kenarlık  (s.13)
+  - STOP:   Rampa yüzeyi üzerine boyanmış yazı (levha değil)                      (s.15)
+  - Hedef:  A3 boyutunda, çerçeveli, Şekil 5 benzeri atış hedefi                  (s.15)
 
 Kullanım:
-    python synth_gen.py --n 200 --bg_dir backgrounds/
-
-Çıktı:
-    dataset/images/train/*.jpg
-    dataset/labels/train/*.txt   (YOLO formatı)
+    python synth_gen.py --n 200
+    python synth_gen.py --n 200 --bg_dir backgrounds/ --preview
 """
 
 import cv2
@@ -21,10 +18,56 @@ import random
 import argparse
 from pathlib import Path
 
-# --- Ayarlar ---
-IMG_W, IMG_H = 640, 640
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
+    print("⚠️  Pillow kurulu değil. 'pip install Pillow' ile kurun (Arial Black için gerekli).")
+
+IMG_W, IMG_H  = 640, 640
 DATASET_ROOT  = Path(__file__).parent / "dataset"
-CLASSES       = {0: "tabela", 1: "stop", 2: "hedef"}
+
+# Şartnamede geçen parkur aşaması isimleri (tabela metinleri)
+TABELA_TEXTS = [
+    "SU GEÇİŞİ", "TAŞLI YOL", "KAYAR ENGEL",
+    "TABELA", "DİK EĞİM", "YAN EĞİM", "ATIŞ",
+    "1", "2", "3", "4", "5", "6", "7",
+]
+
+# ─────────────────────────────────────────────
+# Arial Black font yükleyici (PIL)
+# ─────────────────────────────────────────────
+
+def get_font(size=24):
+    """Arial Black fontunu yükler. Bulunamazsa en yakın alternatifi döner."""
+    if not PIL_AVAILABLE:
+        return None
+
+    # macOS / Linux / Windows için olası font yolları
+    candidates = [
+        "/System/Library/Fonts/Supplemental/Arial Black.ttf",  # macOS
+        "/usr/share/fonts/truetype/msttcorefonts/Arial_Black.ttf",  # Linux
+        "C:/Windows/Fonts/ariblk.ttf",  # Windows
+        # Alternatifler (Arial Black yoksa)
+        "/System/Library/Fonts/Helvetica.ttc",
+        "/System/Library/Fonts/HelveticaNeue.ttc",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    ]
+    for path in candidates:
+        if Path(path).exists():
+            try:
+                return ImageFont.truetype(path, size)
+            except Exception:
+                continue
+    return ImageFont.load_default()
+
+
+def pil_to_cv(pil_img):
+    return cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
+
+def cv_to_pil(cv_img):
+    return Image.fromarray(cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB))
 
 
 # ─────────────────────────────────────────────
@@ -33,70 +76,131 @@ CLASSES       = {0: "tabela", 1: "stop", 2: "hedef"}
 
 def draw_tabela(canvas, x, y, radius):
     """
-    Şartnameye göre: dış çapı 60cm, siyah zemin, beyaz kenarlık + metin.
-    x, y → merkez piksel koordinatı
-    radius → piksel cinsinden yarıçap
+    Şartnameye göre:
+    - Siyah dolu daire, beyaz kenarlık halkası
+    - İçinde Arial Black ile aşama ismi/numarası
+    x, y → merkez piksel | radius → piksel yarıçap
     """
-    # Dış daire (siyah dolgu)
-    cv2.circle(canvas, (x, y), radius, (10, 10, 10), -1)
-    # Beyaz kenarlık halkası
-    cv2.circle(canvas, (x, y), radius, (240, 240, 240), max(3, radius // 10))
-    # Merkezdeki metin (parkur adı placeholder)
-    label_text = random.choice(["SU", "TAS", "EGIM", "ATIS", "1", "2", "3"])
-    font_scale = radius / 40.0
-    thickness  = max(1, int(radius / 20))
-    (tw, th), _ = cv2.getTextSize(label_text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, thickness)
-    cv2.putText(canvas, label_text,
-                (x - tw // 2, y + th // 2),
-                cv2.FONT_HERSHEY_SIMPLEX, font_scale,
-                (230, 230, 230), thickness, cv2.LINE_AA)
+    # ─ OpenCV ile zemin şeklini çiz ─
+    cv2.circle(canvas, (x, y), radius, (8, 8, 8), -1)           # siyah dolgu
+    border_t = max(3, radius // 8)
+    cv2.circle(canvas, (x, y), radius, (240, 240, 240), border_t)  # beyaz kenarlık
+    # İçte ince beyaz halka
+    inner_r = int(radius * 0.82)
+    cv2.circle(canvas, (x, y), inner_r, (220, 220, 220), max(1, border_t // 2))
+
+    # ─ PIL ile Arial Black yazısı ─
+    text = random.choice(TABELA_TEXTS)
+    if PIL_AVAILABLE:
+        font_size = max(12, radius // 2)
+        font = get_font(font_size)
+        pil_img = cv_to_pil(canvas)
+        draw   = ImageDraw.Draw(pil_img)
+
+        # Metin boyutunu al ve ortala
+        bbox = draw.textbbox((0, 0), text, font=font)
+        tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
+        tx = x - tw // 2
+        ty = y - th // 2
+
+        # Beyaz gölge + beyaz metin
+        draw.text((tx + 1, ty + 1), text, font=font, fill=(60, 60, 60))
+        draw.text((tx, ty), text, font=font, fill=(235, 235, 235))
+        canvas = pil_to_cv(pil_img)
+    else:
+        # Fallback: OpenCV font
+        fs = radius / 60.0
+        th = max(1, radius // 18)
+        (tw, _), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_DUPLEX, fs, th)
+        cv2.putText(canvas, text, (x - tw // 2, y + int(radius * 0.18)),
+                    cv2.FONT_HERSHEY_DUPLEX, fs, (225, 225, 225), th, cv2.LINE_AA)
     return canvas
 
 
 def draw_stop(canvas, x, y, w, h):
     """
-    STOP yazısı: Sarı/beyaz zemin üzerine koyu kırmızı kalın yazı.
-    Rampa üzerinde çarpık (perspective) görünebilir — augmentation ile halledilecek.
+    Şartnameye göre: Rampa yüzeyi üzerine BOYANMIŞ yazı (levha değil).
+    Beton/asfalt zemin rengi + beyaz/sarı kalın "STOP" yazısı.
+    Perspective eğriltmesi Roboflow augmentation'da halledilecek.
     """
-    # Zemin dikdörtgen
-    bg_color = random.choice([(240, 240, 200), (255, 255, 255), (200, 200, 180)])
-    cv2.rectangle(canvas, (x, y), (x + w, y + h), bg_color, -1)
-    cv2.rectangle(canvas, (x, y), (x + w, y + h), (60, 60, 60), 2)
+    # Rampa yüzeyi rengi (beton gri tonları, hafif dokulu)
+    ramp_colors = [
+        (110, 115, 112), (130, 128, 125), (95, 98, 96),
+        (140, 138, 133), (120, 122, 118),
+    ]
+    ramp_color = random.choice(ramp_colors)
 
-    # STOP metni
-    font_scale = w / 120.0
-    thickness  = max(2, int(w / 40))
-    text = "STOP"
-    (tw, th), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_DUPLEX, font_scale, thickness)
-    tx = x + (w - tw) // 2
-    ty = y + (h + th) // 2
-    cv2.putText(canvas, text, (tx, ty),
-                cv2.FONT_HERSHEY_DUPLEX, font_scale,
-                (20, 20, 180), thickness, cv2.LINE_AA)
+    # Yüzey alanını boya (rampa zemini simülasyonu)
+    roi = canvas[y:y+h, x:x+w]
+    roi[:] = ramp_color
+    # Hafif gürültü → zemin dokusu
+    noise = np.random.randint(-18, 18, roi.shape, dtype=np.int16)
+    roi = np.clip(roi.astype(np.int16) + noise, 0, 255).astype(np.uint8)
+    canvas[y:y+h, x:x+w] = roi
+
+    # Yazı rengi: Beyaz veya sarı (yol boyası)
+    text_color = random.choice([(255, 255, 255), (240, 230, 30), (255, 250, 200)])
+
+    if PIL_AVAILABLE:
+        font_size = max(14, int(h * 0.65))
+        font = get_font(font_size)
+        pil_img = cv_to_pil(canvas)
+        draw   = ImageDraw.Draw(pil_img)
+
+        bbox = draw.textbbox((0, 0), "STOP", font=font)
+        tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
+        tx = x + (w - tw) // 2
+        ty = y + (h - th) // 2
+
+        # İnce siyah kontur (yol boyası etkisi)
+        for dx, dy in [(-1, -1), (1, -1), (-1, 1), (1, 1)]:
+            draw.text((tx + dx, ty + dy), "STOP", font=font, fill=(0, 0, 0))
+        draw.text((tx, ty), "STOP", font=font, fill=text_color)
+        canvas = pil_to_cv(pil_img)
+    else:
+        fs = w / 130.0
+        th = max(2, int(w / 30))
+        (tw, _), _ = cv2.getTextSize("STOP", cv2.FONT_HERSHEY_DUPLEX, fs, th)
+        tx = x + (w - tw) // 2
+        ty = y + (h + int(h * 0.3)) // 2
+        cv2.putText(canvas, "STOP", (tx, ty),
+                    cv2.FONT_HERSHEY_DUPLEX, fs, (255, 255, 255), th, cv2.LINE_AA)
     return canvas
 
 
 def draw_hedef(canvas, x, y, w, h):
     """
-    Atış hedefi: Şekil 5'e göre çerçeveli A3 poster.
-    Eşmerkezli daireler (kırmızı/siyah/beyaz) + merkez nokta.
+    Şekil 5 — A3 boyutunda atış hedefi, çerçeveli.
+    Eşmerkezli daireler: dıştan içe kırmızı→beyaz→siyah→beyaz→kırmızı.
+    Merkez: siyah nokta.
     """
     cx, cy = x + w // 2, y + h // 2
-    max_r  = min(w, h) // 2
+    max_r  = min(w, h) // 2 - 4
 
-    # Dış çerçeve
-    cv2.rectangle(canvas, (x, y), (x + w, y + h), (40, 40, 40), 2)
-    cv2.rectangle(canvas, (x, y), (x + w, y + h), (220, 220, 220), -1)
+    # Beyaz çerçeve arkaplan
+    cv2.rectangle(canvas, (x, y), (x + w, y + h), (245, 245, 245), -1)
+    cv2.rectangle(canvas, (x, y), (x + w, y + h), (30, 30, 30), 2)
 
-    # Eşmerkezli halkalar (dıştan içe: kırmızı, beyaz, siyah, beyaz, kırmızı)
-    colors = [(0, 0, 200), (220, 220, 220), (30, 30, 30), (220, 220, 220), (0, 0, 200)]
-    for i, color in enumerate(colors):
-        r = int(max_r * (1.0 - i * 0.18))
-        if r > 2:
+    # Eşmerkezli halkalar (Şekil 5'e uygun)
+    rings = [
+        (1.00, (30,  30,  30)),   # dış → siyah
+        (0.80, (220, 220, 220)),  # beyaz
+        (0.60, (20,  20,  180)), # mavi/kırmızı
+        (0.40, (220, 220, 220)),  # beyaz
+        (0.20, (20,  20,  180)), # iç kırmızı/mavi
+    ]
+    for ratio, color in rings:
+        r = int(max_r * ratio)
+        if r > 1:
             cv2.circle(canvas, (cx, cy), r, color, -1)
 
+    # Artı (crosshair) çizgileri
+    line_color = (60, 60, 60)
+    cv2.line(canvas, (cx - max_r, cy), (cx + max_r, cy), line_color, 1)
+    cv2.line(canvas, (cx, cy - max_r), (cx, cy + max_r), line_color, 1)
+
     # Merkez nokta
-    cv2.circle(canvas, (cx, cy), max(2, max_r // 10), (0, 0, 0), -1)
+    cv2.circle(canvas, (cx, cy), max(2, max_r // 8), (255, 255, 255), -1)
     return canvas
 
 
@@ -105,7 +209,6 @@ def draw_hedef(canvas, x, y, w, h):
 # ─────────────────────────────────────────────
 
 def load_backgrounds(bg_dir):
-    """Arka plan görüntülerini yükler. Yoksa düz renkli arka planlar üretir."""
     bgs = []
     if bg_dir and Path(bg_dir).exists():
         for ext in ["*.jpg", "*.png", "*.jpeg"]:
@@ -113,16 +216,20 @@ def load_backgrounds(bg_dir):
                 img = cv2.imread(str(p))
                 if img is not None:
                     bgs.append(cv2.resize(img, (IMG_W, IMG_H)))
-    
+
     if not bgs:
-        print("⚠️  Arka plan klasörü bulunamadı, düz renkli arka planlar kullanılıyor.")
-        for _ in range(20):
-            color = [random.randint(60, 180) for _ in range(3)]
-            bg = np.full((IMG_H, IMG_W, 3), color, dtype=np.uint8)
-            # Hafif gürültü ekle (daha gerçekçi)
-            noise = np.random.randint(0, 15, (IMG_H, IMG_W, 3), dtype=np.uint8)
-            bgs.append(cv2.add(bg, noise))
-    
+        print("⚠️  Arka plan bulunamadı → düz renkli arka planlar kullanılıyor.")
+        terrains = [
+            (90, 85, 75),   # kum/toprak
+            (110, 115, 108),# kaya/beton
+            (70, 90, 65),   # çimen
+            (130, 125, 115),# çakıl
+        ]
+        for color in terrains:
+            for _ in range(5):
+                bg = np.full((IMG_H, IMG_W, 3), color, dtype=np.uint8)
+                noise = np.random.randint(0, 25, (IMG_H, IMG_W, 3), dtype=np.uint8)
+                bgs.append(cv2.add(bg, noise))
     return bgs
 
 
@@ -130,12 +237,11 @@ def load_backgrounds(bg_dir):
 # YOLO label yazar
 # ─────────────────────────────────────────────
 
-def write_label(label_path, class_id, x, y, w, h, img_w=IMG_W, img_h=IMG_H):
-    """YOLO normalize formatında label dosyası yazar."""
-    cx = (x + w / 2) / img_w
-    cy = (y + h / 2) / img_h
-    nw = w / img_w
-    nh = h / img_h
+def write_label(label_path, class_id, x, y, w, h):
+    cx = (x + w / 2) / IMG_W
+    cy = (y + h / 2) / IMG_H
+    nw = w / IMG_W
+    nh = h / IMG_H
     with open(label_path, 'a') as f:
         f.write(f"{class_id} {cx:.6f} {cy:.6f} {nw:.6f} {nh:.6f}\n")
 
@@ -145,87 +251,83 @@ def write_label(label_path, class_id, x, y, w, h, img_w=IMG_W, img_h=IMG_H):
 # ─────────────────────────────────────────────
 
 def generate(n_images, bg_dir, split="train"):
-    out_img_dir = DATASET_ROOT / "images" / split
-    out_lbl_dir = DATASET_ROOT / "labels" / split
-    out_img_dir.mkdir(parents=True, exist_ok=True)
-    out_lbl_dir.mkdir(parents=True, exist_ok=True)
+    out_img = DATASET_ROOT / "images" / split
+    out_lbl = DATASET_ROOT / "labels" / split
+    out_img.mkdir(parents=True, exist_ok=True)
+    out_lbl.mkdir(parents=True, exist_ok=True)
 
-    backgrounds = load_backgrounds(bg_dir)
+    bgs = load_backgrounds(bg_dir)
     count = 0
 
     for i in range(n_images):
-        # Rastgele arka plan seç ve kopyala
-        canvas = random.choice(backgrounds).copy()
-        label_path = out_lbl_dir / f"synth_{i:05d}.txt"
+        canvas = random.choice(bgs).copy()
+        lbl_path = out_lbl / f"synth_{i:05d}.txt"
 
-        # Her görüntüde 1-3 rastgele nesne yerleştir
         n_objects = random.randint(1, 3)
-        placed    = []
 
         for _ in range(n_objects):
-            class_id = random.choice(list(CLASSES.keys()))
+            class_id = random.choice([0, 1, 2])
 
             if class_id == 0:  # tabela
-                radius = random.randint(30, 100)
-                x = random.randint(radius, IMG_W - radius)
-                y = random.randint(radius, IMG_H - radius)
-                draw_tabela(canvas, x, y, radius)
-                bx, by = x - radius, y - radius
-                bw = bh = radius * 2
-                write_label(label_path, class_id, bx, by, bw, bh)
+                radius = random.randint(35, 110)
+                x = random.randint(radius + 5, IMG_W - radius - 5)
+                y = random.randint(radius + 5, IMG_H - radius - 5)
+                canvas = draw_tabela(canvas, x, y, radius)
+                write_label(lbl_path, 0, x - radius, y - radius, radius * 2, radius * 2)
 
-            elif class_id == 1:  # stop
-                w = random.randint(80, 220)
-                h = random.randint(40, 100)
+            elif class_id == 1:  # stop (zemin yazısı)
+                w = random.randint(100, 260)
+                h = random.randint(45, 110)
                 x = random.randint(0, IMG_W - w)
                 y = random.randint(0, IMG_H - h)
-                draw_stop(canvas, x, y, w, h)
-                write_label(label_path, class_id, x, y, w, h)
+                canvas = draw_stop(canvas, x, y, w, h)
+                write_label(lbl_path, 1, x, y, w, h)
 
             elif class_id == 2:  # hedef
-                w = random.randint(60, 180)
-                h = int(w * 1.41)  # A3 en-boy oranı
-                if h > IMG_H: h = IMG_H - 20
+                w = random.randint(60, 200)
+                h = int(w * 1.41)
+                if y + h > IMG_H: h = IMG_H - 20
                 x = random.randint(0, IMG_W - w)
                 y = random.randint(0, IMG_H - h)
-                draw_hedef(canvas, x, y, w, h)
-                write_label(label_path, class_id, x, y, w, h)
+                canvas = draw_hedef(canvas, x, y, w, h)
+                write_label(lbl_path, 2, x, y, w, h)
 
-        # Hafif gaussian blur (gerçekçilik)
-        if random.random() > 0.5:
-            canvas = cv2.GaussianBlur(canvas, (3, 3), 0)
+        # Hafif blur (hareket + odak simülasyonu)
+        if random.random() > 0.6:
+            k = random.choice([3, 5])
+            canvas = cv2.GaussianBlur(canvas, (k, k), 0)
 
-        img_path = out_img_dir / f"synth_{i:05d}.jpg"
-        cv2.imwrite(str(img_path), canvas, [cv2.IMWRITE_JPEG_QUALITY, 90])
+        cv2.imwrite(str(out_img / f"synth_{i:05d}.jpg"), canvas,
+                    [cv2.IMWRITE_JPEG_QUALITY, 92])
         count += 1
+        if count % 50 == 0:
+            print(f"  {count}/{n_images} üretildi...")
 
-    print(f"✅ {count} sentetik görüntü üretildi → {out_img_dir}")
-    print(f"   Etiketler                      → {out_lbl_dir}")
+    print(f"✅ {count} görüntü → {out_img}")
+    print(f"   Etiketler   → {out_lbl}")
 
 
-# ─────────────────────────────────────────────
-# Önizleme: ilk N görüntüyü göster
-# ─────────────────────────────────────────────
-
-def preview(n=5, split="train"):
+def preview(n=6, split="train"):
     img_dir = DATASET_ROOT / "images" / split
-    images  = list(img_dir.glob("*.jpg"))[:n]
-    for img_path in images:
-        img = cv2.imread(str(img_path))
-        cv2.imshow(img_path.name, img)
+    images  = sorted(img_dir.glob("*.jpg"))[:n]
+    for p in images:
+        img = cv2.imread(str(p))
+        if img is not None:
+            cv2.imshow(p.name, img)
+    print("Herhangi bir tuşa basın...")
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="ODBARS Sentetik Veri Üretici")
-    parser.add_argument("--n",      type=int, default=200,  help="Üretilecek görüntü sayısı")
-    parser.add_argument("--bg_dir", type=str, default=None, help="Arka plan görüntü klasörü")
-    parser.add_argument("--split",  type=str, default="train", choices=["train", "val", "test"])
-    parser.add_argument("--preview",action="store_true",    help="Üretilen görüntüleri önizle")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--n",       type=int,  default=200)
+    parser.add_argument("--bg_dir",  type=str,  default=None)
+    parser.add_argument("--split",   type=str,  default="train",
+                        choices=["train", "val", "test"])
+    parser.add_argument("--preview", action="store_true")
     args = parser.parse_args()
 
     generate(args.n, args.bg_dir, args.split)
-
     if args.preview:
-        preview(5, args.split)
+        preview(6, args.split)
