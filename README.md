@@ -6,12 +6,12 @@ ODBARS (Otonom Düşman Bulma ve Analiz Robotik Sistemi) is the software suite d
 
 <table>
   <tr>
-    <td><img src="docs/images/gcs_01.png" width="480"/></td>
-    <td><img src="docs/images/gcs_02.png" width="480"/></td>
+    <td><img src="docs/images/gcs_01.png" width="460"/></td>
+    <td><img src="docs/images/gcs_02.png" width="460"/></td>
   </tr>
   <tr>
-    <td><img src="docs/images/gcs_03.png" width="480"/></td>
-    <td><img src="docs/images/gcs_04.png" width="480"/></td>
+    <td><img src="docs/images/gcs_04.png" width="460"/></td>
+    <td align="center"><img src="docs/images/gcs_03.png" height="300"/></td>
   </tr>
 </table>
 
