@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Serhan Ensar. All rights reserved.
 import React, { useState, useEffect } from 'react';
 import { 
   Activity, Battery, Camera, Crosshair, ShieldAlert, Wifi, Zap, Terminal, 
