@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Serhan Ensar. All rights reserved.
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Activity, Battery, Camera, Crosshair, ShieldAlert, Wifi, Zap, Terminal, 
@@ -544,9 +545,6 @@ export default function App() {
                 <div className="absolute inset-0 flex items-center justify-center opacity-40">
                   <div className="w-full h-[1px] bg-[#f59e0b]/50 absolute"></div>
                   <div className="h-full w-[1px] bg-[#f59e0b]/50 absolute"></div>
-                </div>
-                <div className="absolute top-1/2 left-1/3 w-20 h-28 border-2 border-[#f59e0b] bg-[#f59e0b]/20 flex flex-col justify-end shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                  <div className="bg-[#f59e0b] text-black text-[9px] font-bold px-1 uppercase tracking-widest">TGT: ENGEL (82%)</div>
                 </div>
               </div>
             </div>

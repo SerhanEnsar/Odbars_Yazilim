@@ -1,3 +1,4 @@
+# Copyright (c) 2026 Serhan Ensar. All rights reserved.
 """
 ODBARS Sentetik Veri Üretici (v2 — Şartnameye Uyumlu)
 =======================================================

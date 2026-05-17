@@ -1,3 +1,4 @@
+# Copyright (c) 2026 Serhan Ensar. All rights reserved.
 import cv2
 import time
 import numpy as np
