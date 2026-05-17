@@ -1,6 +1,6 @@
-# 🛩️ ODBARS — TEKNOFEST 2026 AI in Aviation Ground Control Station
+# 🚗 ODBARS — TEKNOFEST 2026 İnsansız Kara Aracı Yer Kontrol Sistemi
 
-ODBARS (Otonom Düşman Bulma ve Analiz Robotik Sistemi) is the software suite developed for the TEKNOFEST 2026 "Artificial Intelligence in Aviation" competition. It consists of a React/Electron-based Ground Control Station (GCS) panel and a Python-based autonomous agent.
+ODBARS (Otonom Düşman Bulma ve Analiz Robotik Sistemi) is the software suite developed for the TEKNOFEST 2026 Unmanned Ground Vehicle (UGV) competition. It consists of a React/Electron-based Ground Control Station (GCS) panel and a Python-based autonomous agent.
 
 ## 📸 Screenshots
 
@@ -17,7 +17,7 @@ ODBARS (Otonom Düşman Bulma ve Analiz Robotik Sistemi) is the software suite d
 
 ## 🏆 Competition
 
-- **Event:** TEKNOFEST 2026 — Yapay Zeka İnsansız Hava Araçları Yarışması (AI in Aviation)
+- **Event:** TEKNOFEST 2026 — İnsansız Kara Araçları Yarışması (UGV)
 - **Category:** Autonomous target detection and analysis
 - **Language:** Turkish (Türkçe)
 
@@ -34,7 +34,7 @@ Odbars_Yazilim/
 
 ### GCS Panel (`panel/`)
 - **Real-time telemetry display** — Battery, activity, signal status
-- **Camera feed integration** — Live video from UAV
+- **Camera feed integration** — Live video from UGV
 - **Mission control UI** — Built with React + Lucide icons
 - **Desktop app** — Packaged with Electron for offline field use
 
