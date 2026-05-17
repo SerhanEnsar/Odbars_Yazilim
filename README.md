@@ -73,6 +73,10 @@ cd agent
 
 See [`docs/system/architecture.md`](docs/system/architecture.md) for full system design.
 
+## 👨‍💻 Developer
+
+Created and developed by **[Serhan Ensar](https://github.com/SerhanEnsar)**.
+
 ## 📄 License
 
 MIT
